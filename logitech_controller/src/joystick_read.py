@@ -1,33 +1,8 @@
 #!/usr/bin/env python
-
+# This module isn't a node- it is simply included in the node, provides
+# some abstraction.
 import os, struct, array
 from fcntl import ioctl
-
-
-
-def wait_for_changes(jsdev, button_map, axis_map):
-    evbuf = jsdev.read(8)
-    if evbuf:
-        time, value, type, number = struct.unpack('IhBB', evbuf)
-	axis_data = {}
-	
-        #if type & 0x80:
-        #     print "(initial)",
-
-        if type & 0x01:
-            button = button_map[number]
-            if button:
-                button_states[button] = value
-                if value:
-                    return (button, 1.0)
-                else:
-                    return (button, 0.0)
-        elif type & 0x02:
-                axis = axis_map[number]
-        if axis:
-                fvalue = value / 32767.0
-                axis_states[axis] = fvalue
-                return (axis, float(round(fvalue, 2)))
 
 
 
@@ -113,6 +88,8 @@ button_map = []
 axis_map = []
 button_map = []
 
+# This initializes with the device path from the joystick.
+
 # Open the joystick device.
 fn = '/dev/input/js2'
 # print('Opening %s...' % fn)
@@ -155,17 +132,11 @@ for btn in buf[:num_buttons]:
 print '%d axes found: %s' % (num_axes, ', '.join(axis_map))
 print '%d buttons found: %s' % (num_buttons, ', '.join(button_map))
 
-# while True:
-# 	print(wait_for_changes(jsdev, button_map, axis_map))
-
 def wait_for_changes():
     evbuf = jsdev.read(8)
     if evbuf:
         time, value, type, number = struct.unpack('IhBB', evbuf)
         axis_data = {}
-
-        #if type & 0x80:
-        #     print "(initial)",
 
         if type & 0x01:
             button = button_map[number]
