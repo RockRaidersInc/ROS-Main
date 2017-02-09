@@ -1,0 +1,64 @@
+Drive Control: How to use
+
+Simple mode: 1 motorController Box
+
+Launch 3 windows
+
+first window: run roscore
+
+2nd window:
+	cd rosdrive
+	source devel/setup.bash
+	rosrun rosdrive listener.py
+
+last window:
+	cd rosdrive
+	source devel/setup.bash
+	rosrun rosdrive talker.py
+
+Now, when talker window is selected you can control motors:
+
+w up M1				up arrow up M2
+s down M1			down arrow down M2
+
+64 is stopped
+
+
+
+
+
+
+
+
+
+Full Drive Control:
+
+launch 6 windows:
+
+1st window = roscore
+
+next 4 windows:
+	cd rosdrive
+	source devel/setup.bash
+	rosrun rosdrive (frontdrive.py, middrive.py, backdrive.py, drivecontroller.py)
+
+last window:
+	cd rosdrive
+	source devel/setup.bash
+	rosrun rosdrive keyboardDrive.py
+
+Now when keyboardDrive terminal is selected you can do this:
+
+
+		     Forward
+
+			/\
+		     	||
+	Counter   <----	   ---->    Clockwise
+			||
+			\/
+
+		     Backward
+
+0,0 on drive controller printout means stopped
+

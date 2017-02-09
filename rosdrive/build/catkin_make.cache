@@ -1,0 +1,2 @@
+.
+-DCATKIN_DEVEL_PREFIX=/home/ben/rosdrive/devel -DCMAKE_INSTALL_PREFIX=/home/ben/rosdrive/install -G Unix Makefiles
