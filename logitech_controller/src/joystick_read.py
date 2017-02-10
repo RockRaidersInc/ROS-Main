@@ -91,7 +91,7 @@ button_map = []
 # This initializes with the device path from the joystick.
 
 # Open the joystick device.
-fn = '/dev/input/js2'
+fn = '/dev/input/js1'
 # print('Opening %s...' % fn)
 jsdev = open(fn, 'rb')
 
