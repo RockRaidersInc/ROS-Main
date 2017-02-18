@@ -1,8 +1,0 @@
-prefix=/home/ben/rosdrive/install
-
-Name: rosdrive
-Description: Description of rosdrive
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/ben/rosdrive/install/lib 
-Requires: 
