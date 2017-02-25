@@ -25,3 +25,7 @@ To test that you have it setup correctly, you can view the video stream using th
 ```
 rosrun image_view image_view image:=/usb_cam/image_raw
 ```
+
+# RQT Mini Tutorial
+
+To run ROS with UI, you must download and install rqt (http://wiki.ros.org/rqt), which I believe comes with default packages. Launch RQT by typing rqt into shell (after running roscore), then go to perspectives tab, click on import, then locate ui.perspective under ROS-Main/user_interface/config directory
