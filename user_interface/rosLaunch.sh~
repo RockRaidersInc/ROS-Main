@@ -1,4 +1,0 @@
-#!/bin/bash
-roscore
-rosrun turtlesim turtlesim_node
-rqt --perspective-file "$(rospack find user_interface)/config/ui.perspective"
