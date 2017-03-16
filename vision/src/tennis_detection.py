@@ -37,7 +37,6 @@ def Setup():
     hsv_yellow = cv2.cvtColor(yellow,cv2.COLOR_BGR2HSV)
     print hsv_yellow
 
-#TODO: Add some way to calibrate for white to be able to compensate for other lighting conditions
 
 #Loop
 #every node should have one
@@ -62,7 +61,7 @@ def Loop(cap):
 
     '''
     gray = cv2.medianBlur(frame,5)
-    gray = cv2.cvtColor(gray,cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(gray,cv2.COLOR_BGR2GRAhY)
     '''
 
     circles = cv2.HoughCircles(mask,cv2.HOUGH_GRADIENT,1,25,param1=100,param2=12,minRadius=0,maxRadius=50)
@@ -93,6 +92,9 @@ def Loop(cap):
 function header
 what does it return? what parameters? general description.
 '''
+
+#TODO: Add some way to calibrate for the color white to be able to compensate for other lighting conditions
+
 def Foo():
     '''
     body of function
