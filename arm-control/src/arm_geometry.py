@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# File Name (arm_geometry.py)
+# Authors (Patrick Love)
+
 # This file contains all parameters and function involved in computing
 # the linear actuator positions from desired arm angles
 
