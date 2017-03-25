@@ -21,10 +21,12 @@ rosrun <vision> <tennis_detection> <parameters>
 ##############################################################################
 
 #include
-import rospy
+#import rospy
 import cv2
 import numpy as np
 from time import sleep as wait
+import sys
+import argparse
 
 #CONSTANTS (organize these as necessary)
 #names for constants should be in ALL CAPS
@@ -33,17 +35,24 @@ from time import sleep as wait
 
 #Setup
 #every node should have one
-def Setup():
-
-    cap = cv2.VideoCapture('/home/nick/catkin_ws/src/ROS-Main/vision/src/TennisBalls.mp4')
+def Setup(vid):
+    if (vid == 'cam'):
+        cap = cv2.VideoCapture(0)
+    elif (vid == 'dog'):
+        cap = cv2.VideoCapture("/home/nick/catkin_ws/src/ROS-Main/vision/src/TennisBalls.mp4")
+    else:
+        print "Invalid parameter"
+        return -1
     yellow = np.uint8([[[255,255,0]]])
     hsv_yellow = cv2.cvtColor(yellow,cv2.COLOR_BGR2HSV)
-    print hsv_yellow
+    #print hsv_yellow
     return cap
 
 #Loop
 #every node should have one
 def Loop(cap):
+    if cap == -1:
+        return
     while(True):
         # Take each frame
         _,frame = cap.read()
@@ -61,11 +70,6 @@ def Loop(cap):
 
         # Bitwise-AND mask and original image
         res = cv2.bitwise_and(frame,frame, mask= mask)
-
-        '''
-        gray = cv2.medianBlur(frame,5)
-        gray = cv2.cvtColor(gray,cv2.COLOR_BGR2GRAhY)
-        '''
 
         mask = cv2.medianBlur(mask,5)
 
@@ -87,7 +91,7 @@ def Loop(cap):
             return
 
         #Wait for a moment to destroy frame
-        wait(0.05)
+        wait(0.03)
 
 ##############################################################################
 
@@ -100,6 +104,19 @@ what does it return? what parameters? general description.
 
 #TODO: Add some way to calibrate for the color white to be able to compensate for other lighting conditions
 
+def parse_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-vid", "-v",type=str, default = "cam", help="Run tennis_detection.py with desired video source, currently accepted parameters are 'dog and 'cam'")
+    return parser.parse_args()
+
+def subscriber():
+    rospy.init_node("tennis_detector",anonymous=True)
+
+    rospy.Subscriber()
+
+    #Makes sure python does not exit until this node is stopped
+    rospy.spin()
+
 def Foo():
     pass
     '''
@@ -110,4 +127,5 @@ def Foo():
 ##############################################################################
 
 if __name__ == '__main__':
-    Loop(Setup())
+    args = parse_arguments()
+    Loop(Setup(args.vid))
