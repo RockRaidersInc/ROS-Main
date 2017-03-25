@@ -35,7 +35,7 @@ from time import sleep as wait
 #every node should have one
 def Setup():
 
-    cap = cv2.VideoCapture('TennisBalls.mp4')
+    cap = cv2.VideoCapture('/home/nick/catkin_ws/src/ROS-Main/vision/src/TennisBalls.mp4')
     yellow = np.uint8([[[255,255,0]]])
     hsv_yellow = cv2.cvtColor(yellow,cv2.COLOR_BGR2HSV)
     print hsv_yellow
@@ -44,9 +44,9 @@ def Setup():
 #Loop
 #every node should have one
 def Loop(cap):
-    while(cap.read()):
+    while(True):
         # Take each frame
-        _, frame = cap.read()
+        _,frame = cap.read()
         if frame == None:
             return
         # Convert BGR to HSV
@@ -81,7 +81,6 @@ def Loop(cap):
         cv2.imshow('Detected tennis balls',frame)
         cv2.imshow('Mask',mask)
         cv2.imshow('Res',res)
-        #cv2.imshow('detected circles',gray)
         k = cv2.waitKey(5) & 0xFF
         if k == 27:
             cv2.destroyAllWindows()
