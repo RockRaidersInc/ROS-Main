@@ -58,30 +58,31 @@ class devicenode:
 
 
 	def call(self,data):
-		#fix this later
-		print("ill work on it later")
 
 		command = data.data
 		com = command.split(' ')
+		print (com[0])
+		print (com[1])
 		if com[0] == 'connect':
 			try:
 				print "connecting"
 				dev = self.req[com[1]]
+				print(dev.device)
 				self.req.pop(dev.device)
-				self.con[dev.device]= dev
+				self.con[com[1]]= dev
 			except:
 				print "no requested device by name: "+com[1]
 			
 
 
-		elif com[1] == 'disconnect':
+		elif com[0] == 'disconnect':
 
 			try:
-				dev = self.con.pop[com[1]]
+				dev = self.con[com[1]]
 				self.con.pop(dev.device)
 				self.jobs.append(dev)
 			except:
-				print "no connected device by name: "+com[1]
+				print "fuck you and everyone around you no connected device by name: "+com[1]
 		
 		else:
 			print ('recieved invalid command type')
@@ -100,21 +101,32 @@ class devicenode:
 				#print (usb.location + " " +req[0].loc)
 				#print ("This is a test "+str(req[0].loc == usb.location))
 			print "looking for devices:"
+			x=0
 			for dev in self.jobs:
 				print "\t"+dev.name
+				x+=1
+
 
 			print "\nrequested devices:"
+			
 			for dev in self.req.itervalues():
 				print "\t"+ dev.name + " "+ dev.device
+				x+=1
 			
 			print "\nmatched devices:"
+			x=0
 			for dev in self.con.itervalues():
 				print "\t"+ dev.name + " "+ dev.device
-	
+				x+=1
+			x=0
 			
 			print "\nconnected usbs:"
 			print (av)
+			#print self.jobs
+			#print self.req
+			#print self.con
 			print "\n"
+		#	print x
 
 
 			name = ""
@@ -133,6 +145,7 @@ class devicenode:
 					#print ("made it through loop")
 
 				except:
+					x+=1
 					print("no usb connected at location "+ dev.loc)
 
 			for dev in self.req.itervalues():

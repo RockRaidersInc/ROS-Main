@@ -7,11 +7,12 @@ from geometry_msgs.msg import Vector3
 class heart:
 	x = 0
 	y = 0
+	z = 0
 	pub = None
 	def update(self,data):
 		self.x = data.x
 		self.y = data.y
-		print ("x,y set to: %i,%i"%(self.x,self.y))
+		self.z = data.z
 	
 
 	def __init__(self):
@@ -24,8 +25,8 @@ class heart:
 	def loop(self):
 		wait = rospy.Rate(50)
 		while not rospy.is_shutdown():
-			print("x,y = %i,%i"%(self.x,self.y))
-			self.pub.publish(Vector3(self.x,self.y,0))
+			print("x,y,z = %i,%i,%i"%(self.x,self.y,self.z))
+			self.pub.publish(Vector3(self.x,self.y,self.z))
 			wait.sleep()
 
 		

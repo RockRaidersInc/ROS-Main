@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<launch>
+   
+	<node pkg="rosdrive" name ="DriveController" type="drivecontrol.py"/>
+
+	<node pkg="rosdrive" name ="frontdrive" type="motornode.py"/>
+	<remap from= "motor" to="front"/>
+	<remap from= 'device' to='frontdevice'/>
+
+	<node pkg="rosdrive" name ="steering" type="motornode.py"/>
+	<remap from= "motor" to="steer"/>
+	<remap from= 'device' to='steerdevice'/>
+
+	<node pkg="rosdrive" name ="backdrive" type="motornode.py"/>
+	<remap from= "motor" to="back"/>
+	<remap from= 'device' to='backdevice'/>
+
+	<node pkg="rosdrive" name = "usbnode" type="deviceconnect.py"/>
+  
+</launch>

@@ -9,11 +9,10 @@ from std_msgs.msg import String
 class motornode:
 	name = ''
 	address = 0x80
-	device = "/dev/ttyACM0"
+	device = "/dev/00000"
 	x=64
 	y=64
 	timeout = 1000
-
 	pub = None
 
 	def __init__(self,n):
@@ -26,8 +25,11 @@ class motornode:
     		rospy.Subscriber(self.name+'device', String, self.setdevice)
     
     		print("start finished")
+		while not rospy.is_shutdown():
+			self.connect()
+			self.normal()
+		self.connect()
 
-    		rospy.spin()
     	def callback(self,data):
     		self.timeout = 1000
 
@@ -40,7 +42,7 @@ class motornode:
 	def setdevice(self,data):
     		self.device = str(data.data)
     		rospy.loginfo("device set to: "+self.device)
-    		self.connect()
+    		
 
 	def connect(self):
 		print("trying to connect")
@@ -52,33 +54,39 @@ class motornode:
     				roboclaw.Open(self.device,115200)
        		 		connect = True
 				self.pub.publish("connect "+self.device)
+				print ("connected")
+				break
     			except:
 				print("no device "+ self.device)
 				self.pub.publish("disconnect "+ self.device)
 			wait.sleep()
-		self.normal()
 
 	def setmotor (self,m,n):
-   	 try:
-      	 	roboclaw.ForwardBackwardM1(self.address,m)
-      	 	roboclaw.ForwardBackwardM2(self.address,n)
+   		
+      		roboclaw.ForwardBackwardM1(self.address,m)
+      		roboclaw.ForwardBackwardM2(self.address,n)
 
-   	 except:
-		print("cannot update motors, possible disconnect")
-		self.pub.publish ("disconnect "+ self.device)
-		self.connect()
+   	 
+		
 	
 	def normal(self):
   		while not rospy.is_shutdown():
 			if (self.timeout > 0):
 				print("setting motor to values %i, %i"%(self.x,self.y))
-      				self.setmotor(self.x,self.y)
+				try:
+      					self.setmotor(self.x,self.y)
+				except:
+					er = 1
+					break
        				self.timeout -=1
         		else:
-	    			self.setmotor(64,64)
-
+				try:
+	    				self.setmotor(64,64)
+				except:
+					er = 1
+					break
     
 	
 
 if __name__ == '__main__':
-    controller = motornode('front')
+	controller = motornode('steer')
