@@ -33,46 +33,34 @@
 #
 # Revision $Id$
 
-## Simple talker demo that listens to std_msgs/Strings published 
-## to the 'chatter' topic
 
 import rospy
-import roboclaw
-from std_msgs.msg import Int32
+from std_msgs.msg import String
 
-address = 0x80
-k1 = 1
-k2 = 1
 
-def callback(data):
-    rospy.loginfo(rospy.get_caller_id() + 'I heard %i', data.data)
-    x = data.data
-    rospy.loginfo("x = %i")
-    roboclaw.ForwardBackwardM1(address, x)
+def talker():
+
+    pub = rospy.Publisher('drivecontrol', String, queue_size=1)
+    rospy.init_node('keycontrol', anonymous=True)
     
-    
-def callback2(data):
-    rospy.loginfo(rospy.get_caller_id() + 'I heard %i', data.data)
-    y = data.data
-    rospy.loginfo("y = %i")
-    roboclaw.ForwardBackwardM2(address, y)
+    while not rospy.is_shutdown():
+        command = raw_input("Enter command name: ")
+	try:
+		print(command)
+	except:
+		print("use parenthesis cause fuck this version of python")
+		continue
+	if command == "set":
+		key = raw_input("enter constant name: ")
+		val = raw_input("enter value: ")
+		message = key+' '+val
+		pub.publish(message)
+			
+	elif command == "print":
+		pub.publish("print")
+	else:
+		print("valid commands are set and print")
 
-def listener():
-
-    # In ROS, nodes are uniquely named. If two nodes with the same
-    # name are launched, the previous one is kicked off. The
-    # anonymous=True flag means that rospy will choose a unique
-    # name for our 'listener' node so that multiple listeners can
-    # run simultaneously.
-    rospy.init_node('mcController', anonymous=True)
-
-    rospy.Subscriber('M1', Int32, callback)
-    rospy.Subscriber('M2', Int32, callback2)
-    dev = raw_input("enter device name: ")
-    roboclaw.Open("/dev/"+dev,115200)
-
-    # spin() simply keeps python from exiting until this node is stopped
-    rospy.spin()
 
 if __name__ == '__main__':
-    listener()
+    talker()

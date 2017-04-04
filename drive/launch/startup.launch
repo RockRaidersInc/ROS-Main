@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+   
+	<node pkg="drive" name ="DriveController" type="drivecontrol.py"/>
+
+	<node pkg="drive" name ="front" type="motornode.py">
+		<remap from= "motor" to="front"/>
+		<remap from= 'device' to='frontdevice'/>
+	</node>
+
+	<node pkg="drive" name ="steering" type="motornode.py">
+		<remap from= "motor" to="steer"/>
+		<remap from= 'device' to='steerdevice'/>
+	</node>
+
+	<node pkg="drive" name ="back" type="motornode.py">
+		<remap from= "motor" to="back"/>
+		<remap from= 'device' to='backdevice'/>
+	</node>
+	<node pkg="drive" name = "usbnode" type = "deviceconnect.py"/>
+	
+  	
+</launch>
