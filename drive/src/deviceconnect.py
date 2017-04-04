@@ -127,8 +127,9 @@ class devicenode:
 			#print self.con
 			print "\n"
 		#	print x
+			q = []
 
-
+	
 			name = ""
 			for dev in self.jobs:
 				try:
@@ -151,6 +152,16 @@ class devicenode:
 			for dev in self.req.itervalues():
 				dev.pub.publish(String(dev.device))
 				print("request: %s to %s"%(dev.name, dev.device))
+			"""q = list(self.req.itervalues())
+			for z in q:
+				try:
+					
+					asdf = av[z.loc]
+				except:
+					self.jobs.append(self.req[z.device])
+					self.req.pop(z.device)
+			q = list(self.con.itervalues())"""
+
 
 			self.wait.sleep()
 
