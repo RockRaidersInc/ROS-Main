@@ -10,7 +10,11 @@ else
     echo "No rover IP set, using default (192.168.1.0)"
 fi
 
-source /opt/ros/indigo/setup.bash
+if [ -d "/opt/ros/kinetic" ]; then
+    source /opt/ros/kinetic/setup.bash
+else
+    source /opt/ros/indigo/setup.bash
+fi
 source ../devel/setup.bash
 
 # Configure ROS environment
@@ -27,4 +31,4 @@ if [ "$ROVER_IP" = "192.168.1.0" -a "$MY_IP" != "192.168.1.9" ]
 fi
 export ROS_IP=$MY_IP
 # Launch the actual code
-roslaunch controller.launch
+roslaunch drive joystick.launch
