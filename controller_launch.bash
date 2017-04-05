@@ -31,4 +31,4 @@ if [ "$ROVER_IP" = "192.168.1.0" -a "$MY_IP" != "192.168.1.9" ]
 fi
 export ROS_IP=$MY_IP
 # Launch the actual code
-roslaunch drive joystick.launch
+roslaunch drive joycam.launch
