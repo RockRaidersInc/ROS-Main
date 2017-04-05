@@ -7,13 +7,5 @@ echo "IP address is:"
 echo $text1
 echo 
 echo
-roslaunch drive startup.launch
-q='quit'
-while true
-do
-echo 'enter command'
-read text
-if text==q
-do
+roslaunch drive startupcam.launch
 
-done
