@@ -23,4 +23,4 @@ fi
 read -p "Press [ENTER] to continue launch..."
 
 export ROS_IP=$MY_IP
-roslaunch drive startup.launch
+roslaunch drive startupcam.launch

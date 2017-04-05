@@ -27,7 +27,7 @@ class devicenode:
 		print("test")
 		rospy.Subscriber('usb', String, self.call)
 	
-		f = open("/home/ben/devices.txt","r")
+		f = open("/home/rockie/devices.txt","r")
 	
 		x=1
 		for line in f:
