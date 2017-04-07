@@ -13,7 +13,7 @@ source ../devel/setup.bash
 
 
 MY_IP=$(hostname -I | grep -Eo '([0-9]*\.){3}[0-9]*')
-if [ "$MY_IP" = "192.168.1.0" ]; then
+if [ "$MY_IP" = "192.168.1.1" ]; then
     echo "Detected configuration for antenna use, if this is incorrect please check your wireless connection"
 else
     echo "Detected configuration for local network use, if this is incorrect please verify that you have properly configured your IP and disabled wireless"

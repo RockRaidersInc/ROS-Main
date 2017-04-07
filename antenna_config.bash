@@ -6,7 +6,7 @@ fi
 
 # Determine desired static IP
 if [ "$1" = "rover" ]; then
-    STATIC_IP=192.168.1.0
+    STATIC_IP=192.168.1.1
 elif [ "$1" = "base" ]; then
     STATIC_IP=192.168.1.9
 else

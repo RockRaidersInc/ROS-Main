@@ -21,7 +21,7 @@ import joystick_read
 
 from geometry_msgs.msg import Vector3
 
-joyname = 'js0'
+joyname = 'js1'
 
 # publish controller info
 
