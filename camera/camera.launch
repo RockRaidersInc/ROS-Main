@@ -1,0 +1,8 @@
+<launch>
+  <group ns="video">
+    <!-- Starting video nodes -->
+    <node pkg="camera" type="camera_stream" name="camera_0">
+      <param name="camera" value="0"/>
+    </node>
+  </group>
+</launch>
