@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+   
+	<node pkg="drive" name ="DriveController" type="drivecontrol.py"/>
+
+	<node pkg="drive" name ="front" type="motornode.py">
+		<remap from= "motor" to="front"/>
+		<remap from= 'device' to='frontdevice'/>
+	</node>
+
+	<node pkg="drive" name ="steering" type="motornode.py">
+		<remap from= "motor" to="steer"/>
+		<remap from= 'device' to='steerdevice'/>
+	</node>
+
+	<node pkg="drive" name ="back" type="motornode.py">
+		<remap from= "motor" to="back"/>
+		<remap from= 'device' to='backdevice'/>
+	</node>
+	<node pkg="drive" name = "usbnode" type = "deviceconnect.py"/>
+
+	<node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    		<param name="video_device" value="/dev/video1" />
+    		<param name="image_width" value="640" />
+    		<param name="image_height" value="480" />
+    		<param name="pixel_format" value="yuyv" />
+    		<param name="camera_frame_id" value="usb_cam" />
+    		<param name="io_method" value="mmap"/>
+  	</node>
+  
+</launch>
