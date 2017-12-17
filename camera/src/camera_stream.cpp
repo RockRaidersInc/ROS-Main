@@ -11,33 +11,33 @@
 
 int main(int argc, char* argv[]){
   //Initialization
-  ros::init(argc, argv, "node_camera",ros::init_options::AnonymousName);
+  ros::init(argc, argv, "camera",ros::init_options::AnonymousName);
   ros::NodeHandle nh;
 
   //Specify which camera is being used
-  int camera_index = 0;
+  int cameraIndex = 0;
   //Create private nodehandle to get private params
-  ros::NodeHandle nh_priv("~");
-  if(nh_priv.hasParam("camera")){
-    nh_priv.getParam("camera", camera_index);
+  ros::NodeHandle nhPriv("~");
+  if(nhPriv.hasParam("camera")){
+    nhPriv.getParam("camera", cameraIndex);
   }
 
-  cv::VideoCapture camera(camera_index);
+  cv::VideoCapture camera(cameraIndex);
 
   std::stringstream ss;
   if(!camera.isOpened()){
-    ss << "No camera was found at index " << camera_index << "!";
+    ss << "No camera was found at index " << cameraIndex << "!";
     //ros::ROS_ERROR("%s\n", ss.str().c_str());
     ros::shutdown();
   }
   ss.str(std::string());
-  ss << "camera_" << camera_index;
+  ss << "camera_" << cameraIndex;
 
 
   image_transport::ImageTransport it(nh);
   image_transport::Publisher pub = it.advertise(ss.str(), 1);
 
-  ros::Rate loop_rate(30);
+  ros::Rate loopRate(30);
   //ros::ROS_INFO("%s\n", "Stream Started!");
 
   while(nh.ok()){
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]){
     }
 
     ros::spinOnce();
-    loop_rate.sleep();
+    loopRate.sleep();
   }
 
   //ros::ROS_INFO("%s\n", "Stream Stopped!");
