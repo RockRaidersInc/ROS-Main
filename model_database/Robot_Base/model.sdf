@@ -1,8 +1,8 @@
 <?xml version='1.0'?>
 <sdf version='1.6'>
-  <model name='Rock_Raiders_Robot'>
+  <model name='Robot_Base'>
     <link name='chassis'>
-      <pose frame=''>0 0 1 0 -0 0</pose>
+      <pose frame=''>0 -0 1 0 -0 0</pose>
       <inertial>
         <mass>50</mass>
         <inertia>
@@ -17,12 +17,11 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.55 1 0.45</size>
+            <size>0.5096 1.0811 0.4445</size>
           </box>
         </geometry>
         <material>
@@ -48,7 +47,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.55 1 0.45</size>
+            <size>0.5096 1.0811 0.4445</size>
           </box>
         </geometry>
         <surface>
@@ -99,7 +98,7 @@
       </collision>
     </link>
     <link name='left_back_leg'>
-      <pose frame=''>0.345 0.43 0.6 0 1.0472 0</pose>
+      <pose frame=''>0.32465 0.43 0.796466 0 1.0472 0</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -114,12 +113,11 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.45 0.11 0.1</size>
+            <size>0.2794 0.01 0.01</size>
           </box>
         </geometry>
         <material>
@@ -145,7 +143,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.45 0.11 0.1</size>
+            <size>0.2794 0.01 0.01</size>
           </box>
         </geometry>
         <surface>
@@ -196,7 +194,7 @@
       </collision>
     </link>
     <link name='left_back_wheel'>
-      <pose frame=''>0.465 0.43 0.45 2.99778 1.57079 2.99777</pose>
+      <pose frame=''>0.465 0.43 0.662782 2.99096 1.57079 2.99094</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -211,12 +209,11 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2</radius>
+            <radius>0.2032</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -243,7 +240,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2</radius>
+            <radius>0.2032</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -295,7 +292,7 @@
       </collision>
     </link>
     <link name='left_front_leg'>
-      <pose frame=''>0.345 -0.43 0.6 0 1.0472 0</pose>
+      <pose frame=''>0.32465 -0.43 0.796466 0 1.0472 0</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -310,12 +307,11 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.45 0.11 0.1</size>
+            <size>0.2794 0.01 0.01</size>
           </box>
         </geometry>
         <material>
@@ -341,7 +337,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.45 0.11 0.1</size>
+            <size>0.2794 0.01 0.01</size>
           </box>
         </geometry>
         <surface>
@@ -392,7 +388,7 @@
       </collision>
     </link>
     <link name='left_front_wheel'>
-      <pose frame=''>0.465 -0.43 0.45 2.99533 1.57079 2.99531</pose>
+      <pose frame=''>0.3945 -0.43 0.662782 2.9779 1.57079 2.97788</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -412,7 +408,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2</radius>
+            <radius>0.2033</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -439,7 +435,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2</radius>
+            <radius>0.2033</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -491,7 +487,7 @@
       </collision>
     </link>
     <link name='left_mid_leg'>
-      <pose frame=''>0.345 0 0.6 0 1.0472 0</pose>
+      <pose frame=''>0.32465 0 0.796466 0 1.0472 0</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -506,12 +502,11 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.45 0.11 0.1</size>
+            <size>0.2794 0.01 0.01</size>
           </box>
         </geometry>
         <material>
@@ -537,7 +532,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.45 0.11 0.1</size>
+            <size>0.2794 0.01 0.01</size>
           </box>
         </geometry>
         <surface>
@@ -588,7 +583,7 @@
       </collision>
     </link>
     <link name='left_mid_wheel'>
-      <pose frame=''>0.465 0 0.45 3.1412 1.57079 3.1412</pose>
+      <pose frame=''>0.465 0 0.662782 3.14098 1.57079 3.14098</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -603,12 +598,11 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2</radius>
+            <radius>0.2032</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -635,7 +629,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2</radius>
+            <radius>0.2032</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -687,7 +681,7 @@
       </collision>
     </link>
     <link name='right_back_leg'>
-      <pose frame=''>-0.345 0.43 0.6 0 -1.0472 0</pose>
+      <pose frame=''>-0.32465 0.43 0.796466 0 -1.0472 0</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -702,12 +696,11 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.45 0.11 0.1</size>
+            <size>0.2794 0.01 0.01</size>
           </box>
         </geometry>
         <material>
@@ -733,7 +726,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.45 0.11 0.1</size>
+            <size>0.2794 0.01 0.01</size>
           </box>
         </geometry>
         <surface>
@@ -784,7 +777,7 @@
       </collision>
     </link>
     <link name='right_back_wheel'>
-      <pose frame=''>-0.465 0.43 0.45 2.89167 1.57079 2.89164</pose>
+      <pose frame=''>-0.465 0.43 0.662782 2.89072 1.57079 2.8907</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -799,12 +792,11 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2</radius>
+            <radius>0.2032</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -831,7 +823,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2</radius>
+            <radius>0.2032</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -883,7 +875,7 @@
       </collision>
     </link>
     <link name='right_front_leg'>
-      <pose frame=''>-0.345 -0.43 0.6 0 -1.0472 0</pose>
+      <pose frame=''>-0.32465 -0.43 0.796466 0 -1.0472 0</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -898,12 +890,11 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.45 0.11 0.1</size>
+            <size>0.2794 0.01 0.01</size>
           </box>
         </geometry>
         <material>
@@ -929,7 +920,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.45 0.11 0.1</size>
+            <size>0.2794 0.01 0.01</size>
           </box>
         </geometry>
         <surface>
@@ -980,7 +971,7 @@
       </collision>
     </link>
     <link name='right_front_wheel'>
-      <pose frame=''>-0.465 -0.43 0.45 2.63662 1.57079 2.63659</pose>
+      <pose frame=''>-0.465 -0.43 0.662782 2.63833 1.57079 2.6383</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -995,37 +986,11 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
-      <visual name='visual'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
-        <geometry>
-          <cylinder>
-            <radius>0.2</radius>
-            <length>0.1</length>
-          </cylinder>
-        </geometry>
-        <material>
-          <lighting>1</lighting>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Black</name>
-          </script>
-          <ambient>0.1 0.1 0.1 1</ambient>
-          <diffuse>0.7 0.7 0.7 1</diffuse>
-          <specular>0.01 0.01 0.01 1</specular>
-          <emissive>0 0 0 1</emissive>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
-        </material>
-        <cast_shadows>1</cast_shadows>
-        <transparency>0</transparency>
-      </visual>
       <visual name='ModelPreview_7::right_front_wheel::visual_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2</radius>
+            <radius>0.2032</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -1046,13 +1011,38 @@
         <cast_shadows>1</cast_shadows>
         <transparency>0</transparency>
       </visual>
+      <visual name='visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.2032</radius>
+            <length>0.1</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.7 0.7 0.7 1</diffuse>
+          <specular>0.01 0.01 0.01 1</specular>
+          <emissive>0 0 0 1</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2</radius>
+            <radius>0.2032</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -1104,7 +1094,7 @@
       </collision>
     </link>
     <link name='right_mid_leg'>
-      <pose frame=''>-0.345 0 0.6 0 -1.0472 0</pose>
+      <pose frame=''>-0.32465 -0 0.796466 0 -1.0472 0</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -1119,12 +1109,11 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.45 0.11 0.1</size>
+            <size>0.2794 0.01 0.01</size>
           </box>
         </geometry>
         <material>
@@ -1150,7 +1139,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.45 0.11 0.1</size>
+            <size>0.2794 0.01 0.01</size>
           </box>
         </geometry>
         <surface>
@@ -1201,7 +1190,7 @@
       </collision>
     </link>
     <link name='right_mid_wheel'>
-      <pose frame=''>-0.465 0 0.45 2.76417 1.57079 2.76415</pose>
+      <pose frame=''>-0.465 -0 0.662782 2.75445 1.57079 2.75441</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -1216,12 +1205,11 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2</radius>
+            <radius>0.2032</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -1248,7 +1236,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2</radius>
+            <radius>0.2032</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
