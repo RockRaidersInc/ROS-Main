@@ -30,6 +30,9 @@
     </include>
 
 
+    <plugin name="SimMotorNode" filename="/home/david/Documents/14_rockraiders/devel/lib/libSimMotorNode.so"/>
+
+
     <model name='ground_plane'>
       <static>1</static>
       <link name='link'>
@@ -43,8 +46,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>100</mu>
-                <mu2>50</mu2>
+                <mu>1</mu>
+                <mu2>1</mu2>
               </ode>
               <torsional>
                 <ode/>
