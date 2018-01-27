@@ -1,0 +1,1 @@
+This node acts as a motor driver for use in the gazebo simulator. A proper readme is coming soon (if I remember lol :))
