@@ -4,7 +4,7 @@
 # Authors (Patrick Love)
 
 # This file contains all parameters and function involved in computing
-# the linear actuator positions from desired arm angles
+# desired encoder values from desired joint angles
 
 # UNITS FOR ALL COMPUTATION:
 # Length:   in
@@ -12,84 +12,125 @@
 
 import math
 
-# CLASSES
-
-class MountingParams
-    def __init__():
-        self.mount1 = None
-        self.mount2 = None
-        self.offang1 = 0
-        self.offang2 = 0
-    def firstMount(dist, ang):
-        self.mount1 = dist
-        self.offang1 = ang
-        return self
-    def secondMount(dist, ang):
-        self.mount1 = dist
-        self.offang1 = ang
-        return self
-    def totalOffset():
-        return self.offang1+self.offang2
-
-class ActuatorParams
-    def __init__(baseLength, range, encodeMin, encoderRange):
-        self.baseLength = baseLength
-        self.range = range
-        self.encodeMin = encodeMin
-        self.encodeRange = encoderRange
-
-#*********** ARM PARAMETERS ***********
-# Currently estimated, should be filled in more precisely when arm design
-# is finalized
-SHOULDER_MOUNT = MountingParams() \
-    .firstMount(    3.0,     math.radians(45)) \
-    .secondMount(   12.0,    math.radians(5.0))
-
-ELBOW_MOUNT = MountingParams() \
-    .firstMount(    12.0,    math.radians(-3.0)) \
-    .secondMount(   -3.0,    0)
-
-WRIST_MOUNT = MountingParams() \
-    .firstMount(    12.0,    math.radians(3.0)) \
-    .secondMount(    2.0,    math.radians(90.0))
-
-#********* ACTUATOR PARAMETERS *********
-#Unsure as yet if actuator manufacturing is consistent enough that we can
-#just provide one set, or if we should measure each individually.  I expect
-#base length and range are consistent, encoder values I am not as sure.
-#Only one set provided for now
-ACTUATOR = ActuatorParams(8.0, 7.0, 0.0, 12.0)
-
+# UTILITIES
 
 # Computes the third side length of a triangle given two side lengths
 # and the angle between them
 def LawOfCosines(a,b,theta):
     return math.sqrt( a*a + b*b - 2*a*b*math.cos(theta) )
 
-# Uses mounting parameters to comupute the total linear actuator length
-# required to get the supplied arm angle
-# angle -        Desired joint angle
-# mount1 -        Distance from joint rotation axis to first actuator mounting pin
-# mount2 -        Distance from joint rotation axis to second actuator mounting pin
-# offsetAngle -    Sum of the angles 
-def LengthFromAngle(angle, mountParams):
-    return LawOfCosines(mountParams.mount1, mountParams.mount2, angle-mountParams.totalOffset())
+# Adds angles between 0 and 2pi, returning results also between 0 to 2pi
+# Can also be used to subtract if second parmeter is negated
+def AngleAdd(a,b):
+    s = a + b
+    if s >= 2*math.pi:
+        s -= 2*math.pi
+    elif s < 0:
+        s += 2*math.pi
+    return s
 
-# Computes the encoder value associated with the actuator spanning a specifed
-# total length.  If the actuator cannot physically produce the given length,
-# None is returned and an error is printed to stderr
-def ActuatorPositionForLength(totalLength, actuatorParams ):
-    extensionFactor = (totalLength-actuatorParams.baseLength)/actuatorParams.range
-    if(extensionFactor < 0 or extensionFactor > 1):
-        print >> sys.stderr, "EXTENSION OF %.2fx MAX IS NOT POSSIBLE" % extensionFactor
-        return None
-    return actuatorParams.encodeMin + extensionFactor * actuatorParams.encodeRange
+# CLASSES
 
+# Abstract class defining general joint functions
+# Really exists more for documentation purposes since a pure
+# interface like this really means nothing since python will
+# just check on any object if these are callable regardles of
+# whether or not it extends Joint.
+class Joint:
+    def RelaxedPos(self): raise NotImplementedError
+    def EncoderError(self, current, target): raise NotImplementedError
+    def EncoderForAngle(self, a): raise NotImplementedError
 
-def PositionForAngle(angle, mount, actuator):
-    actuatorLength = LengthFromAngle(angle, mount)
-    actuatorExtension = ActuatorPositionForLength(actuatorLength, actuator)
-    return actuatorExtension
+# Class for abstracting properties of a particular linear actuator
+class Actuator:
+    def __init__(self, baseLength, range, encodeMin, encoderRange):
+        self.baseLength = baseLength
+        self.range = range
+        self.encodeMin = encodeMin
+        self.encodeRange = encoderRange
+    def LengthToEncoder(self, length):
+        extension = (length-self.baseLength)/self.range
+        if(extension < 0 or extension > 1):
+            print >> sys.stderr, "EXTENSION OF %.2fx MAX IS NOT POSSIBLE" % extension
+            return None
+        return self.encodeMin + extension * self.encodeRange
+
+# Instatiation of the above for the actuators on the rover
+ARM_ACTUATOR = Actuator(8.0, 7.0, 0.0, 12.0)
+
+# Joint implementation based on a joint driven by a linear actuator
+# Requires an Actuator instance, and mounting parameters specified
+# in polar coords with 0 deg being along the line between joint
+# pivots and increasing angle proceeding towards the inside of the
+# joint.  See Offset Angle and Mount Distance in the Joint Geometry
+# Reference PDF
+class ActuatorJoint(Joint):
+    def __init__(self, actuator, (d1,a1), (d2, a2)):
+        self.mount1 = d1
+        self.mount2 = d2
+        self.offang = a1 + a2
+        self.actuator = actuator
+
+    def RelaxedPos(self):
+        return self.actuator.encodeMin + 0.5*self.actuator.encodeRange
+
+    def EncoderError(self, current, target):
+        return target - current;
+
+    def EncoderForAngle(self, a):
+        length = LawOfCosines(self.mount1, self.mount2, a-self.offang)
+        return self.actuator.LengthToEncoder(length)
+        
+# Parameters descrbing a motor's encoder
+class Motor:
+    def __init__(self, eMin, eMax):
+        self.eZero = eMin
+        self.ePerRad = (eMax-eMin)/(2*math.pi)
+    def EncoderForAngle(self, a):
+        return self.eMin + a*self.ePerRad
+    def AngleFromEncoder(self, en):
+        return (en - self.eMin)/self.ePerRad
+
+# Joint implementation based on a motor-driven joint.  Requires joint 
+# angle at which encoder wraps, and an optional reverse flag if mounted such
+# that the motor encoder runs backward relative to joint angle
+class MotorJoint(Joint):
+    def __init__(self, motor, off_ang, reverse=False):
+        self.motor = motor
+        self.off_ang = off_ang
+        self.mult = -1 if reverse else 1
+
+    def RelaxedPos(self, a):
+        return self.EncoderForAngle(180)
+
+    def EncoderError(self, current, target):
+        current = self.motor.AngleFromEncoder(current)
+        target = self.motor.AngleFromEncoder(target)
+        err = target - current # Cannot use AngleAdd since we want -pi to pi instead of 0 to 2pi
+        if err > math.pi:
+            err -= 2*math.pi
+        elif err <= --math.pi:
+            err += 2*math.pi
+        return err
+
+    def EncoderForAngle(self, a):
+        return self.motor.EncoderForAngle(self.mult * AngleAdd(a, -self.off_ang))
+
+# Joint description which bypasses the normal Joint control loop
+# and always returns an error of the target motor encoder angle
+# Can be used in conjunction with a specialized ActuatorDriver
+# in a JointController (see actuator_controller.py) to use builtin
+# PID in a servo/motor_controller instead of custom loop
+class PIDMotorJoint(Joint):
+    def __init__(self, off_ang, reverse = False):
+        self.off_ang = off_ang
+        self.mult = -1 if reverse else 1
+
+    def EncoderError(self, current, target):
+        return self.mult * AngleAdd(a, -self.off_ang)
+
+    def EncoderForAngle(self, a):
+        return a
 
 
 
