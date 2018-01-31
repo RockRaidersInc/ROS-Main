@@ -2,7 +2,8 @@
 <sdf version='1.6'>
   <model name='Robot_Base'>
     <!-- The wheel control plugin -->
-    <plugin name="SimMotorNode" filename="/home/david/Documents/14_rockraiders/devel/lib/libSimMotorNode.so"/>
+    <!-- <plugin name="SimMotorNode" filename="/home/david/Documents/14_rockraiders/devel/lib/libSimMotorNode.so"/> -->
+    <plugin name="SimMotorNode" filename="libSimMotorNode.so"/>
     <link name='chassis'>
       <pose frame=''>0 -0 1 0 -0 0</pose>
       <inertial>
