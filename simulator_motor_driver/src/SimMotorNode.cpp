@@ -20,6 +20,8 @@
 #include "SimMotorNode.h"
 
 
+// #define DEBUG_PRINT
+
 
 namespace gazebo {
     /// \brief A plugin to control a Velodyne sensor.
@@ -107,50 +109,67 @@ namespace gazebo {
 
         this->rosNodeHandle.reset(new ros::NodeHandle("gazebo_motor_node"));
 
-        backLeftMotorSub = rosNodeHandle->subscribe("chatter", 1000, &MotorNodePlugin::backLeftMotorCallback, this);
+        backLeftMotorSub = rosNodeHandle->subscribe("backLeft", 1000, &MotorNodePlugin::backLeftMotorCallback, this);
+        middleLeftMotorSub = rosNodeHandle->subscribe("middleLeft", 1000, &MotorNodePlugin::middleLeftMotorCallback, this);
+        frontLeftMotorSub = rosNodeHandle->subscribe("frontLeft", 1000, &MotorNodePlugin::frontLeftMotorCallback, this);
+        backRightMotorSub = rosNodeHandle->subscribe("backRight", 1000, &MotorNodePlugin::backRightMotorCallback, this);
+        middleRightMotorSub = rosNodeHandle->subscribe("middleRight", 1000, &MotorNodePlugin::middleRightMotorCallback, this);
+        frontRightMotorSub = rosNodeHandle->subscribe("frontRight", 1000, &MotorNodePlugin::frontRightMotorCallback, this);
 
 
-//            ROS_INFO("Hello World!");
+//            ROS_INFO("Simulator Motor Node Started");
     }
 
 
 
     void MotorNodePlugin::backLeftMotorCallback(const std_msgs::Float64::ConstPtr& msg) {
         backLeftMotorVal = msg->data;
+#ifdef DEBUG_PRINT
         ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
+#endif
     }
 
     void MotorNodePlugin::middleLeftMotorCallback(const std_msgs::Float64::ConstPtr& msg) {
         middleLeftMotorVal = msg->data;
+#ifdef DEBUG_PRINT
         ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
+#endif
     }
 
     void MotorNodePlugin::frontLeftMotorCallback(const std_msgs::Float64::ConstPtr& msg) {
         frontLeftMotorVal = msg->data;
+#ifdef DEBUG_PRINT
         ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
+#endif
     }
 
     void MotorNodePlugin::backRightMotorCallback(const std_msgs::Float64::ConstPtr& msg) {
         backRightMotorVal = msg->data;
+#ifdef DEBUG_PRINT
         ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
+#endif
     }
 
     void MotorNodePlugin::middleRightMotorCallback(const std_msgs::Float64::ConstPtr& msg) {
         middleRightMotorVal = msg->data;
+#ifdef DEBUG_PRINT
         ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
+#endif
     }
 
 
     void MotorNodePlugin::frontRightMotorCallback(const std_msgs::Float64::ConstPtr& msg) {
         frontRightMotorVal = msg->data;
+#ifdef DEBUG_PRINT
         ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
+#endif
     }
 
 
 
     void MotorNodePlugin::OnUpdate() {
 
-        int joint_axis = 0;
+        u_int joint_axis = 0;
         this->model->GetJoint("left_back_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(backLeftMotorVal));
         this->model->GetJoint("left_mid_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(middleLeftMotorVal));
         this->model->GetJoint("left_front_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(frontLeftMotorVal));
@@ -162,7 +181,8 @@ namespace gazebo {
 
 
     double MotorNodePlugin::mapMotorTorque(double inval) {
-        return inval * 10;  // This line should be some kind of scalar so that the rover accelerates at about the same rate as the actual motor
+        // This line should be some kind of scalar so that the simulated rover accelerates at about the same rate as the actual motor.
+        return inval * 1.0;
     }
 
 
