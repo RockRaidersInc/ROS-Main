@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+    <include file="$(find simulator_motor_driver)/launch/hardware_motor_drivers.launch">
+    <include file="$(find launch_files)/launch/software_componenets.launch" pass_all_args="true"> 
+</launch>

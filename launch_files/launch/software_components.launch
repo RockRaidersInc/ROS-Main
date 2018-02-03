@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+   
+	<!--  This launch file is for all nodes that aren't hardware of simulator specific (eg, everythign but motor drivers). The vast majority of nodes should be launched from this file  -->
+
+	<!-- <node pkg="drive" name ="front" type="motornode.py">
+		<remap from= "motor" to="front"/>
+		<remap from= 'device' to='frontdevice'/>
+	</node> -->
+
+  
+</launch>
