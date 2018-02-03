@@ -5,6 +5,10 @@ This respository should be your src file in your ROS workspace.  So when cloning
 from your workspace
 
 
+##Starting everything up
+The easiest way is to simply call the bash script `launch_simulated.sh` from the folder launchscripts
+
+
 ##Setup and usage for usb_cam submodule
 
 Once you have cloned your repository, if you intend on working with the USB cameras, you will need to initialize and update the usb_cam submodule.  To do so, simply run:
