@@ -1,6 +1,6 @@
 #!/bin/bash
 source /opt/ros/kinetic/setup.bash
-source ~/ws/devel/setup.bash
+#source ~/ws/devel/setup.bash
 
 # add some gazebo enviornment variables
 cd ../model_database
