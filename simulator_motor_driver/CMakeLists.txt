@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(arm_driver)
+project(simulator_motor_driver)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
+
+
+set(GAZEBOINCLUDEDIRS /usr/include;/usr/include/gazebo-7;/usr/include/gazebo-7/gazebo;/usr/include/sdformat-4.0)
+set(GAZEBOLIBRARYDIRS /usr/lib/x86_64-linux-gnu;/usr/lib/x86_64-linux-gnu/gazebo-7/gazebo/plugins)
+
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -10,12 +15,21 @@ project(arm_driver)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
-  message_generation
   std_msgs
+  gazebo_ros
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+
+
+# Find Gazebo
+find_package(gazebo REQUIRED)
+include_directories(${GAZEBO_INCLUDE_DIRS})
+link_directories(${GAZEBO_LIBRARY_DIRS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
+
+
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -54,12 +68,12 @@ find_package(catkin REQUIRED COMPONENTS
 #   Message2.msg
 # )
 
-# Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  ik_service.srv
-  fk_service.srv
-)
+## Generate services in the 'srv' folder
+# add_service_files(
+#   FILES
+#   Service1.srv
+#   Service2.srv
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -68,12 +82,11 @@ add_service_files(
 #   Action2.action
 # )
 
-# Generate added messages and services with any dependencies listed here
- generate_messages(
+## Generate added messages and services with any dependencies listed here
+# generate_messages(
 #   DEPENDENCIES
 #   std_msgs
-#   arm_driver
- )
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -100,16 +113,15 @@ add_service_files(
 ###################################
 ## The catkin_package macro generates cmake config files for your package
 ## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if you package contains header files
+## INCLUDE_DIRS: uncomment this if your package contains header files
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES arm_driver
+#  LIBRARIES simulator_motor_driver
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
-  CATKIN_DEPENDS message_runtime
 )
 
 ###########
@@ -119,15 +131,14 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include ${catkin_INCLUDE_DIRS}
-  include
+# include
   ${catkin_INCLUDE_DIRS}
-  include/ikfast/openrave-0.9.0/python
 )
 
+
 ## Declare a C++ library
-# add_library(
-  #ik ${catkin_INCLUDE_DIRS}/ikfast/generated_cpp/ik.cpp
+# add_library(${PROJECT_NAME}
+#   src/${PROJECT_NAME}/simulator_motor_driver.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -138,8 +149,9 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(kinematics_service
-  src/kinematics_service.cpp)
+#add_executable(SimMotorNode src/SimMotorNode.cpp)
+
+add_library(SimMotorNode SHARED src/SimMotorNode.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -152,9 +164,11 @@ add_executable(kinematics_service
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # Specify libraries to link a library or executable target against
-target_link_libraries(kinematics_service
-   ${catkin_LIBRARIES}
- )
+target_link_libraries(SimMotorNode
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(SimMotorNode ${GAZEBO_libraries})
 
 #############
 ## Install ##
@@ -196,7 +210,7 @@ target_link_libraries(kinematics_service
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_arm_driver.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_simulator_motor_driver.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

@@ -24,12 +24,12 @@ import time
 #CONSTANTS
 #names for constants should be in ALL CAPS
 # robot arm starting joint angles
-t = None
-# t = numpy.zeros((1,3))
-# t[0,0] = 0.2
-# t[0,1] = 0.3
-# t[0,2] = -0.9
-# xy_ideal = numpy.matrix([[-1.0001], [-1.0001]])
+# t = None
+t = numpy.zeros((1,3))
+t[0,0] = 0.2
+t[0,1] = 0.3
+t[0,2] = -0.9
+xy_ideal = numpy.matrix([[-1.0001], [-1.0001]])
 damping = 0.010
 
 # robot arm joint lengths
@@ -38,7 +38,7 @@ ARM_LENGTHS[0] = 1.0
 ARM_LENGTHS[1] = 0.75
 ARM_LENGTHS[2] = 0.5
 
-time = time.time()
+time_new = time.time()
 
 
 v = 0.25  # target end effector velocity
@@ -56,10 +56,10 @@ def Setup(joint_lengths_in):
 # to the end effector) and the target position (x, y, z). It returns new joint in the same format as they were passed
 # in in.
 def Loop(current_angles, target_position):
-    global time
-    last_time = time
-    time = time.time()
-    dt = last_time - time
+    global time_new
+    last_time = time_new
+    time_new = time.time()
+    dt = last_time - time_new
     dx = v * dt
 
     t = numpy.matrix(current_angles).transpose()
@@ -70,7 +70,7 @@ def Loop(current_angles, target_position):
     # J = numpy.matrix([[-1*L[0]*math.sin(t[0]) + -1*L[1]*math.sin(t[0]+t[1]), -1*L[1]*math.sin(t[0]+t[1])],
     #                   [L[0]*math.cos(t[0]) + L[1]*math.cos(t[0]+t[1]), L[1]*math.cos(t[0]+t[1])]])
 
-    xy_curr2 = calculate_forward_kinematics(t)
+    xy_curr2 = calculate_forward_kinematics(t, ARM_LENGTHS)
     J2 = calculate_jacobian(calculate_forward_kinematics, t, ARM_LENGTHS)
     # print "theta: ", t, "\nxy_curr: ", xy_curr
     xy_curr = xy_curr2
@@ -150,12 +150,12 @@ def draw_graphics():
 
 
 if __name__ == "__main__":
-    Setup()
+#    Setup()
     pygame.init()
     screen = pygame.display.set_mode((600, 600))
     while(True):
         last_time = time.time()
-        Loop()
+        t = Loop(t, xy_ideal)
         draw_graphics()
         while (time.time() - last_time < 1 / fps):
             time.sleep(0.001)

@@ -1,0 +1,10 @@
+# target_xyz is in format [x, y, z]
+float32[] target_xyz
+# target_angles can either be [yaw, pitch, roll] or and 3x3 rotation matrix (in radians)
+#TODO: make sure that it actually is [yaw, pitch, roll]
+float32[] target_angles
+---
+# returns angles, numbering starting from the base (in radians)
+# success will be 1 if the specified position can be reached and 0 therwise
+int32 success
+float32[] angles
