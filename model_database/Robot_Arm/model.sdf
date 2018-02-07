@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <sdf version='1.6'>
   <model name='Robot_Arm'>
-    <link name='base'>
+    <link name='arm_base'>
       <pose frame=''>0 0 0.1 0 -0 0</pose>
       <inertial>
         <mass>50</mass>
@@ -524,7 +524,7 @@
       </physics>
     </joint>
     <joint name='base_center_shaft' type='revolute'>
-      <parent>base</parent>
+      <parent>arm_base</parent>
       <child>center_shaft</child>
       <pose frame=''>0 0 -0.074676 0 -0 0</pose>
       <axis>
