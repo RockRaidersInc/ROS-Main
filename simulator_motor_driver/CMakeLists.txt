@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(simulator_motor_driver)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++11 -g3)
 
 
 set(GAZEBOINCLUDEDIRS /usr/include;/usr/include/gazebo-7;/usr/include/gazebo-7/gazebo;/usr/include/sdformat-4.0)

@@ -14,7 +14,7 @@
 
 #include "ros/callback_queue.h"
 #include "ros/subscribe_options.h"
-#include "std_msgs/Float64.h"
+#include "std_msgs/Int8.h"
 
 
 #include "SimMotorNode.h"
@@ -55,10 +55,10 @@ namespace gazebo {
         // Making a seperate subscriber and callback for each motor was intentional, some of the motors might need
         // to be treated differently from the others (like they might need different torque scaling or something)
         ros::Subscriber backLeftMotorSub;
-        ros::Subscriber middleLeftMotorSub;
+//        ros::Subscriber middleLeftMotorSub;
         ros::Subscriber frontLeftMotorSub;
         ros::Subscriber backRightMotorSub;
-        ros::Subscriber middleRightMotorSub;
+//        ros::Subscriber middleRightMotorSub;
         ros::Subscriber frontRightMotorSub;
 
         double backLeftMotorVal = 0;
@@ -68,13 +68,13 @@ namespace gazebo {
         double middleRightMotorVal = 0;
         double frontRightMotorVal = 0;
 
-        void backLeftMotorCallback(const std_msgs::Float64::ConstPtr& msg);
+        void backLeftMotorCallback(const std_msgs::Int8::ConstPtr& msg);
 
-        void middleLeftMotorCallback(const std_msgs::Float64::ConstPtr& msg);
-        void frontLeftMotorCallback(const std_msgs::Float64::ConstPtr& msg);
-        void backRightMotorCallback(const std_msgs::Float64::ConstPtr& msg);
-        void middleRightMotorCallback(const std_msgs::Float64::ConstPtr& msg);
-        void frontRightMotorCallback(const std_msgs::Float64::ConstPtr& msg);
+        void middleLeftMotorCallback(const std_msgs::Int8::ConstPtr& msg);
+        void frontLeftMotorCallback(const std_msgs::Int8::ConstPtr& msg);
+        void backRightMotorCallback(const std_msgs::Int8::ConstPtr& msg);
+        void middleRightMotorCallback(const std_msgs::Int8::ConstPtr& msg);
+        void frontRightMotorCallback(const std_msgs::Int8::ConstPtr& msg);
 
 
         double mapMotorTorque(double inval);
@@ -110,10 +110,10 @@ namespace gazebo {
         this->rosNodeHandle.reset(new ros::NodeHandle("gazebo_motor_node"));
 
         backLeftMotorSub = rosNodeHandle->subscribe("backLeft", 1000, &MotorNodePlugin::backLeftMotorCallback, this);
-        middleLeftMotorSub = rosNodeHandle->subscribe("middleLeft", 1000, &MotorNodePlugin::middleLeftMotorCallback, this);
+//        middleLeftMotorSub = rosNodeHandle->subscribe("middleLeft", 1000, &MotorNodePlugin::middleLeftMotorCallback, this);
         frontLeftMotorSub = rosNodeHandle->subscribe("frontLeft", 1000, &MotorNodePlugin::frontLeftMotorCallback, this);
         backRightMotorSub = rosNodeHandle->subscribe("backRight", 1000, &MotorNodePlugin::backRightMotorCallback, this);
-        middleRightMotorSub = rosNodeHandle->subscribe("middleRight", 1000, &MotorNodePlugin::middleRightMotorCallback, this);
+//        middleRightMotorSub = rosNodeHandle->subscribe("middleRight", 1000, &MotorNodePlugin::middleRightMotorCallback, this);
         frontRightMotorSub = rosNodeHandle->subscribe("frontRight", 1000, &MotorNodePlugin::frontRightMotorCallback, this);
 
 
@@ -122,35 +122,35 @@ namespace gazebo {
 
 
 
-    void MotorNodePlugin::backLeftMotorCallback(const std_msgs::Float64::ConstPtr& msg) {
+    void MotorNodePlugin::backLeftMotorCallback(const std_msgs::Int8::ConstPtr& msg) {
         backLeftMotorVal = msg->data;
 #ifdef DEBUG_PRINT
         ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
 #endif
     }
 
-    void MotorNodePlugin::middleLeftMotorCallback(const std_msgs::Float64::ConstPtr& msg) {
+    void MotorNodePlugin::middleLeftMotorCallback(const std_msgs::Int8::ConstPtr& msg) {
         middleLeftMotorVal = msg->data;
 #ifdef DEBUG_PRINT
         ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
 #endif
     }
 
-    void MotorNodePlugin::frontLeftMotorCallback(const std_msgs::Float64::ConstPtr& msg) {
+    void MotorNodePlugin::frontLeftMotorCallback(const std_msgs::Int8::ConstPtr& msg) {
         frontLeftMotorVal = msg->data;
 #ifdef DEBUG_PRINT
         ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
 #endif
     }
 
-    void MotorNodePlugin::backRightMotorCallback(const std_msgs::Float64::ConstPtr& msg) {
+    void MotorNodePlugin::backRightMotorCallback(const std_msgs::Int8::ConstPtr& msg) {
         backRightMotorVal = msg->data;
 #ifdef DEBUG_PRINT
         ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
 #endif
     }
 
-    void MotorNodePlugin::middleRightMotorCallback(const std_msgs::Float64::ConstPtr& msg) {
+    void MotorNodePlugin::middleRightMotorCallback(const std_msgs::Int8::ConstPtr& msg) {
         middleRightMotorVal = msg->data;
 #ifdef DEBUG_PRINT
         ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
@@ -158,7 +158,7 @@ namespace gazebo {
     }
 
 
-    void MotorNodePlugin::frontRightMotorCallback(const std_msgs::Float64::ConstPtr& msg) {
+    void MotorNodePlugin::frontRightMotorCallback(const std_msgs::Int8::ConstPtr& msg) {
         frontRightMotorVal = msg->data;
 #ifdef DEBUG_PRINT
         ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
@@ -171,10 +171,10 @@ namespace gazebo {
 
         u_int joint_axis = 0;
         this->model->GetJoint("left_back_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(backLeftMotorVal));
-        this->model->GetJoint("left_mid_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(middleLeftMotorVal));
+//        this->model->GetJoint("left_mid_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(middleLeftMotorVal));
         this->model->GetJoint("left_front_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(frontLeftMotorVal));
         this->model->GetJoint("right_back_wheel_hinge")->SetForce(joint_axis,  -1 * mapMotorTorque(backRightMotorVal));
-        this->model->GetJoint("right_mid_wheel_hinge")->SetForce(joint_axis, -1 * mapMotorTorque(middleRightMotorVal));
+//        this->model->GetJoint("right_mid_wheel_hinge")->SetForce(joint_axis, -1 * mapMotorTorque(middleRightMotorVal));
         this->model->GetJoint("right_front_wheel_hinge")->SetForce(joint_axis, -1 *  mapMotorTorque(frontRightMotorVal));
 
     }
@@ -186,7 +186,7 @@ namespace gazebo {
     }
 
 
-    void testCallback(const std_msgs::Float64::ConstPtr& msg) {
+    void testCallback(const std_msgs::Int8::ConstPtr& msg) {
         std::cout << "test" << std::endl;
     }
 }
