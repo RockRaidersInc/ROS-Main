@@ -27,7 +27,7 @@ class devicenode:
 		print("test")
 		rospy.Subscriber('usb', String, self.call)
 	
-		f = open("/home/rockie/devices.txt","r")
+		f = open("files.txt","r")
 	
 		x=1
 		for line in f:
@@ -65,7 +65,7 @@ class devicenode:
 		print (com[1])
 		if com[0] == 'connect':
 			try:
-				print "connecting"
+				print("connecting")
 				dev = self.req[com[1]]
 				print(dev.device)
 				self.req.pop(dev.device)
@@ -82,7 +82,7 @@ class devicenode:
 				self.con.pop(dev.device)
 				self.jobs.append(dev)
 			except:
-				print "fuck you and everyone around you no connected device by name: "+com[1]
+				print("fuck you and everyone around you no connected device by name: "+com[1])
 		
 		else:
 			print ('recieved invalid command type')
@@ -100,7 +100,7 @@ class devicenode:
 				av[usb.location]= usb.device
 				#print (usb.location + " " +req[0].loc)
 				#print ("This is a test "+str(req[0].loc == usb.location))
-			print "looking for devices:"
+			print("looking for devices:")
 			x=0
 			for dev in self.jobs:
 				print "\t"+dev.name
