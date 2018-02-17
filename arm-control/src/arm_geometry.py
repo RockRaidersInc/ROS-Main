@@ -56,7 +56,7 @@ class Actuator:
         return self.encodeMin + extension * self.encodeRange
 
 # Instatiation of the above for the actuators on the rover
-ARM_ACTUATOR = Actuator(8.0, 7.0, 0.0, 12.0)
+ARM_ACTUATOR = Actuator(8.0, 7.0, 100, 900)
 
 # Joint implementation based on a joint driven by a linear actuator
 # Requires an Actuator instance, and mounting parameters specified
