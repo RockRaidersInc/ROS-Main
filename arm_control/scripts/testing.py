@@ -11,6 +11,8 @@ controller = JointController(
     ActuatorJoint(ARM_ACTUATOR, (3,0), (12,math.radians(5))),
     "encoders/test",
     "drive",
+    "control",
+    0,
     0.01
     )
 controller.Execute("test_control_node")

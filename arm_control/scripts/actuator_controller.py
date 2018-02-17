@@ -7,10 +7,10 @@
 # position control to arm joints.  Instantiated for each of the 
 # necessary joints
 
-
 import rospy
 import arm_geometry
 from std_msgs.msg import Float64, Int16
+from arm_control.msg import ArmPose
 
 
 
@@ -42,6 +42,7 @@ class JointController:
         rospy.init_node('joint_controller_'+name)
         if self.encoder_topic is not None:
             rospy.Subscriber(self.encoder_topic, Int16, self.OnNewPosition)
+        rospy.Subscriber(self.arm_topic, ArmPose, self.OnNewTarget)
         self.drive_pub = rospy.Publisher(self.drive_topic, Float64, queue_size=10)
         rospy.spin()
     
