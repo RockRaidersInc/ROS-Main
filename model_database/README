@@ -1,0 +1,3 @@
+Gazebo needs to be told where to find model files. It doesn't check the model_database file by default.
+
+Run "source fix_model_path.sh" (without quotes) to fix this. The command must be run in each bash shell gazebo is started from.

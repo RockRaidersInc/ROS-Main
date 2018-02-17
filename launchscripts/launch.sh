@@ -7,5 +7,5 @@ echo "IP address is:"
 echo $text1
 echo 
 echo
-roslaunch drive startupcam.launch
+roslaunch launch_files start_rover.launch
 
