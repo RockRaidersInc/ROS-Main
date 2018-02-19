@@ -17,7 +17,7 @@ class motornode:
 	pub = None
 	enc_pub = None
 
-	def __init__(self,n,m1_name=n+'M1',m2_name=n+'M2',useEnc=False):
+	def __init__(self,n,m1_name='M1',m2_name='M2',useEnc=False):
 		self.name = n
 		rospy.init_node('motornode', anonymous=True)
 
@@ -42,7 +42,7 @@ class motornode:
 
 		self.x = int(data.x)
 		self.y = int(data.y)
-		print("(x,y) = (%i,%i)"%(self.x,self.y))
+		#print("(x,y) = (%i,%i)"%(self.x,self.y))
 
 	def callbackM1(self, data):
 		self.timeout = 1000
@@ -88,7 +88,7 @@ class motornode:
 	def normal(self, useEnc):
 		while not rospy.is_shutdown():
 			if (self.timeout > 0):
-				print("setting motor to values %i, %i"%(self.x,self.y))
+				#print("setting motor to values %i, %i"%(self.x,self.y))
 				self.enc(useEnc)
 				try:
 						self.setmotor(self.x,self.y)
@@ -96,12 +96,12 @@ class motornode:
 					er = 1
 					break
 					self.timeout -=1
-				else:
-					try:
-						self.setmotor(64,64)
-					except:
-						er = 1
-						break
+			else:
+				try:
+					self.setmotor(64,64)
+				except:
+					er = 1
+					break
     
 	
 	def enc(self, useEnc):
@@ -113,4 +113,4 @@ class motornode:
 		self.enc_pub.publish(Vector3(enc1[1], enc2[1], 0))
 
 if __name__ == '__main__':
-	controller = motornode('steer', True)
+	controller = motornode('left')
