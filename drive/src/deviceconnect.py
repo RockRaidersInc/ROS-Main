@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import rospy
+import rospkg
 import serial.tools.list_ports
 from std_msgs.msg import String
 import sys
@@ -27,7 +28,9 @@ class devicenode:
 		print("test")
 		rospy.Subscriber('usb', String, self.call)
 	
-		f = open("files.txt","r")
+		path_getter = rospkg.RosPack()	        
+		path = path_getter.get_path("drive")
+		f = open(path+"/src/files.txt","r")
 	
 		x=1
 		for line in f:
