@@ -8,5 +8,7 @@
 		<remap from= 'device' to='frontdevice'/>
 	</node> -->
 
+    <node name="joy" pkg="joy" type="joy_node"\>
+    <node name="joy_control" pkg="drive" type="joy_control.py"\>
   
 </launch>
