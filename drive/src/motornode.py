@@ -113,4 +113,5 @@ class motornode:
 		self.enc_pub.publish(Vector3(enc1[1], enc2[1], 0))
 
 if __name__ == '__main__':
-	controller = motornode('left')
+	name = rospy.get_param('~controller_name')
+	controller = motornode(name)

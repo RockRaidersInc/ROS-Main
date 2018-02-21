@@ -2,4 +2,12 @@
 <launch>
     <include file="$(find simulator_motor_driver)/launch/hardware_motor_drivers.launch">
     <include file="$(find launch_files)/launch/software_componenets.launch" pass_all_args="true"> 
+
+    <node name="deviceconnect" pkg="drive" type="deviceconnect.py"\>
+    <node name="motornode" pkg="drive" type="motornode.py">
+        <param name="controller_name" value="left"\>
+    </node>
+    <node name="motornode" pkg="drive" type="motornode.py">
+        <param name="controller_name" value="right"\>
+    </node>
 </launch>
