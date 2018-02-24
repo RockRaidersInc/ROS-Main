@@ -1,6 +1,11 @@
 #!/bin/bash
-source /opt/ros/kinetic/setup.bash
-#source ~/ws/devel/setup.bash
+
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+echo $SCRIPTPATH
+cd $SCRIPTPATH
+
+#source /opt/ros/kinetic/setup.bash
+source ../../devel/setup.bash
 
 # add some gazebo enviornment variables
 cd ../model_database

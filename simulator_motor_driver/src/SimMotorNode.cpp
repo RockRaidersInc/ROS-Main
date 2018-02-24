@@ -5,6 +5,7 @@
 #include <cmath>
 #include <ctime>
 #include <chrono>
+#include <vector>
 
 #include <ros/ros.h>
 #include <gazebo/gazebo.hh>
@@ -61,12 +62,21 @@ namespace gazebo {
 //        ros::Subscriber middleRightMotorSub;
         ros::Subscriber frontRightMotorSub;
 
+        ros::Subscriber ArmSub0;
+        ros::Subscriber ArmSub1;
+        ros::Subscriber ArmSub2;
+        ros::Subscriber ArmSub3;
+        ros::Subscriber ArmSub4;
+        ros::Subscriber ArmSub5;
+
+
         double backLeftMotorVal = 0;
         double middleLeftMotorVal = 0;
         double frontLeftMotorVal = 0;
         double backRightMotorVal = 0;
         double middleRightMotorVal = 0;
         double frontRightMotorVal = 0;
+        double armJointVals[6];
 
         void backLeftMotorCallback(const std_msgs::Int8::ConstPtr& msg);
 
@@ -75,6 +85,12 @@ namespace gazebo {
         void backRightMotorCallback(const std_msgs::Int8::ConstPtr& msg);
         void middleRightMotorCallback(const std_msgs::Int8::ConstPtr& msg);
         void frontRightMotorCallback(const std_msgs::Int8::ConstPtr& msg);
+        void ArmCallback0(const std_msgs::Int8::ConstPtr& msg);
+        void ArmCallback1(const std_msgs::Int8::ConstPtr& msg);
+        void ArmCallback2(const std_msgs::Int8::ConstPtr& msg);
+        void ArmCallback3(const std_msgs::Int8::ConstPtr& msg);
+        void ArmCallback4(const std_msgs::Int8::ConstPtr& msg);
+        void ArmCallback5(const std_msgs::Int8::ConstPtr& msg);
 
 
         double mapMotorTorque(double inval);
@@ -89,6 +105,10 @@ namespace gazebo {
 
 
     void MotorNodePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
+        for(int i = 0; i < 6; i++) {
+                armJointVals[i] = 0;
+        }
+
         this->model = _model;
 
 
@@ -109,12 +129,16 @@ namespace gazebo {
 
         this->rosNodeHandle.reset(new ros::NodeHandle("gazebo_motor_node"));
 
-        backLeftMotorSub = rosNodeHandle->subscribe("backLeft", 1000, &MotorNodePlugin::backLeftMotorCallback, this);
-//        middleLeftMotorSub = rosNodeHandle->subscribe("middleLeft", 1000, &MotorNodePlugin::middleLeftMotorCallback, this);
-        frontLeftMotorSub = rosNodeHandle->subscribe("frontLeft", 1000, &MotorNodePlugin::frontLeftMotorCallback, this);
-        backRightMotorSub = rosNodeHandle->subscribe("backRight", 1000, &MotorNodePlugin::backRightMotorCallback, this);
-//        middleRightMotorSub = rosNodeHandle->subscribe("middleRight", 1000, &MotorNodePlugin::middleRightMotorCallback, this);
-        frontRightMotorSub = rosNodeHandle->subscribe("frontRight", 1000, &MotorNodePlugin::frontRightMotorCallback, this);
+        backLeftMotorSub = rosNodeHandle->subscribe("/motors/backLeft", 1, &MotorNodePlugin::backLeftMotorCallback, this);
+//        middleLeftMotorSub = rosNodeHandle->subscribe("/motors/middleLeft", 1000, &MotorNodePlugin::middleLeftMotorCallback, this);
+        frontLeftMotorSub = rosNodeHandle->subscribe("/motors/frontLeft", 1, &MotorNodePlugin::frontLeftMotorCallback, this);
+        backRightMotorSub = rosNodeHandle->subscribe("/motors/backRight", 1, &MotorNodePlugin::backRightMotorCallback, this);
+//        middleRightMotorSub = rosNodeHandle->subscribe("/motors/middleRight", 1000, &MotorNodePlugin::middleRightMotorCallback, this);
+        frontRightMotorSub = rosNodeHandle->subscribe("/motors/frontRight", 1, &MotorNodePlugin::frontRightMotorCallback, this);
+        
+        ArmSub0 = rosNodeHandle->subscribe("/motors/Arm0", 1, &MotorNodePlugin::ArmCallback0, this);
+        ArmSub1 = rosNodeHandle->subscribe("/motors/Arm1", 1, &MotorNodePlugin::ArmCallback1, this);
+        ArmSub2 = rosNodeHandle->subscribe("/motors/Arm2", 1, &MotorNodePlugin::ArmCallback2, this);
 
 
 //            ROS_INFO("Simulator Motor Node Started");
@@ -165,6 +189,30 @@ namespace gazebo {
 #endif
     }
 
+    void MotorNodePlugin::ArmCallback0(const std_msgs::Int8::ConstPtr& msg) {
+        armJointVals[0] = (double) msg->data;
+    }
+
+    void MotorNodePlugin::ArmCallback1(const std_msgs::Int8::ConstPtr& msg) {
+        armJointVals[1] = (double) msg->data;
+    }
+
+    void MotorNodePlugin::ArmCallback2(const std_msgs::Int8::ConstPtr& msg) {
+        armJointVals[2] = (double) msg->data;
+    }
+
+    void MotorNodePlugin::ArmCallback3(const std_msgs::Int8::ConstPtr& msg) {
+        armJointVals[3] = (double) msg->data;
+    }
+
+    void MotorNodePlugin::ArmCallback4(const std_msgs::Int8::ConstPtr& msg) {
+        armJointVals[4] = (double) msg->data;
+    }
+
+    void MotorNodePlugin::ArmCallback5(const std_msgs::Int8::ConstPtr& msg) {
+        armJointVals[5] = (double) msg->data;
+    }
+
 
 
     void MotorNodePlugin::OnUpdate() {
@@ -173,16 +221,19 @@ namespace gazebo {
         this->model->GetJoint("left_back_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(backLeftMotorVal));
 //        this->model->GetJoint("left_mid_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(middleLeftMotorVal));
         this->model->GetJoint("left_front_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(frontLeftMotorVal));
-        this->model->GetJoint("right_back_wheel_hinge")->SetForce(joint_axis,  -1 * mapMotorTorque(backRightMotorVal));
-//        this->model->GetJoint("right_mid_wheel_hinge")->SetForce(joint_axis, -1 * mapMotorTorque(middleRightMotorVal));
-        this->model->GetJoint("right_front_wheel_hinge")->SetForce(joint_axis, -1 *  mapMotorTorque(frontRightMotorVal));
-
+        this->model->GetJoint("right_back_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(backRightMotorVal));
+//        this->model->GetJoint("right_mid_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(middleRightMotorVal));
+        this->model->GetJoint("right_front_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(frontRightMotorVal));
+        
+        this->model->GetJoint("armbase_armcentershaft")->SetForce(joint_axis, mapMotorTorque(armJointVals[0]));
+        this->model->GetJoint("armcentershaftoffset_backarm")->SetForce(joint_axis, mapMotorTorque(armJointVals[1]));
+        this->model->GetJoint("backarm_forearm")->SetForce(joint_axis, mapMotorTorque(armJointVals[2]));
     }
 
 
     double MotorNodePlugin::mapMotorTorque(double inval) {
         // This line should be some kind of scalar so that the simulated rover accelerates at about the same rate as the actual motor.
-        return inval * 1.0;
+        return inval * 0.1;
     }
 
 

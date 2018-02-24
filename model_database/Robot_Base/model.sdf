@@ -198,7 +198,7 @@
     <link name='base_arm'>
       <pose frame=''>-0 0.3048 1.09335 0 -0 0</pose>
       <inertial>
-        <mass>50</mass>
+        <mass>5</mass>
         <inertia>
           <ixx>0.166667</ixx>
           <ixy>0</ixy>
@@ -735,8 +735,8 @@
         <surface>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
+              <mu>0.15</mu>
+              <mu2>0.15</mu2>
               <fdir1>0 0 0</fdir1>
               <slip1>0</slip1>
               <slip2>0</slip2>
@@ -929,8 +929,8 @@
         <surface>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
+              <mu>0.15</mu>
+              <mu2>0.15</mu2>
               <fdir1>0 0 0</fdir1>
               <slip1>0</slip1>
               <slip2>0</slip2>
@@ -1097,7 +1097,7 @@
           <lighting>1</lighting>
           <script>
             <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/Black</name>
           </script>
           <ambient>0.1 0.1 0.1 1</ambient>
           <diffuse>0.7 0.7 0.7 1</diffuse>
@@ -1123,8 +1123,8 @@
         <surface>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
+              <mu>0.15</mu>
+              <mu2>0.15</mu2>
               <fdir1>0 0 0</fdir1>
               <slip1>0</slip1>
               <slip2>0</slip2>
@@ -1304,31 +1304,6 @@
         <cast_shadows>1</cast_shadows>
         <transparency>0</transparency>
       </visual>
-      <visual name='visual'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
-        <geometry>
-          <cylinder>
-            <radius>0.2032</radius>
-            <length>0.1</length>
-          </cylinder>
-        </geometry>
-        <material>
-          <lighting>1</lighting>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Black</name>
-          </script>
-          <ambient>0.1 0.1 0.1 1</ambient>
-          <diffuse>0.7 0.7 0.7 1</diffuse>
-          <specular>0.01 0.01 0.01 1</specular>
-          <emissive>0 0 0 1</emissive>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
-        </material>
-        <cast_shadows>1</cast_shadows>
-        <transparency>0</transparency>
-      </visual>
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
@@ -1342,8 +1317,8 @@
         <surface>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
+              <mu>0.15</mu>
+              <mu2>0.15</mu2>
               <fdir1>0 0 0</fdir1>
               <slip1>0</slip1>
               <slip2>0</slip2>
@@ -1603,8 +1578,8 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
+          <damping>0.25</damping>
+          <friction>0.25</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1636,8 +1611,8 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
+          <damping>0.25</damping>
+          <friction>0.25</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1669,8 +1644,8 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
+          <damping>0.25</damping>
+          <friction>0.25</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1702,8 +1677,8 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
+          <damping>0.25</damping>
+          <friction>0.25</friction>
         </dynamics>
       </axis>
       <physics>
