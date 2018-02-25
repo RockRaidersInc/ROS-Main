@@ -52,6 +52,9 @@ namespace gazebo {
         // a pointer to this ros node
         std::unique_ptr<ros::NodeHandle> rosNodeHandle;
 
+        // for controlling the arm joint angles
+        physics::JointController* j2_controller;
+
 
         // Making a seperate subscriber and callback for each motor was intentional, some of the motors might need
         // to be treated differently from the others (like they might need different torque scaling or something)
@@ -95,6 +98,8 @@ namespace gazebo {
 
         double mapMotorTorque(double inval);
 
+        double map(double x, double in_min, double in_max, double out_min, double out_max);
+
 
     };
 
@@ -126,6 +131,8 @@ namespace gazebo {
         this->updateConnection = event::Events::ConnectWorldUpdateBegin(
                 std::bind(&MotorNodePlugin::OnUpdate, this));
 
+        this->j2_controller = new physics::JointController(this->model);
+
 
         this->rosNodeHandle.reset(new ros::NodeHandle("gazebo_motor_node"));
 
@@ -139,6 +146,10 @@ namespace gazebo {
         ArmSub0 = rosNodeHandle->subscribe("/motors/Arm0", 1, &MotorNodePlugin::ArmCallback0, this);
         ArmSub1 = rosNodeHandle->subscribe("/motors/Arm1", 1, &MotorNodePlugin::ArmCallback1, this);
         ArmSub2 = rosNodeHandle->subscribe("/motors/Arm2", 1, &MotorNodePlugin::ArmCallback2, this);
+        ArmSub3 = rosNodeHandle->subscribe("/motors/Arm3", 1, &MotorNodePlugin::ArmCallback3, this);
+        ArmSub4 = rosNodeHandle->subscribe("/motors/Arm4", 1, &MotorNodePlugin::ArmCallback4, this);
+        ArmSub5 = rosNodeHandle->subscribe("/motors/Arm5", 1, &MotorNodePlugin::ArmCallback5, this);
+
 
 
 //            ROS_INFO("Simulator Motor Node Started");
@@ -225,9 +236,9 @@ namespace gazebo {
 //        this->model->GetJoint("right_mid_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(middleRightMotorVal));
         this->model->GetJoint("right_front_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(frontRightMotorVal));
         
-        this->model->GetJoint("armbase_armcentershaft")->SetForce(joint_axis, mapMotorTorque(armJointVals[0]));
-        this->model->GetJoint("armcentershaftoffset_backarm")->SetForce(joint_axis, mapMotorTorque(armJointVals[1]));
-        this->model->GetJoint("backarm_forearm")->SetForce(joint_axis, mapMotorTorque(armJointVals[2]));
+        this->j2_controller->SetJointPosition(this->model->GetJoint("armbase_armcentershaft"), map(armJointVals[0], -128, 127, -3.14, 3.14));
+        this->j2_controller->SetJointPosition(this->model->GetJoint("armcentershaftoffset_backarm"), map(armJointVals[1], -128, 127, -3.14, 3.14));
+        this->j2_controller->SetJointPosition(this->model->GetJoint("backarm_forearm"), map(armJointVals[2], -128, 127, -3.14, 3.14));
     }
 
 
@@ -239,5 +250,11 @@ namespace gazebo {
 
     void testCallback(const std_msgs::Int8::ConstPtr& msg) {
         std::cout << "test" << std::endl;
+    }
+
+
+    double MotorNodePlugin::map(double x, double in_min, double in_max, double out_min, double out_max)
+    {
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 }
