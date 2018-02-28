@@ -131,9 +131,16 @@ namespace gazebo {
         this->updateConnection = event::Events::ConnectWorldUpdateBegin(
                 std::bind(&MotorNodePlugin::OnUpdate, this));
 
+        /*
+        physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+        const std::string frictionModel = "cone_model";
+        physics->SetParam("friction_model", frictionModel);
+        */
+
         this->j2_controller = new physics::JointController(this->model);
 
 
+        // All ROS stuff
         this->rosNodeHandle.reset(new ros::NodeHandle("gazebo_motor_node"));
 
         backLeftMotorSub = rosNodeHandle->subscribe("/motors/backLeft", 1, &MotorNodePlugin::backLeftMotorCallback, this);
@@ -151,6 +158,10 @@ namespace gazebo {
         ArmSub5 = rosNodeHandle->subscribe("/motors/Arm5", 1, &MotorNodePlugin::ArmCallback5, this);
 
 
+        this->model->GetJoint("left_back_wheel_hinge")->SetParam("max_force", 0, 10000);
+        this->model->GetJoint("left_front_wheel_hinge")->SetParam("max_force", 0, 10000);
+        this->model->GetJoint("right_back_wheel_hinge")->SetParam("max_force", 0, 10000);
+        this->model->GetJoint("right_front_wheel_hinge")->SetParam("max_force", 0, 10000);
 
 //            ROS_INFO("Simulator Motor Node Started");
     }
@@ -166,50 +177,38 @@ namespace gazebo {
 
     void MotorNodePlugin::middleLeftMotorCallback(const std_msgs::Int8::ConstPtr& msg) {
         middleLeftMotorVal = msg->data;
-#ifdef DEBUG_PRINT
-        ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
-#endif
     }
 
     void MotorNodePlugin::frontLeftMotorCallback(const std_msgs::Int8::ConstPtr& msg) {
         frontLeftMotorVal = msg->data;
-#ifdef DEBUG_PRINT
-        ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
-#endif
     }
 
     void MotorNodePlugin::backRightMotorCallback(const std_msgs::Int8::ConstPtr& msg) {
         backRightMotorVal = msg->data;
-#ifdef DEBUG_PRINT
-        ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
-#endif
     }
 
     void MotorNodePlugin::middleRightMotorCallback(const std_msgs::Int8::ConstPtr& msg) {
         middleRightMotorVal = msg->data;
-#ifdef DEBUG_PRINT
-        ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
-#endif
     }
 
 
     void MotorNodePlugin::frontRightMotorCallback(const std_msgs::Int8::ConstPtr& msg) {
         frontRightMotorVal = msg->data;
-#ifdef DEBUG_PRINT
-        ROS_INFO("I heard: [%s]", std::to_string(msg->data).c_str());
-#endif
     }
 
     void MotorNodePlugin::ArmCallback0(const std_msgs::Int8::ConstPtr& msg) {
         armJointVals[0] = (double) msg->data;
+        this->j2_controller->SetJointPosition(this->model->GetJoint("armbase_armcentershaft"), map(armJointVals[0], -128, 127, -3.14, 3.14));
     }
 
     void MotorNodePlugin::ArmCallback1(const std_msgs::Int8::ConstPtr& msg) {
         armJointVals[1] = (double) msg->data;
+        this->j2_controller->SetJointPosition(this->model->GetJoint("armcentershaftoffset_backarm"), map(armJointVals[1], -128, 127, -3.14, 3.14));
     }
 
     void MotorNodePlugin::ArmCallback2(const std_msgs::Int8::ConstPtr& msg) {
         armJointVals[2] = (double) msg->data;
+        this->j2_controller->SetJointPosition(this->model->GetJoint("backarm_forearm"), map(armJointVals[2], -128, 127, -3.14, 3.14));
     }
 
     void MotorNodePlugin::ArmCallback3(const std_msgs::Int8::ConstPtr& msg) {
@@ -230,15 +229,18 @@ namespace gazebo {
 
         u_int joint_axis = 0;
         this->model->GetJoint("left_back_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(backLeftMotorVal));
-//        this->model->GetJoint("left_mid_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(middleLeftMotorVal));
         this->model->GetJoint("left_front_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(frontLeftMotorVal));
         this->model->GetJoint("right_back_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(backRightMotorVal));
-//        this->model->GetJoint("right_mid_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(middleRightMotorVal));
         this->model->GetJoint("right_front_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(frontRightMotorVal));
+
+        // this->model->GetJoint("left_back_wheel_hinge")->SetParam("vel", joint_axis, mapMotorTorque(backLeftMotorVal));
+        // this->model->GetJoint("left_front_wheel_hinge")->SetParam("vel", joint_axis,  mapMotorTorque(frontLeftMotorVal));
+        // this->model->GetJoint("right_back_wheel_hinge")->SetParam("vel", joint_axis,  mapMotorTorque(backRightMotorVal));
+        // this->model->GetJoint("right_front_wheel_hinge")->SetParam("vel", joint_axis, mapMotorTorque(frontRightMotorVal));
         
-        this->j2_controller->SetJointPosition(this->model->GetJoint("armbase_armcentershaft"), map(armJointVals[0], -128, 127, -3.14, 3.14));
-        this->j2_controller->SetJointPosition(this->model->GetJoint("armcentershaftoffset_backarm"), map(armJointVals[1], -128, 127, -3.14, 3.14));
-        this->j2_controller->SetJointPosition(this->model->GetJoint("backarm_forearm"), map(armJointVals[2], -128, 127, -3.14, 3.14));
+        // this->j2_controller->SetJointPosition(this->model->GetJoint("armbase_armcentershaft"), map(armJointVals[0], -128, 127, -3.14, 3.14));
+        // this->j2_controller->SetJointPosition(this->model->GetJoint("armcentershaftoffset_backarm"), map(armJointVals[1], -128, 127, -3.14, 3.14));
+        // this->j2_controller->SetJointPosition(this->model->GetJoint("backarm_forearm"), map(armJointVals[2], -128, 127, -3.14, 3.14));
     }
 
 

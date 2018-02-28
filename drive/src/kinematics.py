@@ -3,10 +3,10 @@
 # Author: Robert Katzschmann, Shih-Yuan Liu
 # Modified by PCH 2017, David Michelman 2018
 
-gain = 10.0
+gain = 1.0
 trim = 0.0
 baseline = 1.0  # Distance between wheels (m)
-radius = 0.3  # Wheel radius (m)
+radius = 0.15  # Wheel radius (m)
 k = 1.0
 limit = 100.0
 

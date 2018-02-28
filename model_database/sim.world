@@ -81,5 +81,6 @@
       </link>
       <pose frame=''>0.000967 -0.039388 0 0 -0 0</pose>
     </model>
+    <plugin name='FixFrictionNode' filename='libFixFrictionNode.so'/>
   </world>
 </sdf>

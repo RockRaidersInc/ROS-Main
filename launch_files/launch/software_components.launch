@@ -3,11 +3,6 @@
    
 	<!--  This launch file is for all nodes that aren't hardware of simulator specific (eg, everythign but motor drivers). The vast majority of nodes should be launched from this file  -->
 
-	<!-- <node pkg="drive" name ="front" type="motornode.py">
-		<remap from= "motor" to="front"/>
-		<remap from= 'device' to='frontdevice'/>
-	</node> -->
-
     <node name="joy" pkg="joy" type="joy_node">
 		<!-- Limit the message send rate, it can reach over 7000 msgs/sec when unlimited -->
 		<param name="~coalesce_interval" type="double" value="0.01"/>	

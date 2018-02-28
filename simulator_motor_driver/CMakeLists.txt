@@ -25,7 +25,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 # Find Gazebo
 find_package(gazebo REQUIRED)
-include_directories(${GAZEBO_INCLUDE_DIRS})
+include_directories(
+  include ${catkin_INCLUDE_DIRS}${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
@@ -152,6 +153,7 @@ include_directories(
 #add_executable(SimMotorNode src/SimMotorNode.cpp)
 
 add_library(SimMotorNode SHARED src/SimMotorNode.cpp)
+add_library(FixFrictionNode SHARED src/world_fix_friction_plugin.cpp )
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -164,11 +166,13 @@ add_library(SimMotorNode SHARED src/SimMotorNode.cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # Specify libraries to link a library or executable target against
-target_link_libraries(SimMotorNode
-  ${catkin_LIBRARIES}
+target_link_libraries(SimMotorNode ${catkin_LIBRARIES}
+FixFrictionNode ${catkin_LIBRARIES}
 )
 
-target_link_libraries(SimMotorNode ${GAZEBO_libraries})
+target_link_libraries(SimMotorNode ${GAZEBO_libraries}
+FixFrictionNode ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

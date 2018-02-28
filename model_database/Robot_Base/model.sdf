@@ -6,12 +6,12 @@
       <inertial>
         <mass>50</mass>
         <inertia>
-          <ixx>0.166667</ixx>
+          <ixx>0.25</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.166667</iyy>
+          <iyy>0.25</iyy>
           <iyz>0</iyz>
-          <izz>0.166667</izz>
+          <izz>0.25</izz>
         </inertia>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
@@ -198,7 +198,7 @@
     <link name='base_arm'>
       <pose frame=''>-0 0.3048 1.09335 0 -0 0</pose>
       <inertial>
-        <mass>5</mass>
+        <mass>1</mass>
         <inertia>
           <ixx>0.166667</ixx>
           <ixy>0</ixy>
@@ -735,11 +735,11 @@
         <surface>
           <friction>
             <ode>
-              <mu>0.15</mu>
-              <mu2>0.15</mu2>
+              <mu>0.7500001</mu>
+              <mu2>0.7500001</mu2>
               <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
+              <slip1>0.37500001</slip1>
+              <slip2>0.37500001</slip2>
             </ode>
             <torsional>
               <coefficient>1</coefficient>
@@ -929,11 +929,11 @@
         <surface>
           <friction>
             <ode>
-              <mu>0.15</mu>
-              <mu2>0.15</mu2>
+              <mu>0.7500001</mu>
+              <mu2>0.7500001</mu2>
               <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
+              <slip1>0.37500001</slip1>
+              <slip2>0.37500001</slip2>
             </ode>
             <torsional>
               <coefficient>1</coefficient>
@@ -1123,11 +1123,11 @@
         <surface>
           <friction>
             <ode>
-              <mu>0.15</mu>
-              <mu2>0.15</mu2>
+              <mu>0.7500001</mu>
+              <mu2>0.7500001</mu2>
               <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
+              <slip1>0.37500001</slip1>
+              <slip2>0.37500001</slip2>
             </ode>
             <torsional>
               <coefficient>1</coefficient>
@@ -1317,11 +1317,11 @@
         <surface>
           <friction>
             <ode>
-              <mu>0.15</mu>
-              <mu2>0.15</mu2>
+              <mu>0.7500001</mu>
+              <mu2>0.7500001</mu2>
               <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
+              <slip1>0.37500001</slip1>
+              <slip2>0.37500001</slip2>
             </ode>
             <torsional>
               <coefficient>1</coefficient>
@@ -1378,7 +1378,7 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
           <damping>0</damping>
-          <friction>0</friction>
+          <friction>10000</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1428,7 +1428,7 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
           <damping>0</damping>
-          <friction>0</friction>
+          <friction>1000</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1461,7 +1461,7 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
           <damping>0</damping>
-          <friction>0</friction>
+          <friction>1000</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1572,14 +1572,14 @@
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
-          <effort>-1</effort>
-          <velocity>-1</velocity>
+          <effort>10000</effort>
+          <velocity>6</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0.25</damping>
-          <friction>0.25</friction>
+          <damping>0.500001</damping>
+          <friction>0.1001</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1605,14 +1605,14 @@
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
-          <effort>-1</effort>
-          <velocity>-1</velocity>
+          <effort>10000</effort>
+          <velocity>6</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0.25</damping>
-          <friction>0.25</friction>
+          <damping>0.500001</damping>
+          <friction>0.1001</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1638,14 +1638,14 @@
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
-          <effort>-1</effort>
-          <velocity>-1</velocity>
+          <effort>10000</effort>
+          <velocity>6</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0.25</damping>
-          <friction>0.25</friction>
+          <damping>0.500001</damping>
+          <friction>0.1001</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1671,14 +1671,14 @@
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
-          <effort>-1</effort>
-          <velocity>-1</velocity>
+          <effort>10000</effort>
+          <velocity>6</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0.25</damping>
-          <friction>0.25</friction>
+          <damping>0.500001</damping>
+          <friction>0.1001</friction>
         </dynamics>
       </axis>
       <physics>

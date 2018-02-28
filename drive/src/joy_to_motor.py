@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import rospy
-from geometry_msgs.msg import Vector3 
-from dependent_messages.msg import Twist2D
+from geometry_msgs.msg import Vector3, Twist
+# from dependent_messages.msg import Twist2D
 from std_msgs.msg import Int8
 import kinematics
 
@@ -26,7 +26,7 @@ class joycontrol:
 
         # rospy.Subscriber('left_joystick_in', Vector3, self.left_callback)
         # rospy.Subscriber('right_joystick_in', Vector3, self.right_callback)
-        rospy.Subscriber('twist_in', Twist2D, self.twist_callback)
+        rospy.Subscriber('twist_in', Twist, self.twist_callback)
 
         self.publish_timer = rospy.Timer(rospy.Duration(0.05), self.publish_stuff)  # publish joystick angles every 0.05 seconds
 
@@ -37,7 +37,7 @@ class joycontrol:
         self.back_right_pub.publish(int(self.right))
 
     def twist_callback(self, data):
-        self.left, self.right = kinematics.inverse_kinematics(data.v, data.omega)
+        self.left, self.right = kinematics.inverse_kinematics(max(min(data.linear.x, 64), -64), max(min(data.angular.z, 64), -64))
 
     def left_callback(self, data):
         self.left = map_to(data.x, self.joy_min, self.joy_max, self.motor_min, self.motor_max)
