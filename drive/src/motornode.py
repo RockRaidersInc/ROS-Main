@@ -4,7 +4,7 @@ import rospy
 import roboclaw
 from geometry_msgs.msg import Vector3
 from std_msgs.msg import String
-from std_msgs.msg import Int32
+from std_msgs.msg import Int8
 
 
 class motornode:
@@ -19,19 +19,17 @@ class motornode:
 
 	def __init__(self,n,m1_name='M1',m2_name='M2',useEnc=False):
 		self.name = n
-		rospy.init_node('motornode', anonymous=True)
 
 		self.pub = rospy.Publisher('usb', String, queue_size = 1)
 
 		rospy.Subscriber(self.name, Vector3, self.callback)
 		rospy.Subscriber(self.name+'device', String, self.setdevice)
-		rospy.Subscriber(m1_name, Int32, self.callbackM1)
-		rospy.Subscriber(m2_name, Int32, self.callbackM2)
+		rospy.Subscriber(m1_name, Int8, self.callbackM1)
+		rospy.Subscriber(m2_name, Int8, self.callbackM2)
 		
 		if (useEnc == True):
 			self.enc_pub = rospy.Publisher(self.name+'encoder', Vector3, queue_size=3)
     
-		print("start finished")
 		while not rospy.is_shutdown():
 			self.connect()
 			self.normal(useEnc)
@@ -42,21 +40,20 @@ class motornode:
 
 		self.x = int(data.x)
 		self.y = int(data.y)
-		#print("(x,y) = (%i,%i)"%(self.x,self.y))
 
-	def callbackM1(self, data):
+	def callbackM1(self, msg):
 		self.timeout = 1000
-		self.x = data
+		self.x = msg.data
 
-	def callbackM2(self, data):
+	def callbackM2(self, msg):
 		self.timeout = 1000
-		self.y = data
+		self.y = msg.data
 
 
 
 	def setdevice(self,data):
-			self.device = str(data.data)
-			rospy.loginfo("device set to: "+self.device)
+		self.device = str(data.data)
+		rospy.loginfo("device set to: "+self.device)
 			
 
 	def connect(self):
@@ -78,9 +75,9 @@ class motornode:
 					wait.sleep()
 
 	def setmotor (self,m,n):
-		
-			roboclaw.ForwardBackwardM1(self.address,m)
-			roboclaw.ForwardBackwardM2(self.address,n)
+                rospy.logdebug("Setting motor to %d, %d", m, n)
+		roboclaw.ForwardBackwardM1(self.address,m)
+		roboclaw.ForwardBackwardM2(self.address,n)
 
 	 
 		
@@ -91,11 +88,11 @@ class motornode:
 				#print("setting motor to values %i, %i"%(self.x,self.y))
 				self.enc(useEnc)
 				try:
-						self.setmotor(self.x,self.y)
+					self.setmotor(self.x,self.y)
 				except:
 					er = 1
-					break
 					self.timeout -=1
+					break
 			else:
 				try:
 					self.setmotor(64,64)
@@ -113,5 +110,9 @@ class motornode:
 		self.enc_pub.publish(Vector3(enc1[1], enc2[1], 0))
 
 if __name__ == '__main__':
-	name = rospy.get_param('~controller_name')
-	controller = motornode(name)
+	rospy.init_node('motornode', anonymous=True)
+	name = rospy.get_param('~controller_name', 'motornode')
+	m1Name = rospy.get_param('~m1_name', 'M1')
+	m2Name = rospy.get_param('~m2_name', 'M2')
+        use_enc = rospy.get_param('~use_enc', False)
+	controller = motornode(name, m1Name, m2Name, use_enc)
