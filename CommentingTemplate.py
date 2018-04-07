@@ -63,3 +63,16 @@ def Foo(params):
     '''
 
 ##############################################################################
+
+
+## Notes ## (not a part of the template)
+# Other conventions
+
+# All names should be descriptive of whatever it is!
+
+# All function names should be camelcase and begin with a capital letter (FunctionName)
+# All names of classes should be camelcase and begin with a capital letter (ClassName)
+# All variable names should be camelcase and begin with a lowercase letter (variableName)
+# All names for constants should be in all caps with underscores for spacing (CONSTANT_NAME)
+
+#If you installed any libraries or other packages that your code depends on, make sure you make note of that!
