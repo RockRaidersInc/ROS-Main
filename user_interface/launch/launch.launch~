@@ -1,4 +1,0 @@
-<launch>
-	<node name="turtle" pkg="turtlesim" type="turtlesim_node" />
-	<node name="rqt" pkg="rqt_gui" type="rqt_gui" />
-</launch>
