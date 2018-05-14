@@ -8,6 +8,7 @@ cd $SCRIPTPATH
 source ../../devel/setup.bash
 
 # add some gazebo enviornment variables
+source /usr/share/gazebo/setup.sh
 cd ../model_database
 source fix_gazebo_paths.sh
 cd ../launchscripts

@@ -233,10 +233,16 @@ namespace gazebo {
         this->model->GetJoint("right_back_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(backRightMotorVal));
         this->model->GetJoint("right_front_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(frontRightMotorVal));
 
-        // this->model->GetJoint("left_back_wheel_hinge")->SetParam("vel", joint_axis, mapMotorTorque(backLeftMotorVal));
-        // this->model->GetJoint("left_front_wheel_hinge")->SetParam("vel", joint_axis,  mapMotorTorque(frontLeftMotorVal));
-        // this->model->GetJoint("right_back_wheel_hinge")->SetParam("vel", joint_axis,  mapMotorTorque(backRightMotorVal));
-        // this->model->GetJoint("right_front_wheel_hinge")->SetParam("vel", joint_axis, mapMotorTorque(frontRightMotorVal));
+        // this->model->GetJoint("left_back_wheel_hinge")->SetVel(joint_axis, mapMotorTorque(backLeftMotorVal));
+        // this->model->GetJoint("left_front_wheel_hinge")->SetVel(joint_axis,  mapMotorTorque(frontLeftMotorVal));
+        // this->model->GetJoint("right_back_wheel_hinge")->SetVel(joint_axis,  mapMotorTorque(backRightMotorVal));
+        // this->model->GetJoint("right_front_wheel_hinge")->SetVel(joint_axis, mapMotorTorque(frontRightMotorVal));
+
+
+        // this->model->GetJoint("left_back_wheel_hinge")->SetParam("vel", joint_axis, backLeftMotorVal);
+        // this->model->GetJoint("left_front_wheel_hinge")->SetParam("vel", joint_axis,  frontLeftMotorVal);
+        // this->model->GetJoint("right_back_wheel_hinge")->SetParam("vel", joint_axis,  backRightMotorVal);
+        // this->model->GetJoint("right_front_wheel_hinge")->SetParam("vel", joint_axis, frontRightMotorVal);
         
         // this->j2_controller->SetJointPosition(this->model->GetJoint("armbase_armcentershaft"), map(armJointVals[0], -128, 127, -3.14, 3.14));
         // this->j2_controller->SetJointPosition(this->model->GetJoint("armcentershaftoffset_backarm"), map(armJointVals[1], -128, 127, -3.14, 3.14));
