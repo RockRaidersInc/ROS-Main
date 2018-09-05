@@ -1,8 +1,0 @@
-prefix=/home/david/Documents/14_rockraiders/src/simulator_motor_driver/cmake-build-debug/devel
-
-Name: simulator_motor_driver
-Description: Description of simulator_motor_driver
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/david/Documents/14_rockraiders/src/simulator_motor_driver/cmake-build-debug/devel/lib 
-Requires: 

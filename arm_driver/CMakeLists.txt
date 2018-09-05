@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   message_generation
   std_msgs
+  
 )
 
 ## System dependencies are found with CMake's conventions
@@ -69,11 +70,11 @@ add_service_files(
 # )
 
 # Generate added messages and services with any dependencies listed here
- generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-#   arm_driver
- )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+#  arm_driver
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -107,9 +108,9 @@ add_service_files(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES arm_driver
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 #  DEPENDS system_lib
-  CATKIN_DEPENDS message_runtime
+#  CATKIN_DEPENDS message_runtime
 )
 
 ###########
@@ -139,7 +140,13 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(kinematics_service
-  src/kinematics_service.cpp)
+  src/kinematics_service.cpp
+)
+
+
+# this line lets kinematics_service.cpp include messages defined in the same package
+add_dependencies(kinematics_service ${${PROJECT_NAME}_EXPORTED_TARGETS}) 
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

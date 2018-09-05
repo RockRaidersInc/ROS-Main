@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC  -std=c++11  -shared -Wl,-soname,libvelodyne_plugin.so -o libvelodyne_plugin.so CMakeFiles/velodyne_plugin.dir/velodyne_plugin.cc.o  -L/usr/lib/x86_64-linux-gnu/gazebo-7/plugins 
