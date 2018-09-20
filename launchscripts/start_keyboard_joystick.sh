@@ -7,4 +7,4 @@ cd $SCRIPTPATH
 #source /opt/ros/kinetic/setup.bash
 source ../../devel/setup.bash
 
-rosrun teleop_twist_keyboard teleop_twist_keyboard.py cmd_vel:=/twist
+rosrun teleop_twist_keyboard teleop_twist_keyboard.py cmd_vel:=/cmd_vel

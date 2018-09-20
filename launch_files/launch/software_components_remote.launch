@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+   
+	<!--  This launch file is for all nodes that aren't hardware of simulator specific (eg, everythign but motor drivers). The vast majority of nodes should be launched from this file  -->
+    <node name="joy" pkg="joy" type="joy_node">
+		<!-- Limit the message send rate, it can reach over 7000 msgs/sec when unlimited -->
+        <param name="dev" value="/dev/input/js0"/>
+        <param name="deadzone" value="0.1"/>
+	</node>
+    <node name="joy_control" pkg="drive" type="joycontrol.py"/>
+    <node name="joy_to_motor" pkg="drive" type="joy_to_motor.py">
+        <remap from="left_motor_power" to="/motors/left_vel"/>
+        <remap from="right_motor_power" to="/motors/right_vel"/>
+    </node>
+  
+</launch>

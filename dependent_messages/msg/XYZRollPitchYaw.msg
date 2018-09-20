@@ -1,0 +1,2 @@
+geometry_msgs/Vector3 position
+dependent_messages/RollPitchYaw orientation

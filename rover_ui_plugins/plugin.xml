@@ -1,0 +1,53 @@
+<library path="src">
+  <class name="Video Selection" type="rover_ui_plugins.video_selection.VideoSelectionPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+        Allows video streams to be chosen.
+    </description>
+    <qtgui>
+      <group>
+        <label>Rock Raiders Plugins</label>
+      </group>
+      <!-- optional grouping...
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>Video Selection</label>
+      <icon type="theme">system-help</icon>
+    </qtgui>
+  </class>
+  <class name="Battery Monitoring" type="rover_ui_plugins.battery_monitoring.BatteryMonitoringPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+        Monitors battery
+    </description>
+    <qtgui>
+      <group>
+        <label>Rock Raiders Plugins</label>
+      </group>
+      <!-- optional grouping...
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>Battery Monitoring</label>
+      <icon type="theme">system-help</icon>
+    </qtgui>
+  </class>
+  <class name="Kill Counter" type="rover_ui_plugins.kill_counter.KillCounterPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+        Counts martians killed
+    </description>
+    <qtgui>
+      <group>
+        <label>Rock Raiders Plugins</label>
+      </group>
+      <!-- optional grouping...
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>Kill Counter</label>
+      <icon type="theme">system-help</icon>
+    </qtgui>
+  </class>
+</library>

@@ -1,16 +1,17 @@
 <?xml version="1.0"?>
 <launch>
-    <include file="$(find launch_files)/launch/software_components.launch" pass_all_args="true"/> 
+    <include file="$(find launch_files)/launch/software_components.launch" pass_all_args="true"/>
 
-    <node name="deviceconnect" pkg="drive" type="deviceconnect.py"/>
     <node name="motornode_left" pkg="drive" type="motornode.py">
-        <param name="controller_name" value="left"/>
-	<param name="m1_name" value="/motors/backLeft"/>
-	<param name="m2_name" value="/motors/frontLeft"/>
+        <param name="controller_name" value="front"/>
+        <param name="m1_name" value="/motors/left"/>
+        <param name="m2_name" value="/motors/left"/>
+        <param name="address" value="129"/>
     </node>
     <node name="motornode_right" pkg="drive" type="motornode.py">
-        <param name="controller_name" value="right"/>
-	<param name="m1_name" value="/motors/frontRight"/>
-	<param name="m2_name" value="/motors/backRight"/>
+        <param name="controller_name" value="back"/>
+        <param name="m1_name" value="/motors/right"/>
+        <param name="m2_name" value="/motors/right"/>
+        <param name="address" value="128"/>
     </node>
 </launch>

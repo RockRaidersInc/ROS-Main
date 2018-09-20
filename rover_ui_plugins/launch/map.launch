@@ -1,0 +1,19 @@
+<launch>
+    <node pkg="tf" type="static_transform_publisher" name="swri_transform" args="0 0 0 0 0 0 world dummy 10"  />
+
+    <node pkg="swri_transform_util" type="initialize_origin.py" name="initialize_origin" >
+        <param name="local_xy_frame" value="world"/>
+        <param name="local_xy_origin" value="Spata"/>
+        <rosparam param="local_xy_origins">
+            [{ name: Spata,
+             latitude: 42.729306,
+             longitude: -73.680906,
+             altitude: 129.69,
+             heading: 0.0}]
+        </rosparam>
+    </node>
+
+    <node pkg="mapviz" type="mapviz" name="mapscviz"/>
+
+    <include file="$(find rover_ui_plugins)/launch/translator.launch"/>
+</launch>

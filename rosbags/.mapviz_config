@@ -1,0 +1,52 @@
+capture_directory: ~
+fixed_frame: dummy
+target_frame: <none>
+fix_orientation: false
+rotate_90: false
+enable_antialiasing: true
+show_displays: true
+show_status_bar: true
+show_capture_tools: true
+window_width: 1867
+window_height: 1056
+view_scale: 0.1252099
+offset_x: -123.129
+offset_y: -99.48544
+use_latest_transforms: true
+background: "#a0a0a4"
+displays:
+  - type: mapviz_plugins/tile_map
+    name: new display
+    config:
+      visible: true
+      collapsed: false
+      custom_sources:
+        []
+      bing_api_key: AiIX-6udSVkSODllmASHVIKmciqdCo153vUDAWZOyxibI-bqbzyVpxS-MfDmFIqk
+      source: Bing Maps (terrain)
+  - type: mapviz_plugins/gps
+    name: new display
+    config:
+      visible: true
+      collapsed: false
+      topic: /fix_map_filtered
+      color: "#545fff"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 0
+      show_laps: false
+      static_arrow_sizes: false
+      arrow_size: 224
+  - type: mapviz_plugins/gps
+    name: new display
+    config:
+      visible: true
+      collapsed: false
+      topic: /fix_map_unfiltered
+      color: "#00ff00"
+      draw_style: points
+      position_tolerance: 0
+      buffer_size: 0
+      show_laps: false
+      static_arrow_sizes: false
+      arrow_size: 25

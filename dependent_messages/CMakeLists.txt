@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   message_generation
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -47,6 +48,8 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   Twist2D.msg
+  RollPitchYaw.msg
+  XYZRollPitchYaw.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -67,6 +70,7 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   std_msgs  # Or other packages containing msgs
+  geometry_msgs
 )
 
 ################################################

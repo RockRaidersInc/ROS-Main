@@ -6,6 +6,7 @@
     <remap from="/gazebo_motor_node/frontLeft" to="/motors/frontLeft"/>
     <remap from="/gazebo_motor_node/backRight" to="/motors/backRight"/>
     <remap from="/gazebo_motor_node/frontRight" to="/motors/frontRight"/> -->
+    
 
   </include>
 </launch>

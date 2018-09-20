@@ -1,0 +1,26 @@
+<launch>
+  <node pkg="video_stream_opencv" type="video_stream" name="cam1">
+    <param name="video_stream_provider" value="/home/siddharth/Videos/rockets_loop.mp4"/>
+    <remap from="camera" to="cam1"/>
+    <remap from="image_publisher" to="cam1"/>
+  </node>
+  <node pkg="video_stream_opencv" type="video_stream" name="cam2">
+    <param name="video_stream_provider" value="/home/siddharth/Videos/kfc.mkv"/>
+    <remap from="camera" to="cam2"/>
+    <remap from="image_publisher" to="cam2"/>
+  </node>
+  <node pkg="video_stream_opencv" type="video_stream" name="cam3">
+    <param name="video_stream_provider" value="/home/siddharth/Videos/rock_raiders.webm"/>
+    <remap from="camera" to="cam3"/>
+    <remap from="image_publisher" to="cam3"/>
+  </node>
+  <node pkg="video_stream_opencv" type="video_stream" name="cam4">
+    <param name="video_stream_provider" value="/home/siddharth/Videos/spongebob_loop.mkv"/>
+    <remap from="camera" to="cam4"/>
+    <remap from="image_publisher" to="cam4"/>
+  </node>
+
+  <node pkg="topic_tools" type="mux" name="video_mux" args="cam_out cam1 cam2 cam3 cam4">
+    <remap from="mux" to="video_mux"/>
+  </node>
+</launch>
