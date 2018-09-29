@@ -1,0 +1,5 @@
+These three commands are needed to run the GPS manually.
+
+/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A505WWCA-if00-port0
+gpsd -S 4000 /dev/ttyUSB0
+rosrun gpsd_client gpsd_client _host:=localhost _port:=4000
