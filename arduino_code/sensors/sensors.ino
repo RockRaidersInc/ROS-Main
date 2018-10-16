@@ -13,6 +13,8 @@ Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(30301);
 Adafruit_LSM303_Mag_Unified   mag   = Adafruit_LSM303_Mag_Unified(30302);
 Adafruit_L3GD20_Unified       gyro  = Adafruit_L3GD20_Unified(20);
 
+unsigned long sequence_num;
+
 void displaySensorDetails(void)
 {
   sensor_t sensor;
@@ -53,6 +55,18 @@ void displaySensorDetails(void)
   delay(500);
 }
 
+
+
+void print_space_if_positive(float x) {
+ if (x >= 0.0) {
+    Serial.print(" ");
+ } 
+ if (abs(x) < 10.0) {
+    Serial.print(" "); 
+ }
+}
+
+
 void setup(void)
 {
   Serial.begin(115200);
@@ -82,31 +96,51 @@ void setup(void)
   displaySensorDetails();
   
   Serial.println(F("ACCEL X Y Z (m/s^2), MAG X Y Z (uT), GYRO X Y Z (rad/s)"));
+  
+  sequence_num = 0;
 }
+
 
 void loop(void)
 {
+  unsigned long loop_start_time = millis();  // this will overflow after about 50 days, it isn't an issue for us
+  
   /* Get a new sensor event */
-  sensors_event_t event;
+  sensors_event_t accel_event;
+  sensors_event_t gyro_event;
+  sensors_event_t mag_event;
    
-  /* Display the results (acceleration is measured in m/s^2) */
-  accel.getEvent(&event);
-  Serial.print("Start: "); Serial.print(event.acceleration.x);
-  Serial.print(" "); Serial.print(event.acceleration.y);
-  Serial.print(" "); Serial.print(event.acceleration.z); Serial.print(", ");
+  /* Display the results (acceleration is measured in m/s^2) (magnetic vector values are in micro-Tesla (uT)) (gyrocope values in rad/s) */
+  accel.getEvent(&accel_event);
+  gyro.getEvent(&gyro_event);
+  mag.getEvent(&mag_event);
+  
+  Serial.print("Seq:"); Serial.print(sequence_num);
+  Serial.print(", ms_time:"); Serial.print(loop_start_time);
+  Serial.print(", ");
+  print_space_if_positive(accel_event.acceleration.x); Serial.print(accel_event.acceleration.x); Serial.print(" ");
+  print_space_if_positive(accel_event.acceleration.y); Serial.print(accel_event.acceleration.y); Serial.print(" "); 
+  print_space_if_positive(accel_event.acceleration.z); Serial.print(accel_event.acceleration.z); Serial.print(", ");
 
   /* Display the results (magnetic vector values are in micro-Tesla (uT)) */
-  mag.getEvent(&event);
-  Serial.print(event.magnetic.x);
-  Serial.print(" "); Serial.print(event.magnetic.y);
-  Serial.print(" "); Serial.print(event.magnetic.z); Serial.print(", ");
+  print_space_if_positive(mag_event.magnetic.x); Serial.print(mag_event.magnetic.x); Serial.print(" "); 
+  print_space_if_positive(mag_event.magnetic.y);  Serial.print(mag_event.magnetic.y); Serial.print(" "); 
+  print_space_if_positive(mag_event.magnetic.z); Serial.print(mag_event.magnetic.z); Serial.print(", ");
 
   /* Display the results (gyrocope values in rad/s) */
-  gyro.getEvent(&event);
-  Serial.print(event.gyro.x);
-  Serial.print(" "); Serial.print(event.gyro.y);
-  Serial.print(" "); Serial.print(event.gyro.z);
+  print_space_if_positive(gyro_event.gyro.x); Serial.print(gyro_event.gyro.x); Serial.print(" ");
+  print_space_if_positive(gyro_event.gyro.y); Serial.print(gyro_event.gyro.y); Serial.print(" ");
+  print_space_if_positive(gyro_event.gyro.z); Serial.print(gyro_event.gyro.z);
 
-  Serial.println(F(""));
-  delay(0);
+  Serial.println("");
+
+  // the loop should run every 10 ms
+  int loop_time = 10;
+  unsigned long current_time = millis();
+  if (current_time - loop_start_time < loop_time)
+  {
+     delay(loop_time - (current_time - loop_start_time)); 
+  }
+  
+  sequence_num += 1;
 }
