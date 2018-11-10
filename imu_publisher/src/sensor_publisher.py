@@ -11,6 +11,9 @@ from sensor_msgs.msg import Imu as Imu_msg
 from sensor_msgs.msg import MagneticField as MagneticField_msg
 
 
+arduino_serial_id = "usb-Arduino__www.arduino.cc__0043_75335313437351E01021-if00"
+
+
 def signal_handler(sig, frame):
     print('control c detected, exiting')
     sys.exit(0)
@@ -35,7 +38,7 @@ def main(imu_pub, mag_pub):
     else:
         no_print = False
 
-    ser = serial.Serial('/dev/serial/by-id/usb-Arduino_Srl_Arduino_Mega_7563331313335180E041-if00', 115200, timeout=1)
+    ser = serial.Serial('/dev/serial/by-id/' + arduino_serial_id, 115200, timeout=1)
 
     # this is an easy way to parse the data coming out of the IMU. The Arduino prints the data
     # as text instad of in binary so that it would be human readable (and much easier to debug)

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+    <node name="imu_filter_node" pkg="imu_filter_madgwick" type="imu_filter_node">
+        <param name="zeta" value="0"/>  <!-- gyro drift gain (rads/sec) -->
+    </node>
+    <node name="imu_publisher" pkg="imu_publisher" type="sensor_publisher.py">
+    </node>
+
+
+
+</launch>
