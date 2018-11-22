@@ -7,6 +7,7 @@
 #include <Adafruit_LSM303_U.h>
 #include <Adafruit_L3GD20_U.h>
 #include <Adafruit_9DOF.h>
+#include <SoftwareSerial.h>
 
 /* Assign a unique ID to the sensors */
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(30301);
@@ -14,6 +15,10 @@ Adafruit_LSM303_Mag_Unified   mag   = Adafruit_LSM303_Mag_Unified(30302);
 Adafruit_L3GD20_Unified       gyro  = Adafruit_L3GD20_Unified(20);
 
 unsigned long sequence_num;
+
+
+SoftwareSerial gps_serial(13, 12); // RX, TX
+
 
 void displaySensorDetails(void)
 {
@@ -98,6 +103,8 @@ void setup(void)
   Serial.println(F("ACCEL X Y Z (m/s^2), MAG X Y Z (uT), GYRO X Y Z (rad/s)"));
   
   sequence_num = 0;
+  
+  gps_serial.begin(9600);
 }
 
 
@@ -105,16 +112,17 @@ void loop(void)
 {
   unsigned long loop_start_time = millis();  // this will overflow after about 50 days, it isn't an issue for us
   
+  
   /* Get a new sensor event */
   sensors_event_t accel_event;
   sensors_event_t gyro_event;
   sensors_event_t mag_event;
-   
+
   /* Display the results (acceleration is measured in m/s^2) (magnetic vector values are in micro-Tesla (uT)) (gyrocope values in rad/s) */
   accel.getEvent(&accel_event);
   gyro.getEvent(&gyro_event);
   mag.getEvent(&mag_event);
-  
+
   Serial.print("Seq:"); Serial.print(sequence_num);
   Serial.print(", ms_time:"); Serial.print(loop_start_time);
   Serial.print(", ");
@@ -133,6 +141,12 @@ void loop(void)
   print_space_if_positive(gyro_event.gyro.z); Serial.print(gyro_event.gyro.z);
 
   Serial.println("");
+  
+  while (gps_serial.available()) {
+    Serial.write("!");  
+    Serial.write(gps_serial.read());
+  }
+  
 
   // the loop should run every 10 ms
   int loop_time = 10;
