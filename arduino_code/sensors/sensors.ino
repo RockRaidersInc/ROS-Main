@@ -2,12 +2,16 @@
  *  This code reads data from the IMU and writes it to the serial line. It has an associated ROS node named imu_publisher.
  */
 
+#define _SS_MAX_RX_BUFF 256
+
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM303_U.h>
 #include <Adafruit_L3GD20_U.h>
 #include <Adafruit_9DOF.h>
 #include <SoftwareSerial.h>
+
+#define _SS_MAX_RX_BUFF 256
 
 /* Assign a unique ID to the sensors */
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(30301);
@@ -108,6 +112,14 @@ void setup(void)
 }
 
 
+void check_gps_data() {
+  while (gps_serial.available()) {
+    Serial.write("!");  
+    Serial.write(gps_serial.read());
+  } 
+}
+
+
 void loop(void)
 {
   unsigned long loop_start_time = millis();  // this will overflow after about 50 days, it isn't an issue for us
@@ -122,38 +134,40 @@ void loop(void)
   accel.getEvent(&accel_event);
   gyro.getEvent(&gyro_event);
   mag.getEvent(&mag_event);
+  check_gps_data();
 
   Serial.print("Seq:"); Serial.print(sequence_num);
+  
   Serial.print(", ms_time:"); Serial.print(loop_start_time);
   Serial.print(", ");
   print_space_if_positive(accel_event.acceleration.x); Serial.print(accel_event.acceleration.x); Serial.print(" ");
   print_space_if_positive(accel_event.acceleration.y); Serial.print(accel_event.acceleration.y); Serial.print(" "); 
   print_space_if_positive(accel_event.acceleration.z); Serial.print(accel_event.acceleration.z); Serial.print(", ");
+  check_gps_data();
 
   /* Display the results (magnetic vector values are in micro-Tesla (uT)) */
   print_space_if_positive(mag_event.magnetic.x); Serial.print(mag_event.magnetic.x); Serial.print(" "); 
   print_space_if_positive(mag_event.magnetic.y);  Serial.print(mag_event.magnetic.y); Serial.print(" "); 
   print_space_if_positive(mag_event.magnetic.z); Serial.print(mag_event.magnetic.z); Serial.print(", ");
+  check_gps_data();
 
   /* Display the results (gyrocope values in rad/s) */
   print_space_if_positive(gyro_event.gyro.x); Serial.print(gyro_event.gyro.x); Serial.print(" ");
   print_space_if_positive(gyro_event.gyro.y); Serial.print(gyro_event.gyro.y); Serial.print(" ");
   print_space_if_positive(gyro_event.gyro.z); Serial.print(gyro_event.gyro.z);
-
   Serial.println("");
+  check_gps_data();
   
-  while (gps_serial.available()) {
-    Serial.write("!");  
-    Serial.write(gps_serial.read());
-  }
+
   
 
   // the loop should run every 10 ms
   int loop_time = 10;
   unsigned long current_time = millis();
-  if (current_time - loop_start_time < loop_time)
+  while (current_time - loop_start_time < loop_time)
   {
-     delay(loop_time - (current_time - loop_start_time)); 
+     delay(1); 
+     check_gps_data();
   }
   
   sequence_num += 1;

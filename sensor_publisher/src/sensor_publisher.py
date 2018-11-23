@@ -9,6 +9,7 @@ import signal
 
 from sensor_msgs.msg import Imu as Imu_msg
 from sensor_msgs.msg import MagneticField as MagneticField_msg
+from nmea_msgs.msg import Sentence as NmeaSentence_msg
 
 
 arduino_serial_id = "usb-Arduino__www.arduino.cc__0043_75335313437351E01021-if00"
@@ -91,16 +92,24 @@ def main(imu_pub, mag_pub):
 
         imu_buffer, imu_line = get_line_from_list(imu_buffer)
         if imu_line is not None:
-            print(imu_line)
+            # print(imu_line)
             process_imu_data(imu_line, regex)
 
         gps_buffer, gps_line = get_line_from_list(gps_buffer)
         if gps_line is not None:
-            print(gps_line)
+            print("gps_line:", gps_line)
+            send_gps_nmea_sentence(gps_line)
+
+
+def send_gps_nmea_sentence(sentence):
+    sentence = sentence.strip()
+    msg = NmeaSentence_msg()
+    msg.sentence = sentence
+    msg.header.stamp = rospy.get_rostime()
+    gps_pub.publish(msg)
 
 
 expected_seq_num = None
-
 
 def process_imu_data(line, regex):
     global expected_seq_num
@@ -108,14 +117,12 @@ def process_imu_data(line, regex):
     global no_print
 
     match = regex.search(line)
-    if not no_print:
-        print(line)
-        print(match)
+    # if not no_print:
+    #     print(line)
+    #     print(match)
     if match is None:
         return  # The arduino prints out some non-data text when it starts up,
         # we probably read that. nothing to do except read more data
-    if not no_print:
-        print(match.group('gyro_x'))
 
     recieved_seq_num = float(match.group('sequence_num'))
     recieved_timestamp = float(match.group('timestamp')) / 1000.  # convert from ms to seconds
@@ -158,7 +165,9 @@ def process_imu_data(line, regex):
         pass  # there was probably some corrupted data from the serial connection
 
 if __name__ == "__main__":
-    imu_pub = rospy.Publisher('imu/data_raw', Imu_msg, queue_size = 2)
-    mag_pub = rospy.Publisher('imu/mag', MagneticField_msg, queue_size = 2)
+    imu_pub = rospy.Publisher('sensor/imu_data_raw', Imu_msg, queue_size = 2)
+    mag_pub = rospy.Publisher('sensor/mag_raw', MagneticField_msg, queue_size = 2)
+    gps_pub = rospy.Publisher('sensor/nmea_sentences', NmeaSentence_msg, queue_size = 2)
+
     rospy.init_node('IMU_reader_node')
     main(imu_pub, mag_pub)
