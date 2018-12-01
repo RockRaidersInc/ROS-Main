@@ -97,7 +97,7 @@ def main(imu_pub, mag_pub):
 
         gps_buffer, gps_line = get_line_from_list(gps_buffer)
         if gps_line is not None:
-            print("gps_line:", gps_line)
+            # print("gps_line:", gps_line)
             send_gps_nmea_sentence(gps_line)
 
 
@@ -135,7 +135,7 @@ def process_imu_data(line, regex):
     data_collection_time = arduino_start_time + recieved_timestamp
 
     try:
-        # TODO: add a timestamp
+        # TODO: add a timestamp  -- edit, I think it's done? it would probably be good to check
         imu_msg = Imu_msg()
         imu_msg.header.stamp = rospy.get_rostime()
         imu_msg.header.stamp.secs = int(data_collection_time)

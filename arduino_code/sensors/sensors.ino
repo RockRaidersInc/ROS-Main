@@ -115,7 +115,8 @@ void setup(void)
 void check_gps_data() {
   while (gps_serial.available()) {
     Serial.write("!");  
-    Serial.write(gps_serial.read());
+    char next = gps_serial.read();
+    Serial.write(next);
   } 
 }
 
@@ -136,6 +137,7 @@ void loop(void)
   mag.getEvent(&mag_event);
   check_gps_data();
 
+
   Serial.print("Seq:"); Serial.print(sequence_num);
   
   Serial.print(", ms_time:"); Serial.print(loop_start_time);
@@ -144,12 +146,14 @@ void loop(void)
   print_space_if_positive(accel_event.acceleration.y); Serial.print(accel_event.acceleration.y); Serial.print(" "); 
   print_space_if_positive(accel_event.acceleration.z); Serial.print(accel_event.acceleration.z); Serial.print(", ");
   check_gps_data();
+  
 
   /* Display the results (magnetic vector values are in micro-Tesla (uT)) */
   print_space_if_positive(mag_event.magnetic.x); Serial.print(mag_event.magnetic.x); Serial.print(" "); 
   print_space_if_positive(mag_event.magnetic.y);  Serial.print(mag_event.magnetic.y); Serial.print(" "); 
   print_space_if_positive(mag_event.magnetic.z); Serial.print(mag_event.magnetic.z); Serial.print(", ");
   check_gps_data();
+
 
   /* Display the results (gyrocope values in rad/s) */
   print_space_if_positive(gyro_event.gyro.x); Serial.print(gyro_event.gyro.x); Serial.print(" ");
@@ -159,15 +163,11 @@ void loop(void)
   check_gps_data();
   
 
-  
-
-  // the loop should run every 10 ms
+  // the loop should run at most every 10 ms
   int loop_time = 10;
-  unsigned long current_time = millis();
-  while (current_time - loop_start_time < loop_time)
+  while (millis() - loop_start_time < loop_time)
   {
      delay(1); 
-     check_gps_data();
   }
   
   sequence_num += 1;
