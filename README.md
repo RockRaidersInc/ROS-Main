@@ -45,3 +45,4 @@ sudo apt install gpsd
 sudo apt install ros-kinetic-gpsd-client
 
 sudo apt install ros-kinetic-tf2-geometry-msgs
+sudo apt install ros-kinetic-nmea-navsat-driver
