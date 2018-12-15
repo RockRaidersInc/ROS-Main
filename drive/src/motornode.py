@@ -26,10 +26,10 @@ class motornode:
 		rospy.Subscriber(self.name+'device', String, self.setdevice)
 		rospy.Subscriber(m1_name, Int8, self.callbackM1)
 		rospy.Subscriber(m2_name, Int8, self.callbackM2)
-		
+
 		if (useEnc == True):
 			self.enc_pub = rospy.Publisher(self.name+'encoder', Vector3, queue_size=3)
-    
+
 		while not rospy.is_shutdown():
 			self.connect()
 			self.normal(useEnc)
@@ -50,11 +50,10 @@ class motornode:
 		self.y = msg.data
 
 
-
 	def setdevice(self,data):
 		self.device = str(data.data)
 		rospy.loginfo("device set to: "+self.device)
-			
+
 
 	def connect(self):
 		print("trying to connect")
@@ -79,9 +78,7 @@ class motornode:
 		roboclaw.ForwardBackwardM1(self.address,m)
 		roboclaw.ForwardBackwardM2(self.address,n)
 
-	 
-		
-	
+
 	def normal(self, useEnc):
 		while not rospy.is_shutdown():
 			if (self.timeout > 0):
@@ -99,8 +96,8 @@ class motornode:
 				except:
 					er = 1
 					break
-    
-	
+
+
 	def enc(self, useEnc):
 		if (useEnc == False):
 			return

@@ -98,14 +98,14 @@ class Cmd():
 	SETPWMMODE = 148
 	GETPWMMODE = 149
 	FLAGBOOTLOADER = 255
-			
+
 #Private Functions
 
 def crc_clear():
 	global _crc
 	_crc = 0
 	return
-	
+
 def crc_update(data):
 	global _crc
 	_crc = _crc ^ (data << 8)
@@ -128,17 +128,17 @@ def _readchecksumword():
 	data = port.read(2)
 	if len(data)==2:
 		crc = (ord(data[0])<<8) | ord(data[1])
-		return (1,crc)	
+		return (1,crc)
 	return (0,0)
-	
+
 def _readbyte():
 	data = port.read(1)
 	if len(data):
 		val = ord(data)
 		crc_update(val)
-		return (1,val)	
+		return (1,val)
 	return (0,0)
-	
+
 def _readword():
 	val1 = _readbyte()
 	if val1[0]:
@@ -157,7 +157,7 @@ def _readlong():
 				val4 = _readbyte()
 				if val4[0]:
 					return (1,val1[1]<<24|val2[1]<<16|val3[1]<<8|val4[1])
-	return (0,0)	
+	return (0,0)
 
 def _readslong():
 	val = _readlong()
@@ -177,7 +177,7 @@ def _writesbyte(val):
 def _writeword(val):
 	_writebyte((val>>8)&0xFF)
 	_writebyte(val&0xFF)
-	
+
 def _writesword(val):
 	_writeword(val)
 
@@ -852,7 +852,7 @@ def DutyAccelM2(address,accel,duty):
 
 def DutyAccelM1M2(address,accel1,duty1,accel2,duty2):
 	return _writeS24S24(Cmd.MIXEDDUTYACCEL,duty1,accel1,duty2,accel2)
-	
+
 def ReadM1VelocityPID(address):
 	data = _read_n(address,Cmd.READM1PID,4)
 	if data[0]:
@@ -873,10 +873,10 @@ def ReadM2VelocityPID(address):
 
 def SetMainVoltages(address,min, max):
 	return _write22(address,Cmd.SETMAINVOLTAGES,min,max)
-	
+
 def SetLogicVoltages(address,min, max):
 	return _write22(address,Cmd.SETLOGICVOLTAGES,min,max)
-	
+
 def ReadMinMaxMainVoltages(address):
 	val = _read4(address,Cmd.GETMINMAXMAINVOLTAGES)
 	if val[0]:
@@ -907,7 +907,7 @@ def ReadM1PositionPID(address):
 		data[2]/=1024.0
 		return data
 	return (0,0,0,0,0,0,0,0)
-	
+
 def ReadM2PositionPID(address):
 	data = _read_n(address,Cmd.READM2POSPID,7)
 	if data[0]:
@@ -964,7 +964,7 @@ def GetDeadBand(address):
 	if val[0]:
 		return (1,val[1]>>8,val[1]&0xFF)
 	return (0,0,0)
-	
+
 #Warning(TTL Serial): Baudrate will change if not already set to 38400.  Communications will be lost
 def RestoreDefaults(address):
 	return _write0(address,Cmd.RESTOREDEFAULTS)
@@ -983,7 +983,7 @@ def ReadEncoderModes(address):
 	if val[0]:
 		return (1,val[1]>>8,val[1]&0xFF)
 	return (0,0,0)
-	
+
 def SetM1EncoderMode(address,mode):
 	return _write1(address,Cmd.SETM1ENCODERMODE,mode)
 
@@ -1036,4 +1036,3 @@ def Open(comport, rate):
 	port = None
 	port = serial.Serial(comport, baudrate=rate, timeout=0.1, interCharTimeout=0.01)
 	return
-
