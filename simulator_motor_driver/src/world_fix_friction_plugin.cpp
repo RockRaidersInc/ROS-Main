@@ -13,7 +13,7 @@ namespace gazebo
 
     public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
             {
-                std::cerr << "\nworld_fix_friction_plugin is attached to the simulator" << std::endl;
+                std::cerr << std::endl << "world_fix_friction_plugin is attached to the simulator" << std::endl;
 
                 physics::PhysicsEnginePtr physics = _world->GetPhysicsEngine();
                 const std::string frictionModel = "cone_model";

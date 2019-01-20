@@ -5,7 +5,7 @@
 
     <node name="joy" pkg="joy" type="joy_node">
 		<!-- Limit the message send rate, it can reach over 7000 msgs/sec when unlimited -->
-        <param name="dev" value="/dev/input/js2"/>
+        <param name="dev" value="/dev/input/js0"/>
 		<!-- <param name="~coalesce_interval" type="double" value="0.01"/>	-->
 		<!-- <param name="~autorepeat_rate" type="double" value="0.05"/> -->
 	</node>
