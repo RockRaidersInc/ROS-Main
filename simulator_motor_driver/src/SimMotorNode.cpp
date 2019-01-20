@@ -59,10 +59,8 @@ namespace gazebo {
         // Making a seperate subscriber and callback for each motor was intentional, some of the motors might need
         // to be treated differently from the others (like they might need different torque scaling or something)
         ros::Subscriber backLeftMotorSub;
-//        ros::Subscriber middleLeftMotorSub;
         ros::Subscriber frontLeftMotorSub;
         ros::Subscriber backRightMotorSub;
-//        ros::Subscriber middleRightMotorSub;
         ros::Subscriber frontRightMotorSub;
 
         ros::Subscriber ArmSub0;
@@ -94,7 +92,6 @@ namespace gazebo {
         void ArmCallback3(const std_msgs::Int8::ConstPtr& msg);
         void ArmCallback4(const std_msgs::Int8::ConstPtr& msg);
         void ArmCallback5(const std_msgs::Int8::ConstPtr& msg);
-
 
         double mapMotorTorque(double inval);
 
@@ -144,12 +141,10 @@ namespace gazebo {
         this->rosNodeHandle.reset(new ros::NodeHandle("gazebo_motor_node"));
 
         backLeftMotorSub = rosNodeHandle->subscribe("/motors/backLeft", 1, &MotorNodePlugin::backLeftMotorCallback, this);
-//        middleLeftMotorSub = rosNodeHandle->subscribe("/motors/middleLeft", 1000, &MotorNodePlugin::middleLeftMotorCallback, this);
         frontLeftMotorSub = rosNodeHandle->subscribe("/motors/frontLeft", 1, &MotorNodePlugin::frontLeftMotorCallback, this);
         backRightMotorSub = rosNodeHandle->subscribe("/motors/backRight", 1, &MotorNodePlugin::backRightMotorCallback, this);
-//        middleRightMotorSub = rosNodeHandle->subscribe("/motors/middleRight", 1000, &MotorNodePlugin::middleRightMotorCallback, this);
         frontRightMotorSub = rosNodeHandle->subscribe("/motors/frontRight", 1, &MotorNodePlugin::frontRightMotorCallback, this);
-        
+       
         ArmSub0 = rosNodeHandle->subscribe("/motors/Arm0", 1, &MotorNodePlugin::ArmCallback0, this);
         ArmSub1 = rosNodeHandle->subscribe("/motors/Arm1", 1, &MotorNodePlugin::ArmCallback1, this);
         ArmSub2 = rosNodeHandle->subscribe("/motors/Arm2", 1, &MotorNodePlugin::ArmCallback2, this);
