@@ -5,17 +5,13 @@
 
     <node name="joy" pkg="joy" type="joy_node">
 		<!-- Limit the message send rate, it can reach over 7000 msgs/sec when unlimited -->
-        <param name="dev" value="/dev/input/js2"/>
-		<!-- <param name="~coalesce_interval" type="double" value="0.01"/>	-->
-		<!-- <param name="~autorepeat_rate" type="double" value="0.05"/> -->
+        <param name="dev" value="/dev/input/js0"/>
+        <param name="deadzone" value="0.1"/>
 	</node>
     <node name="joy_control" pkg="drive" type="joycontrol.py"/>
     <node name="joy_to_motor" pkg="drive" type="joy_to_motor.py">
-	<remap from="twist_in" to="/twist"/>
-	<remap from="front_left_motor_power" to="/motors/frontLeft"/>
-	<remap from="back_left_motor_power" to="/motors/backLeft"/>
-	<remap from="front_right_motor_power" to="/motors/frontRight"/>
-	<remap from="back_right_motor_power" to="/motors/backRight"/>
+        <remap from="left_motor_power" to="/motors/left_vel"/>
+        <remap from="right_motor_power" to="/motors/right_vel"/>
     </node>
   
 </launch>

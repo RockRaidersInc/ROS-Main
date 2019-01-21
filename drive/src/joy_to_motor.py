@@ -1,12 +1,12 @@
+#!/usr/bin/env python
 #TO DO: Add subscriber to orientation data with callback to calc_motor_limits, properly define motor limits
 
-#!/usr/bin/env python
 
 #Last edited by Connor McGowan 1/18/19
 
 import rospy
 from geometry_msgs.msg import Twist
-from std_msgs.msg import Int8
+from std_msgs.msg import Int16
 import kinematics
 
 class joycontrol:
@@ -14,8 +14,8 @@ class joycontrol:
         self.left = 0
         self.right = 0
 
-	self.motor_max = 12.7
-	self.motor_min = -12.7
+        self.motor_max = 12.7
+        self.motor_min = -12.7
 
         #Should go in a config file
         self.min_turn_radius = 35.485/24
@@ -23,10 +23,10 @@ class joycontrol:
 
         rospy.init_node('joycontrol')
 
-        self.left_pub = rospy.Publisher('left_motor_power', Int8, queue_size=1)
-        self.right_pub = rospy.Publisher('right_motor_power', Int8, queue_size=1)
+        self.left_pub = rospy.Publisher('left_motor_power', Int16, queue_size=1)
+        self.right_pub = rospy.Publisher('right_motor_power', Int16, queue_size=1)
 
-        rospy.Subscriber('twist_in', Twist, self.twist_callback)
+        rospy.Subscriber('/drive_twist', Twist, self.twist_callback)
 
         self.publish_timer = rospy.Timer(rospy.Duration(0.05), self.publish_to_motors)  # publish joystick angles every 0.05 seconds
 
@@ -89,8 +89,12 @@ class joycontrol:
                 temp_right = self.motor_min
 
         #Set final angular velocities 
-        self.left = temp_left
-        self.right = temp_right
+        #self.left = temp_left
+        #self.right = temp_right
+
+        #angular velocities to encoder ticks
+        self.left = temp_left / (2 * 3.14) * 12 * 81
+        self.right = temp_right / (2 * 3.14) * 12 * 81
 
 if __name__ == '__main__':
     joy = joycontrol()

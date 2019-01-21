@@ -2,114 +2,155 @@
 
 import rospy
 import roboclaw
-from geometry_msgs.msg import Vector3
-from std_msgs.msg import String
 from std_msgs.msg import Int8
+from std_msgs.msg import Int16
+
+import serial.tools.list_ports
+import time
 
 
 class motornode:
-	name = ''
-	address = 0x80
-	device = "/dev/00000"
-	x=64
-	y=64
-	timeout = 1000
-	pub = None
-	enc_pub = None
+    TIMEOUT_TIME = 1000
 
-	def __init__(self,n,m1_name='M1',m2_name='M2',useEnc=False):
-		self.name = n
+    name = ''
+    address = 0x80
+    device = ''
 
-		self.pub = rospy.Publisher('usb', String, queue_size = 1)
+    timeout = 0
 
-		rospy.Subscriber(self.name, Vector3, self.callback)
-		rospy.Subscriber(self.name+'device', String, self.setdevice)
-		rospy.Subscriber(m1_name, Int8, self.callbackM1)
-		rospy.Subscriber(m2_name, Int8, self.callbackM2)
+    m1_enc_pub = None
+    m2_enc_pub = None
 
-		if (useEnc == True):
-			self.enc_pub = rospy.Publisher(self.name+'encoder', Vector3, queue_size=3)
+    connected = False
 
-		while not rospy.is_shutdown():
-			self.connect()
-			self.normal(useEnc)
-		self.connect()
+    m1_pwm = None
+    m2_pwm = None
 
-	def callback(self,data):
-		self.timeout = 1000
-
-		self.x = int(data.x)
-		self.y = int(data.y)
-
-	def callbackM1(self, msg):
-		self.timeout = 1000
-		self.x = msg.data
-
-	def callbackM2(self, msg):
-		self.timeout = 1000
-		self.y = msg.data
+    m1_vel = None
+    m2_vel = None
 
 
-	def setdevice(self,data):
-		self.device = str(data.data)
-		rospy.loginfo("device set to: "+self.device)
+    def __init__(self, name, m1_name='M1', m2_name='M2', publish_enc=False, address=0x80):
+        self.name = name
+        self.address = address
+        self.timeout = int(round(time.time() * 1000))
+
+        #PWM from 0 to 127
+        #rospy.Subscriber(m1_name + '_pwm', Int8, self.callbackM1_pwm)
+        #rospy.Subscriber(m2_name + '_pwm', Int8, self.callbackM2_pwm)
+
+        #Signed velocity in encoder ticks/second
+        rospy.Subscriber(m1_name + '_vel', Int16, self.callbackM1_vel)
+        rospy.Subscriber(m2_name + '_vel', Int16, self.callbackM2_vel)
+
+        #TODO: Need accel, speed, decel, and pos
+        #rospy.Subscriber(m1_name + '_pos', Int8, self.callbackM1_pos)
+        #rospy.Subscriber(m2_name + '_pos', Int8, self.callbackM2_pos)
+
+        if publish_enc:
+            self.m1_enc_pub = rospy.Publisher(m1_name + '_enc', Int8, queue_size = 1)
+            self.m2_enc_pub = rospy.Publisher(m2_name + '_enc', Int8, queue_size = 1)
+
+        while not rospy.is_shutdown():
+            # Try to connect every second
+            self.connected = self.connect()
+            if self.connected:
+                rospy.loginfo('%s has connected', self.address)
+                #print("connected")
+                break
+            rospy.sleep(1.0)
+
+        while not rospy.is_shutdown():
+            # Publish encoder readings
+            if self.m1_enc_pub is not None:
+                self.m1_enc_pub.pub(roboclaw.ReadEncM1(self.address))
+                self.m2_enc_pub.pub(roboclaw.ReadEncM2(self.address))
+
+            # Timeout if no command recieved for more than TIMEOUT_TIME
+            if int(round(time.time() * 1000)) - self.timeout > self.TIMEOUT_TIME:
+                roboclaw.ForwardBackwardM1(self.address, 64)
+                roboclaw.ForwardBackwardM2(self.address, 64)
+            else:
+                if self.m1_pwm is not None:
+                    roboclaw.ForwardBackwardM1(self.address, self.m1_pwm)
+                    self.m1_pwm = None
+                if self.m2_pwm is not None:
+                    roboclaw.ForwardBackwardM2(self.address, self.m2_pwm)
+                    self.m2_pwm = None
+                if self.m1_vel is not None:
+                    roboclaw.SpeedM1(self.address, self.m1_vel)
+                    self.m1_vel = None
+                if self.m2_vel is not None:
+                    roboclaw.SpeedM2(self.address, self.m2_vel)
+                    self.m2_vel = None
 
 
-	def connect(self):
-		print("trying to connect")
-		connect = False
-		wait = rospy.Rate(1)
-		while (connect==False):
-				try:
-					print(self.device)
-					roboclaw.Open(self.device,115200)
-					connect = True
-					self.pub.publish("connect "+self.device)
-					roboclaw.ResetEncoders(self.address);
-					print ("connected")
-					break
-				except:
-					print("no device "+ self.device)
-					self.pub.publish("disconnect "+ self.device)
-					wait.sleep()
-
-	def setmotor (self,m,n):
-                rospy.logdebug("Setting motor to %d, %d", m, n)
-		roboclaw.ForwardBackwardM1(self.address,m)
-		roboclaw.ForwardBackwardM2(self.address,n)
+    def connect(self):
+        ports = serial.tools.list_ports.comports()
+        for usb in ports:
+            try:
+                # Open up the serial port and see if data is available at the desired address
+                roboclaw.Open(usb.device, 38400)
+                c1, c2 = roboclaw.GetConfig(self.address)
+                print(c1)
+                print(c2)
+                print(' ')
+                if (c1 is not 0) or (c2 is not 0):
+                    self.device = usb.device
+                    rospy.loginfo('%s has connected to roboclaw with address %s', self.device, self.address)
+                    #print(self.name + ' ' + self.device)
+                    return True
+                else:
+                    roboclaw.port.close()
+            except IOError:
+                continue
+        return False
 
 
-	def normal(self, useEnc):
-		while not rospy.is_shutdown():
-			if (self.timeout > 0):
-				#print("setting motor to values %i, %i"%(self.x,self.y))
-				self.enc(useEnc)
-				try:
-					self.setmotor(self.x,self.y)
-				except:
-					er = 1
-					self.timeout -=1
-					break
-			else:
-				try:
-					self.setmotor(64,64)
-				except:
-					er = 1
-					break
+    def callbackM1_pwm(self, msg):
+        if self.connected:
+            self.timeout = int(round(time.time() * 1000))
+            self.m1_pwm = msg.data
+        else:
+            #rospy.loginfo('%s recieved M1_pwm, not connected', self.address)
+            pass
+            
+    def callbackM2_pwm(self, msg):
+        if self.connected:
+            self.timeout = int(round(time.time() * 1000))
+            self.m2_pwm = msg.data
+        else:
+            #rospy.loginfo('%s recieved M2_pwm, not connected', self.address)
+            pass
 
 
-	def enc(self, useEnc):
-		if (useEnc == False):
-			return
-		enc1 = roboclaw.ReadEncM1(self.address)
-		enc2 = roboclaw.ReadEncM2(self.address)
+    def callbackM1_vel(self, msg):
+        if self.connected:
+            self.timeout = int(round(time.time() * 1000))
+            self.m1_vel = msg.data
+        else:
+            rospy.loginfo('%s recieved M1_vel, not connected', self.address)
+            pass
 
-		self.enc_pub.publish(Vector3(enc1[1], enc2[1], 0))
+    def callbackM2_vel(self, msg):
+        if self.connected:
+            self.timeout = int(round(time.time() * 1000))
+            self.m2_vel = msg.data
+        else:
+            rospy.loginfo('%s recieved M2_vel, not connected', self.address)
+            pass
+
+    def callbackM1_pos(self, msg):
+        pass
+    def callbackM2_pos(self, msg):
+        pass
+
 
 if __name__ == '__main__':
-	rospy.init_node('motornode', anonymous=True)
-	name = rospy.get_param('~controller_name', 'motornode')
-	m1Name = rospy.get_param('~m1_name', 'M1')
-	m2Name = rospy.get_param('~m2_name', 'M2')
-        use_enc = rospy.get_param('~use_enc', False)
-	controller = motornode(name, m1Name, m2Name, use_enc)
+    rospy.init_node('motornode', anonymous=True)
+    name = rospy.get_param('~controller_name', 'motornode')
+    m1Name = rospy.get_param('~m1_name', 'M1')
+    m2Name = rospy.get_param('~m2_name', 'M2')
+    pub_enc = rospy.get_param('~pub_enc', False)
+    address = int(rospy.get_param('~address', 0x80))
+    controller = motornode(name, m1Name, m2Name, pub_enc, address)
