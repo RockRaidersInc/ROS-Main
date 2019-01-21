@@ -94,6 +94,7 @@ namespace gazebo {
         void ArmCallback5(const std_msgs::Int8::ConstPtr& msg);
 
         double mapMotorTorque(double inval);
+        double mapMotorVel(double inval);
 
         double map(double x, double in_min, double in_max, double out_min, double out_max);
 
@@ -223,16 +224,20 @@ namespace gazebo {
     void MotorNodePlugin::OnUpdate() {
 
         u_int joint_axis = 0;
+
+/*
         this->model->GetJoint("left_back_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(backLeftMotorVal));
         this->model->GetJoint("left_front_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(frontLeftMotorVal));
         this->model->GetJoint("right_back_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(backRightMotorVal));
         this->model->GetJoint("right_front_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(frontRightMotorVal));
+*/
 
-        // this->model->GetJoint("left_back_wheel_hinge")->SetParam("vel", joint_axis, mapMotorTorque(backLeftMotorVal));
-        // this->model->GetJoint("left_front_wheel_hinge")->SetParam("vel", joint_axis,  mapMotorTorque(frontLeftMotorVal));
-        // this->model->GetJoint("right_back_wheel_hinge")->SetParam("vel", joint_axis,  mapMotorTorque(backRightMotorVal));
-        // this->model->GetJoint("right_front_wheel_hinge")->SetParam("vel", joint_axis, mapMotorTorque(frontRightMotorVal));
-        
+        this->model->GetJoint("left_back_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(backLeftMotorVal));
+        this->model->GetJoint("left_front_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(frontLeftMotorVal));
+        this->model->GetJoint("right_back_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(backRightMotorVal));
+        this->model->GetJoint("right_front_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(frontRightMotorVal));
+
+
         // this->j2_controller->SetJointPosition(this->model->GetJoint("armbase_armcentershaft"), map(armJointVals[0], -128, 127, -3.14, 3.14));
         // this->j2_controller->SetJointPosition(this->model->GetJoint("armcentershaftoffset_backarm"), map(armJointVals[1], -128, 127, -3.14, 3.14));
         // this->j2_controller->SetJointPosition(this->model->GetJoint("backarm_forearm"), map(armJointVals[2], -128, 127, -3.14, 3.14));
@@ -241,7 +246,12 @@ namespace gazebo {
 
     double MotorNodePlugin::mapMotorTorque(double inval) {
         // This line should be some kind of scalar so that the simulated rover accelerates at about the same rate as the actual motor.
-        return inval * 0.1;
+        return inval * -0.1;
+    }
+
+    double MotorNodePlugin::mapMotorVel(double inval) {
+        // This line should make the simulated wheels turn at about the same speed as the real rover's wheels
+        return inval * -0.1;
     }
 
 

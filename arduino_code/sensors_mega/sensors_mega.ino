@@ -108,13 +108,30 @@ void setup(void)
   
   sequence_num = 0;
   
+  
+  delay(1000);
+  
   gps_serial.begin(9600);
+  char version_msg[] = {0xA0, 0xA1, 0x00, 0x04, 0x05, 0x00, 0x05, 0x00, 0x00, 0x0D, 0x0A};
+  for (int i = 0; i < 9; i++) { gps_serial.write(version_msg[i]);}
+  
+  char ack = gps_serial.read();
+  if (ack != 0x02) {
+    Serial.print("did not get correct ack from gps when changing baud rate, actually got");
+    Serial.print(ack + '0');
+    Serial.println();
+  }
+  
+  gps_serial.end();
+  gps_serial.begin(9600);
+//  gps_serial.begin(115200);
 }
 
 
 void check_gps_data() {
   while (gps_serial.available()) {
-    Serial.write("!");  
+//    Serial.write("!");
+    Serial.write("");
     char next = gps_serial.read();
     Serial.write(next);
   } 
@@ -138,28 +155,28 @@ void loop(void)
   check_gps_data();
 
 
-  Serial.print("Seq:"); Serial.print(sequence_num);
-  
-  Serial.print(", ms_time:"); Serial.print(loop_start_time);
-  Serial.print(", ");
-  print_space_if_positive(accel_event.acceleration.x); Serial.print(accel_event.acceleration.x); Serial.print(" ");
-  print_space_if_positive(accel_event.acceleration.y); Serial.print(accel_event.acceleration.y); Serial.print(" "); 
-  print_space_if_positive(accel_event.acceleration.z); Serial.print(accel_event.acceleration.z); Serial.print(", ");
-  check_gps_data();
-  
-
-  /* Display the results (magnetic vector values are in micro-Tesla (uT)) */
-  print_space_if_positive(mag_event.magnetic.x); Serial.print(mag_event.magnetic.x); Serial.print(" "); 
-  print_space_if_positive(mag_event.magnetic.y);  Serial.print(mag_event.magnetic.y); Serial.print(" "); 
-  print_space_if_positive(mag_event.magnetic.z); Serial.print(mag_event.magnetic.z); Serial.print(", ");
-  check_gps_data();
-
-
-  /* Display the results (gyrocope values in rad/s) */
-  print_space_if_positive(gyro_event.gyro.x); Serial.print(gyro_event.gyro.x); Serial.print(" ");
-  print_space_if_positive(gyro_event.gyro.y); Serial.print(gyro_event.gyro.y); Serial.print(" ");
-  print_space_if_positive(gyro_event.gyro.z); Serial.print(gyro_event.gyro.z);
-  Serial.println("");
+//  Serial.print("Seq:"); Serial.print(sequence_num);
+//  
+//  Serial.print(", ms_time:"); Serial.print(loop_start_time);
+//  Serial.print(", ");
+//  print_space_if_positive(accel_event.acceleration.x); Serial.print(accel_event.acceleration.x); Serial.print(" ");
+//  print_space_if_positive(accel_event.acceleration.y); Serial.print(accel_event.acceleration.y); Serial.print(" "); 
+//  print_space_if_positive(accel_event.acceleration.z); Serial.print(accel_event.acceleration.z); Serial.print(", ");
+//  check_gps_data();
+//  
+//
+//  /* Display the results (magnetic vector values are in micro-Tesla (uT)) */
+//  print_space_if_positive(mag_event.magnetic.x); Serial.print(mag_event.magnetic.x); Serial.print(" "); 
+//  print_space_if_positive(mag_event.magnetic.y);  Serial.print(mag_event.magnetic.y); Serial.print(" "); 
+//  print_space_if_positive(mag_event.magnetic.z); Serial.print(mag_event.magnetic.z); Serial.print(", ");
+//  check_gps_data();
+//
+//
+//  /* Display the results (gyrocope values in rad/s) */
+//  print_space_if_positive(gyro_event.gyro.x); Serial.print(gyro_event.gyro.x); Serial.print(" ");
+//  print_space_if_positive(gyro_event.gyro.y); Serial.print(gyro_event.gyro.y); Serial.print(" ");
+//  print_space_if_positive(gyro_event.gyro.z); Serial.print(gyro_event.gyro.z);
+//  Serial.println("");
   check_gps_data();
   
 

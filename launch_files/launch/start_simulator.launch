@@ -2,5 +2,7 @@
 <launch>
     <include file="$(find launch_files)/launch/software_components.launch" pass_all_args="true"/> 
     <include file="$(find simulator_motor_driver)/launch/simulator.launch"/>
-  
+
+    <node name="camera_transform_publisher" pkg="tf" type="static_transform_publisher" args="0 0 0.58 0 0 -1.57 map camera_link 10" />
+    <node name="rviz_sim" pkg="rviz" type="rviz" output="screen" />
 </launch>
