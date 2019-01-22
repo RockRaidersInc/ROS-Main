@@ -26,7 +26,7 @@ class joycontrol:
         self.left_pub = rospy.Publisher('left_motor_power', Int16, queue_size=1)
         self.right_pub = rospy.Publisher('right_motor_power', Int16, queue_size=1)
 
-        rospy.Subscriber('/drive_twist', Twist, self.twist_callback)
+        rospy.Subscriber('/cmd_vel', Twist, self.twist_callback)
 
         self.publish_timer = rospy.Timer(rospy.Duration(0.05), self.publish_to_motors)  # publish joystick angles every 0.05 seconds
 
