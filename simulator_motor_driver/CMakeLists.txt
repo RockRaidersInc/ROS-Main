@@ -153,7 +153,8 @@ include_directories(
 #add_executable(SimMotorNode src/SimMotorNode.cpp)
 
 add_library(SimMotorNode SHARED src/SimMotorNode.cpp)
-add_library(FixFrictionNode SHARED src/world_fix_friction_plugin.cpp )
+add_library(FixFrictionNode SHARED src/world_fix_friction_plugin.cpp)
+add_library(SimGpsPlugin SHARED src/SimGpsPlugin.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -165,6 +166,12 @@ add_library(FixFrictionNode SHARED src/world_fix_friction_plugin.cpp )
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+add_dependencies(SimGpsPlugin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(SimGpsPlugin
+  ${catkin_LIBRARIES}
+)
+
+
 # Specify libraries to link a library or executable target against
 target_link_libraries(SimMotorNode ${catkin_LIBRARIES}
 FixFrictionNode ${catkin_LIBRARIES}
@@ -173,6 +180,9 @@ FixFrictionNode ${catkin_LIBRARIES}
 target_link_libraries(SimMotorNode ${GAZEBO_libraries}
 FixFrictionNode ${catkin_LIBRARIES}
 )
+
+target_link_libraries(SimGpsPlugin ${GAZEBO_libraries})
+
 
 #############
 ## Install ##
