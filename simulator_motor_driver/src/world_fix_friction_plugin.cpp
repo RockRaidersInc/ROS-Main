@@ -6,10 +6,7 @@ namespace gazebo
 {
   class FixFrictionPlugin : public WorldPlugin
   {
-    public: FixFrictionPlugin() : WorldPlugin()
-            {
-              printf("Hello World!\n");
-            }
+    public: FixFrictionPlugin() : WorldPlugin() { }
 
     public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
             {

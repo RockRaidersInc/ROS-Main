@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
   <model name="gps_imu">
-    <link name="link">
+    <link name="gps_imu_link">
 
       <inertial>
         <mass>0.05</mass>
@@ -31,26 +31,22 @@
         </geometry>
       </collision>
 
-
-      <sensor name="imu_sensor" type="imu">
-        <always_on>true</always_on>
-        <update_rate>100</update_rate>
-        <visualize>true</visualize>
-        <topic>__default_topic__</topic>
-        <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
-          <topicName>imu</topicName>
-          <bodyName>imu_link</bodyName>
-          <updateRateHZ>100.0</updateRateHZ>
-          <gaussianNoise>0.0</gaussianNoise>
-          <xyzOffset>0 0 0</xyzOffset>
-          <rpyOffset>0 0 0</rpyOffset>
-          <frameName>imu_link</frameName>
-        </plugin>
-        <pose>0 0 0 0 0 0</pose>
-      </sensor>
-
       <sensor name="imu" type="imu">
-        <imu>
+        <always_on>true</always_on>
+          <update_rate>100</update_rate>
+          <visualize>true</visualize>
+          <topic>__default_topic__</topic>
+          <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+            <topicName>imu</topicName>
+            <bodyName>gps_imu_link</bodyName>
+            <updateRateHZ>100.0</updateRateHZ>
+            <gaussianNoise>0.0</gaussianNoise>
+            <xyzOffset>0 0 0</xyzOffset>
+            <rpyOffset>0 0 0</rpyOffset>
+            <frameName>imu_link</frameName>
+          </plugin>
+          <pose>0 0 0 0 0 0</pose>
+          <imu>
           <angular_velocity>
             <x>
               <noise type="gaussian">
@@ -108,25 +104,17 @@
         <update_rate>200</update_rate>
       </sensor>
 
-      <sensor name="gps_sensor" type="gps">
+      <!--<sensor name="a_gps_sensor" type="gps">
+        <plugin name="custom_gps_sim_2" filename="libSimGpsPlugin.so"/>
+      </sensor>-->
+
+      <!--<sensor name="gps_sensor" type="gps">
         <always_on>true</always_on>
         <update_rate>10</update_rate>
         <visualize>true</visualize>
         <topic>rover_gps</topic>
-        <plugin name="novatel_gps_sim" filename="libhector_gazebo_ros_gps.so">
-          <alwaysOn>1</alwaysOn>
-          <updateRate>10.0</updateRate>
-          <bodyName>gps_link</bodyName>
-          <topicName>fix</topicName>
-          <velocityTopicName>fix_velocity</velocityTopicName>
-          <drift>0.0 0.0 0.0</drift>
-          <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
-          <velocityDrift>0 0 0</velocityDrift>
-          <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
-        </plugin>
-      </sensor>
+        <plugin name="custom_gps_sim" filename="libSimGpsPlugin.so"/>
 
-      <sensor name="gps_sensor" type="gps">
         <gps>
           <position_sensing>
             <horizontal>
@@ -151,8 +139,19 @@
         </gps>
         <always_on>1</always_on>
         <update_rate>10</update_rate>
-      </sensor>
+      </sensor> -->
 
     </link>
+    <plugin name="custom_gps_sim" filename="libhector_gazebo_ros_gps.so">
+        <alwaysOn>1</alwaysOn>
+        <updateRate>10.0</updateRate>
+        <bodyName>gps_imu_link</bodyName>
+        <topicName>fix</topicName>
+        <velocityTopicName>fix_velocity</velocityTopicName>
+        <drift>0.0 0.0 0.0</drift>
+        <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
+        <velocityDrift>0 0 0</velocityDrift>
+        <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
+    </plugin>
   </model>
 </sdf>

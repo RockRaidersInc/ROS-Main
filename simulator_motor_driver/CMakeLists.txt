@@ -166,10 +166,7 @@ add_library(SimGpsPlugin SHARED src/SimGpsPlugin.cpp)
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_dependencies(SimGpsPlugin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(SimGpsPlugin
-  ${catkin_LIBRARIES}
-)
+# add_dependencies(SimGpsPlugin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
 # Specify libraries to link a library or executable target against
@@ -181,7 +178,7 @@ target_link_libraries(SimMotorNode ${GAZEBO_libraries}
 FixFrictionNode ${catkin_LIBRARIES}
 )
 
-target_link_libraries(SimGpsPlugin ${GAZEBO_libraries})
+target_link_libraries(SimGpsPlugin ${catkin_LIBRARIES} ${GAZEBO_libraries})
 
 
 #############
