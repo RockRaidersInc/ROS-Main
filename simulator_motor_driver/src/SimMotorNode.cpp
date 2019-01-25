@@ -190,7 +190,7 @@ namespace gazebo {
 
     double MotorNodePlugin::mapMotorVel(double inval) {
         // This line makes the simulated wheels turn at the same speed as the actual wheels
-        return inval * 2 * 3.14 / (12 * 81);
+        return inval * 2 * 3.14 / (12 * 81) * 2;
     }
 
     // shamelessly coppied from the arduino standard library
