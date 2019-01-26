@@ -49,3 +49,24 @@ sudo apt install ros-kinetic-nmea-navsat-driver
 
 ## Simulation installs
 sudo apt-get install ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control
+
+# Networking
+Rock raiders 2 laptop
+IP Address: 192.168.1.10
+Username: rockie
+Password: rockie
+
+Base station rocket M900
+IP Address: 192.168.1.2
+Username: ubnt
+Password: ubnt
+
+Motherboard
+IP Address: 192.168.1.11
+Username: rock
+Password: rock
+
+Rover rocket M900
+IP Address: 192.168.1.3
+Username: ubnt
+Password: ubnt
