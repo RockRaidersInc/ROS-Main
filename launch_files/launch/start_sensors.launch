@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <launch>
+<!--
     <node name="imu_filter_node" pkg="imu_filter_madgwick" type="imu_filter_node">
-        <param name="zeta" value="0"/>  <!-- gyro drift gain (rads/sec) -->
+        <param name="zeta" value="0"/>
         <remap from="/imu/data_raw" to="/sensor/imu_data_raw"/>
         <remap from="/imu/mag" to="/sensor/mag_raw"/>
         <remap from="/imu/data" to="/position_fused"/>
     </node>
+-->
     <node name="sensor_publisher" pkg="sensor_publisher" type="sensor_publisher.py">
     </node>
     <node name="gps_parser" pkg="nmea_navsat_driver" type="nmea_topic_driver">

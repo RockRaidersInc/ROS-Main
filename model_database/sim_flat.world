@@ -22,26 +22,15 @@
     </spherical_coordinates>
 
 
-    <include>
-      <uri>model://sun</uri>
-      <pose>0 0 100   0 0 0</pose>
-    </include>
-
 
     <include>
       <uri>model://Robot_Base</uri>
       <name>rover</name>
-      <pose>0 0 0.5   0 0 0</pose>
+      <pose>0 0 0.4   0 0 0</pose>
     </include>
 
 
-    <include>
-      <uri>model://terrain</uri>
-      <name>terrain</name>
-      <pose>0 0 0   0 0 0 </pose>
-    </include>
-
-    <plugin name="SimMotorNode" filename="libSimMotorNode.so"/>
+    <plugin name="SimMotorNode" filename="/home/david/Documents/14_rockraiders/devel/lib/libSimMotorNode.so"/>
 
 
     <model name='ground_plane'>
@@ -92,8 +81,6 @@
       </link>
       <pose frame=''>0.000967 -0.039388 0 0 -0 0</pose>
     </model>
-
     <plugin name='FixFrictionNode' filename='libFixFrictionNode.so'/>
-
   </world>
 </sdf>
