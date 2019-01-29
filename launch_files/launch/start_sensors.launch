@@ -9,12 +9,13 @@
     </node>
 -->
     <node name="sensor_publisher" pkg="sensor_publisher" type="sensor_publisher.py">
-        <remap from="/sensors/nmea_sentences" to="/odom/nmea_sentences"/>
-        <remap from="/sensor/imu_data_raw" to="/odom/imu"/>
+        <remap from="nmea_sentences" to="/odom/nmea_sentences"/>
+        <remap from="/imu_data_raw" to="/odom/imu"/>
+        <remap from="mag_raw" to="/odom/mag"/>
     </node>
     <node name="gps_parser" pkg="nmea_navsat_driver" type="nmea_topic_driver">
         <remap from="/nmea_sentence" to="/odom/nmea_sentences"/>
-        <remap from="/fix" to="/odom/fix">
+        <remap from="/fix" to="/odom/fix"/>
     </node>
 
 

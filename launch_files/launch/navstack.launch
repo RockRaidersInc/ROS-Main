@@ -4,9 +4,14 @@
 	<!--  navstack related nodes  -->
 
 
+    <!-- 
     <node pkg="sensor_node_pkg" type="sensor_node_type" name="sensor_node_name" output="screen">
         <param name="sensor_param" value="param_value" />
     </node>
+    -->
+
+    <include file="$(find launch_files)/launch/start_sensors.launch"/> 
+
     <node pkg="odom_node_pkg" type="odom_node_type" name="odom_node" output="screen">
         <param name="odom_param" value="param_value" />
     </node>
