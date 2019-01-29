@@ -10,7 +10,7 @@
             <heightmap>
               <uri>file://media/dem/mtsthelens_129.dem</uri>
               <size>150 150 25</size>
-              <pos>77 0 -695</pos>
+              <pos>0 0 -695</pos>
             </heightmap>
           </geometry>
         </collision>
@@ -42,7 +42,7 @@
               </blend>
               <uri>file://media/dem/mtsthelens_129.dem</uri>
               <size>150 150 25</size>
-              <pos>77 0 -695</pos>
+              <pos>0 0 -695</pos>
             </heightmap>
           </geometry>
         </visual>

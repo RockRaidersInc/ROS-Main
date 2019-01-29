@@ -37,7 +37,7 @@
           <visualize>true</visualize>
           <topic>__default_topic__</topic>
           <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
-            <topicName>imu</topicName>
+            <topicName>/odom/imu</topicName>
             <bodyName>gps_imu_link</bodyName>
             <updateRateHZ>100.0</updateRateHZ>
             <gaussianNoise>0.0</gaussianNoise>
@@ -146,7 +146,7 @@
         <alwaysOn>1</alwaysOn>
         <updateRate>10.0</updateRate>
         <bodyName>gps_imu_link</bodyName>
-        <topicName>fix</topicName>
+        <topicName>/odom/fix</topicName>
         <velocityTopicName>fix_velocity</velocityTopicName>
         <drift>0.0 0.0 0.0</drift>
         <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
