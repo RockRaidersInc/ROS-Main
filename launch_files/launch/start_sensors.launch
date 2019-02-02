@@ -15,6 +15,7 @@
     <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node" >
         <param name="gain" value="0.1"/>
         <param name="zeta" value="0"/>
+        <param name="orientation_stddev" value="1.0"/>
         <param name="mag_bias_x" value="0"/>
         <param name="mag_bias_y" value="0"/>
         <param name="mag_bias_z" value="0"/>
