@@ -1,9 +1,14 @@
 <?xml version="1.0"?>
 <launch>
-   
-	<!--  navstack related nodes  -->
+    <!-- 3D sensor -->
 
+    <!-- Odometry -->
+    <!-- <include file="$(find launch_files)/launch/start_sensors.launch"/> -->
+    <!-- Transforms -->
+<!--     <node name="joy" pkg="tf" type="static_transform_publisher" value="0 0.25 0.58 0 0 -1.57 base_link camera_link 10">
+    </node> -->
 
+<<<<<<< HEAD
     <!-- 
     <node pkg="sensor_node_pkg" type="sensor_node_type" name="sensor_node_name" output="screen">
         <param name="sensor_param" value="param_value" />
@@ -17,10 +22,27 @@
     </node>
     <node pkg="transform_configuration_pkg" type="transform_configuration_type" name="transform_configuration_name" output="screen">
         <param name="transform_configuration_param" value="param_value" />
+=======
+    <!-- ROSbags -->
+    <node pkg="rosbag" 
+          name="gps_bag" 
+          type="play" 
+          args="/home/wus7/catkin_ws/src/rosbags/rosbag-gps-walk-field-2.bag"/>
+
+    <!-- Robot Localization -->
+    <node pkg="robot_localization" type="navsat_transform_node" name="navsat_tf" respawn="true">
+        <param name="magnetic_declination_radians" value="0"/>
+        <param name="yaw_offset" value="0"/>
+        <remap from="/imu/data" to="/odom/imu" />
+        <remap from="/gps/fix" to="/odom/fix" />
+        <!-- <remap from="/odometry/filtered" to="/odom" /> -->
+>>>>>>> 3ce44e15659cdda40799d88476a369754f40f838
     </node>
 
+<!--     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_odom" respawn="true"/>
+        <param name="odom0" value="odometry/gps"/>
+        <param name="imu0" value="odom/imu">
+    </node> -->
 
-    <!--  transorm tree  -->
-    <node name="joy" pkg="tf" type="static_transform_publisher" value="0 0.25 0.58 0 0 -1.57 base_link camera_link 10"/>
-  
+
 </launch>

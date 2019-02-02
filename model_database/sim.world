@@ -22,6 +22,15 @@
     </spherical_coordinates>
 
 
+<!-- gazebo 7 doesn't seem to support changing the default camera location, this should be uncommented if we move to gazebo 9+ -->
+<!--
+    <gui>
+      <camera>
+        <pose> -80 -7 7 0 -0.8 1.57</pose>
+      </camera>
+    </gui>
+-->
+
     <include>
       <uri>model://sun</uri>
       <pose>0 0 100   0 0 0</pose>
@@ -31,14 +40,14 @@
     <include>
       <uri>model://Robot_Base</uri>
       <name>rover</name>
-      <pose>-76 0 0.5   0 0 0</pose>
+      <pose> -76 0 0.5   0 0 0</pose>
     </include>
 
 
     <include>
       <uri>model://terrain</uri>
       <name>terrain</name>
-      <pose>0 0 0   0 0 0 </pose>
+      <pose> 0 0 0   0 0 0 </pose>
     </include>
 
     <plugin name="SimMotorNode" filename="libSimMotorNode.so"/>
@@ -90,7 +99,7 @@
         <kinematic>0</kinematic>
         <gravity>1</gravity>
       </link>
-      <pose frame=''>0.000967 -0.039388 0 0 -0 0</pose>
+      <pose frame=''>-70 0 0 0 -0 0</pose>
     </model>
 
     <plugin name='FixFrictionNode' filename='libFixFrictionNode.so'/>

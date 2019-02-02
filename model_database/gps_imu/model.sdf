@@ -50,24 +50,24 @@
           <angular_velocity>
             <x>
               <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.0</stddev>
+                <mean>-0.01</mean>
+                <stddev>0.025</stddev>
                 <bias_mean>0.0</bias_mean>
                 <bias_stddev>0.0</bias_stddev>
               </noise>
             </x>
             <y>
               <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.0</stddev>
+                <mean>0.01</mean>
+                <stddev>0.025</stddev>
                 <bias_mean>0.0</bias_mean>
                 <bias_stddev>0.0</bias_stddev>
               </noise>
             </y>
             <z>
               <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.0</stddev>
+                <mean>0.01</mean>
+                <stddev>0.025</stddev>
                 <bias_mean>0.0</bias_mean>
                 <bias_stddev>0.0</bias_stddev>
               </noise>
@@ -76,24 +76,24 @@
           <linear_acceleration>
             <x>
               <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.0</stddev>
+                <mean>-0.01</mean>
+                <stddev>0.025</stddev>
                 <bias_mean>0.0</bias_mean>
                 <bias_stddev>0.0</bias_stddev>
               </noise>
             </x>
             <y>
               <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.0</stddev>
+                <mean>0.01</mean>
+                <stddev>0.025</stddev>
                 <bias_mean>0.0</bias_mean>
                 <bias_stddev>0.0</bias_stddev>
               </noise>
             </y>
             <z>
               <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.0</stddev>
+                <mean>-0.01</mean>
+                <stddev>0.025</stddev>
                 <bias_mean>0.0</bias_mean>
                 <bias_stddev>0.0</bias_stddev>
               </noise>
@@ -148,10 +148,10 @@
         <bodyName>gps_imu_link</bodyName>
         <topicName>/odom/fix</topicName>
         <velocityTopicName>fix_velocity</velocityTopicName>
-        <drift>0.0 0.0 0.0</drift>
-        <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
-        <velocityDrift>0 0 0</velocityDrift>
-        <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
+        <drift>2.0 2.0 2.0</drift>
+        <gaussianNoise>0.25 0.25 0.25</gaussianNoise>
+        <velocityDrift>1 1 1</velocityDrift>
+        <velocityGaussianNoise>0.1 0.1 0.1</velocityGaussianNoise>
     </plugin>
   </model>
 </sdf>
