@@ -165,9 +165,9 @@ def process_imu_data(line, regex):
         pass  # there was probably some corrupted data from the serial connection
 
 if __name__ == "__main__":
-    imu_pub = rospy.Publisher('imu_data_raw', Imu_msg, queue_size = 2)
-    mag_pub = rospy.Publisher('mag_raw', MagneticField_msg, queue_size = 2)
-    gps_pub = rospy.Publisher('nmea_sentences', NmeaSentence_msg, queue_size = 2)
+    imu_pub = rospy.Publisher('imu/data_raw', Imu_msg, queue_size = 2)
+    mag_pub = rospy.Publisher('imu/mag', MagneticField_msg, queue_size = 2)
+    gps_pub = rospy.Publisher('gps/nmea_sentence', NmeaSentence_msg, queue_size = 2)
 
     rospy.init_node('IMU_reader_node')
     main(imu_pub, mag_pub)

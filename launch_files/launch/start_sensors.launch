@@ -1,23 +1,25 @@
 <?xml version="1.0"?>
 <launch>
-<!--
-    <node name="imu_filter_node" pkg="imu_filter_madgwick" type="imu_filter_node">
+    <!-- Sensor Publisher -->
+    <node name="localization_sensors" pkg="sensor_publisher" type="sensor_publisher.py"/>
+
+    <!-- GPS nmea sentences to coordinates-->
+    <node name="gps_parser" pkg="nmea_navsat_driver" type="nmea_topic_driver" >
+        <remap from="/nmea_sentence" to="/gps/nmea_sentence"/>
+        <remap from="/fix" to="/gps/fix"/>
+        <remap from="/vel" to="/gps/vel"/>
+        <remap from="/time_reference" to="/gps/time_reference"/>
+    </node>
+
+    <!-- Sensor fusion for IMUs -->
+    <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node" >
+        <param name="gain" value="0.1"/>
         <param name="zeta" value="0"/>
-        <remap from="/imu/data_raw" to="/sensor/imu_data_raw"/>
-        <remap from="/imu/mag" to="/sensor/mag_raw"/>
-        <remap from="/imu/data" to="/position_fused"/>
+        <param name="mag_bias_x" value="0"/>
+        <param name="mag_bias_y" value="0"/>
+        <param name="mag_bias_z" value="0"/>
+        <remap from="/imu/data_raw" to="imu/data_raw"/>
+        <remap from="/imu/mag" to="/imu/mag"/>
     </node>
--->
-    <node name="sensor_publisher" pkg="sensor_publisher" type="sensor_publisher.py">
-        <remap from="nmea_sentences" to="/odom/nmea_sentences"/>
-        <remap from="/imu_data_raw" to="/odom/imu"/>
-        <remap from="mag_raw" to="/odom/mag"/>
-    </node>
-    <node name="gps_parser" pkg="nmea_navsat_driver" type="nmea_topic_driver">
-        <remap from="/nmea_sentence" to="/odom/nmea_sentences"/>
-        <remap from="/fix" to="/odom/fix"/>
-    </node>
-
-
 
 </launch>
