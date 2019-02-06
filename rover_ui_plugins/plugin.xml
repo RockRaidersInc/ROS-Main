@@ -33,4 +33,21 @@
       <icon type="theme">system-help</icon>
     </qtgui>
   </class>
+  <class name="Kill Counter" type="rover_ui_plugins.kill_counter.KillCounterPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+        Counts martians killed
+    </description>
+    <qtgui>
+      <group>
+        <label>Rock Raiders Plugins</label>
+      </group>
+      <!-- optional grouping...
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>Kill Counter</label>
+      <icon type="theme">system-help</icon>
+    </qtgui>
+  </class>
 </library>
