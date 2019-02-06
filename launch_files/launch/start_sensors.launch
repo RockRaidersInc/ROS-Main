@@ -3,6 +3,10 @@
     <!-- Sensor Publisher -->
     <node name="localization_sensors" pkg="sensor_publisher" type="sensor_publisher.py"/>
 
+    <!-- Transforms, not sure if this is done right -->
+    <node pkg="tf" type="static_transform_publisher" name="base_to_gps" args="0 0 0 0 0 0 base_link gps0_link 100" />
+    <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 0 base_link imu0_link 100" />
+
     <!-- GPS nmea sentences to coordinates-->
     <node name="gps_parser" pkg="nmea_navsat_driver" type="nmea_topic_driver" >
         <remap from="/nmea_sentence" to="/gps/nmea_sentence"/>
@@ -13,11 +17,16 @@
 
     <!-- Sensor fusion for IMUs -->
     <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node" >
+        <!-- Dynamically Reconfigurable Parameters -->
         <param name="gain" value="0.1"/>
         <param name="zeta" value="0"/>
+        <param name="orientation_stddev" value="1.0"/>
         <param name="mag_bias_x" value="0"/>
         <param name="mag_bias_y" value="0"/>
         <param name="mag_bias_z" value="0"/>
+        <!-- Not Dynamically Reconfigurable Parameters -->
+        <param name="fixed_frame" value="base_link"/>
+        <!-- Remapping -->
         <remap from="/imu/data_raw" to="imu/data_raw"/>
         <remap from="/imu/mag" to="/imu/mag"/>
     </node>

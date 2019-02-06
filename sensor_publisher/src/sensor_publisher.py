@@ -106,6 +106,7 @@ def send_gps_nmea_sentence(sentence):
     msg = NmeaSentence_msg()
     msg.sentence = sentence
     msg.header.stamp = rospy.get_rostime()
+    msg.header.frame_id = 'gps0_link'
     gps_pub.publish(msg)
 
 
@@ -140,6 +141,7 @@ def process_imu_data(line, regex):
         imu_msg.header.stamp = rospy.get_rostime()
         imu_msg.header.stamp.secs = int(data_collection_time)
         imu_msg.header.stamp.nsecs = int((data_collection_time - imu_msg.header.stamp.secs) * 1000000000)
+        imu_msg.header.frame_id = "imu0_link"
 
         imu_msg.linear_acceleration.x = float(match.group('accel_x'))
         imu_msg.linear_acceleration.y = float(match.group('accel_y'))
