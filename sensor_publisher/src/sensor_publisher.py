@@ -143,13 +143,16 @@ def process_imu_data(line, regex):
         imu_msg.header.stamp.nsecs = int((data_collection_time - imu_msg.header.stamp.secs) * 1000000000)
         imu_msg.header.frame_id = "imu0_link"
 
-        imu_msg.linear_acceleration.x = float(match.group('accel_x'))
-        imu_msg.linear_acceleration.y = float(match.group('accel_y'))
-        imu_msg.linear_acceleration.z = float(match.group('accel_z'))
+        accel_x, accel_y, accel_z = float(match.group('accel_x')), float(match.group('accel_y')), float(match.group('accel_z'))
+        imu_msg.linear_acceleration.x = map_to(accel_x, -0.4, 10.3, 0, 9.81)
+        imu_msg.linear_acceleration.y = map_to(accel_y, 0.2, 9.7, 0, 9.81)
+        imu_msg.linear_acceleration.z = map_to(accel_z, 0, 10.75, 0, 9.81)
         set_covariance_as_identity(imu_msg.linear_acceleration_covariance)
-        imu_msg.angular_velocity.x = float(match.group('gyro_x'))
-        imu_msg.angular_velocity.y = float(match.group('gyro_y'))
-        imu_msg.angular_velocity.z = float(match.group('gyro_z'))
+
+        gyro_x, gyro_y, gyro_z = float(match.group('gyro_x')), float(match.group('gyro_y')), float(match.group('gyro_z'))
+        imu_msg.angular_velocity.x = gyro_x - 0.01
+        imu_msg.angular_velocity.y = gyro_y - 0.03
+        imu_msg.angular_velocity.z = gyro_z - 0.06
         set_covariance_as_identity(imu_msg.angular_velocity_covariance)
 
         mag_msg = MagneticField_msg()
@@ -165,6 +168,11 @@ def process_imu_data(line, regex):
         mag_pub.publish(mag_msg)
     except ValueError as e:
         pass  # there was probably some corrupted data from the serial connection
+
+
+def map_to(x, in_min, in_max, out_min, out_max):
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
 
 if __name__ == "__main__":
     imu_pub = rospy.Publisher('imu/data_raw', Imu_msg, queue_size = 2)
