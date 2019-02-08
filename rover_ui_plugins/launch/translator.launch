@@ -1,7 +1,12 @@
 <launch>
-<node name="fix_translator" pkg="gps_common" type="fix_translator">
+<node name="fix_translator_filtered" pkg="gps_common" type="fix_translator">
     <!-- Translate from NavSatFix to GPSFix //-->
-      <remap from="/navsat_fix_in"  to="/fix"/>
-      <remap from="/gps_fix_out"    to="/fix_map"/>
+      <remap from="/navsat_fix_in"  to="/gps/filtered"/>
+      <remap from="/gps_fix_out"    to="/fix_map_filtered"/>
+</node>
+<node name="fix_translator_unfiltered" pkg="gps_common" type="fix_translator">
+    <!-- Translate from NavSatFix to GPSFix //-->
+      <remap from="/navsat_fix_in"  to="/gps/fix"/>
+      <remap from="/gps_fix_out"    to="/fix_map_unfiltered"/>
 </node>
 </launch>

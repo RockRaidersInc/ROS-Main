@@ -14,5 +14,7 @@
     </node>
 
     <node pkg="mapviz" type="mapviz" name="mapviz"/>
+
+    <include file="$(find rover_ui_plugins)/launch/translator.launch"/>
 </launch>
 
