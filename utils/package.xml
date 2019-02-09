@@ -51,7 +51,10 @@
   <buildtool_depend>catkin</buildtool_depend>
   <depend>rospy</depend>
   <depend>dependent_messages</depend>
+<<<<<<< HEAD
   <depend>nav_msgs</depend>
+=======
+>>>>>>> cc1a0b6daad9a22e2cdfc8c71cbf548c8982d573
 
 
   <!-- The export tag contains other, unspecified, tags -->
