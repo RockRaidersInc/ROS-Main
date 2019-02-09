@@ -49,10 +49,7 @@ add_message_files(
   FILES
   Twist2D.msg
   RollPitchYaw.msg
-<<<<<<< HEAD
   XYZRollPitchYaw.msg
-=======
->>>>>>> cc1a0b6daad9a22e2cdfc8c71cbf548c8982d573
 )
 
 ## Generate services in the 'srv' folder
