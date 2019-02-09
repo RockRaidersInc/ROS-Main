@@ -28,7 +28,11 @@ def callback(in_msg):
     z = in_msg.orientation.z
     w = in_msg.orientation.w
     out_msg = RPY_msg()
+<<<<<<< HEAD
     # out_msg.header = in_msg.header
+=======
+    out_msg.header = in_msg.header
+>>>>>>> cc1a0b6daad9a22e2cdfc8c71cbf548c8982d573
     out_msg.roll  = atan2(2*y*w + 2*x*z, 1 - 2*y*y - 2*z*z) * 180 / pi
     out_msg.pitch = atan2(2*x*w + 2*y*z, 1 - 2*x*x - 2*z*z) * 180 / pi
     out_msg.yaw   = -asin(2*x*y + 2*z*w) * 180 / pi
