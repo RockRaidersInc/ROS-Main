@@ -36,6 +36,10 @@
         <remap from="/imu/mag" to="/imu/mag"/>
     </node>
 
+    <node name="imu_quaternion_to_rpy" pkg="utils" type="quaternion_to_rpy_imu.py">
+        <remap from="~imu_msg_in" to="/imu/data"/>
+        <remap from="~rpy_msg_out" to="/debug/imu_rpy"/>
+    </node>
 
     <!-- Robot Localization -->
     <!-- GPS coordinates to odometry -->
@@ -45,7 +49,7 @@
              Refer to https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml-->
         <param name="magnetic_declination_radians" value="0.226893"/> <!-- 0.235910337  -->
         <!-- Need to tune, yaw should == 0 when facing east -->
-        <param name="yaw_offset" value="1.57"/> 
+        <param name="yaw_offset" value="0.0"/> 
         <param name="zero_altitude" value="true"/> 
         <param name="publish_filtered_gps" value="true" />
         <param name="broadcast_utm_transform" value="true"/>
@@ -131,4 +135,10 @@
          </rosparam>
 
     </node>
+
+    <node name="odom_msg_to_to_xyz_rpy" pkg="utils" type="odom_msg_to_xyz_rpy.py">
+        <remap from="~odom_msg_in" to="/odometry/filtered"/>
+        <remap from="~xyz_rpy_msg_out" to="/debug/odom_filtered_xyz_rpy"/>
+    </node>
+
 </launch>
