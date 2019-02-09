@@ -114,17 +114,17 @@
         <accelOffset>0.0 0.0 0.0</accelOffset>
         <accelDrift>0.0 0.0 0.0</accelDrift>
         <accelDriftFrequency>0.0 0.0 0.0</accelDriftFrequency>
-        <accelGaussianNoise>0.0 0.0 0.0</accelGaussianNoise>
+        <accelGaussianNoise>0.1 0.1 0.1</accelGaussianNoise>
 
         <rateOffset>0.0 0.0 0.0</rateOffset>
         <rateDrift>0.0 0.0 0.0</rateDrift>
         <rateDriftFrequency>0.0 0.0 0.0</rateDriftFrequency>
-        <rateGaussianNoise>0.0 0.0 0.0</rateGaussianNoise>
+        <rateGaussianNoise>0.1 0.1 0.1</rateGaussianNoise>
 
         <yawOffset>0.0</yawOffset>
         <yawDrift>0.0</yawDrift>
         <yawDriftFrequency>0.0</yawDriftFrequency>
-        <yawGaussianNoise>0.0</yawGaussianNoise>
+        <yawGaussianNoise>0.1</yawGaussianNoise>
     </plugin>
 
     <plugin name="custom_gps_sim" filename="libhector_gazebo_ros_gps.so">
@@ -134,9 +134,9 @@
         <topicName>/gps/fix</topicName>
         <velocityTopicName>/gps/vel</velocityTopicName>
         <drift>0.0 0.0 0.0</drift>
-        <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
+        <gaussianNoise>0.1 0.1 0.1</gaussianNoise>
         <velocityDrift>0 0 0</velocityDrift>
-        <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
+        <velocityGaussianNoise>0.1 0.1 0.1</velocityGaussianNoise>
     </plugin>
 
     <plugin name="custom_magnetometer_sim" filename="libhector_gazebo_ros_magnetic.so">
@@ -147,7 +147,7 @@
         <magnitude> 60 </magnitude>
         <offset>0 0 0</offset>
         <drift>0 0 0</drift>
-        <gaussianNoise>0 0 0</gaussianNoise>
+        <gaussianNoise>0.1 0.1 0.1</gaussianNoise>
     </plugin>
   </model>
 </sdf>
