@@ -31,13 +31,13 @@
         </geometry>
       </collision>
 
-      <sensor name="imu" type="imu">
+      <!--<sensor name="imu" type="imu">
         <always_on>true</always_on>
           <update_rate>100</update_rate>
           <visualize>true</visualize>
           <topic>__default_topic__</topic>
           <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
-            <topicName>/odom/imu</topicName>
+            <topicName>/imu/data</topicName>
             <bodyName>gps_imu_link</bodyName>
             <updateRateHZ>100.0</updateRateHZ>
             <gaussianNoise>0.0</gaussianNoise>
@@ -102,56 +102,52 @@
         </imu>
         <always_on>1</always_on>
         <update_rate>200</update_rate>
-      </sensor>
-
-      <!--<sensor name="a_gps_sensor" type="gps">
-        <plugin name="custom_gps_sim_2" filename="libSimGpsPlugin.so"/>
       </sensor>-->
-
-      <!--<sensor name="gps_sensor" type="gps">
-        <always_on>true</always_on>
-        <update_rate>10</update_rate>
-        <visualize>true</visualize>
-        <topic>rover_gps</topic>
-        <plugin name="custom_gps_sim" filename="libSimGpsPlugin.so"/>
-
-        <gps>
-          <position_sensing>
-            <horizontal>
-              <noise type="none">
-              </noise>
-            </horizontal>
-            <vertical>
-              <noise type="none">
-              </noise>
-            </vertical>
-          </position_sensing>
-          <velocity_sensing>
-            <horizontal>
-              <noise type="none">
-              </noise>
-            </horizontal>
-            <vertical>
-              <noise type="none">
-              </noise>
-            </vertical>
-          </velocity_sensing>
-        </gps>
-        <always_on>1</always_on>
-        <update_rate>10</update_rate>
-      </sensor> -->
-
     </link>
+
+    <plugin name="custom_imu_sim" filename="libhector_gazebo_ros_imu.so">
+        <alwaysOn>1</alwaysOn>
+        <updateRate>50.0</updateRate>
+        <bodyName>gps_imu_link</bodyName>
+        <robotNamespace> /rover </robotNamespace>
+        <topicName>imu</topicName>
+        <accelOffset>0.0 0.0 0.0</accelOffset>
+        <accelDrift>0.0 0.0 0.0</accelDrift>
+        <accelDriftFrequency>0.0 0.0 0.0</accelDriftFrequency>
+        <accelGaussianNoise>0.0 0.0 0.0</accelGaussianNoise>
+
+        <rateOffset>0.0 0.0 0.0</rateOffset>
+        <rateDrift>0.0 0.0 0.0</rateDrift>
+        <rateDriftFrequency>0.0 0.0 0.0</rateDriftFrequency>
+        <rateGaussianNoise>0.0 0.0 0.0</rateGaussianNoise>
+
+        <yawOffset>0.0</yawOffset>
+        <yawDrift>0.0</yawDrift>
+        <yawDriftFrequency>0.0</yawDriftFrequency>
+        <yawGaussianNoise>0.0</yawGaussianNoise>
+    </plugin>
+
     <plugin name="custom_gps_sim" filename="libhector_gazebo_ros_gps.so">
         <alwaysOn>1</alwaysOn>
-        <updateRate>10.0</updateRate>
+        <updateRate>1.0</updateRate>
         <bodyName>gps_imu_link</bodyName>
-        <topicName>/odom/fix</topicName>
-        <velocityTopicName>fix_velocity</velocityTopicName>
-        <drift>2.0 2.0 2.0</drift>
-        <gaussianNoise>0.25 0.25 0.25</gaussianNoise>
-        <velocityDrift>1 1 1</velocityDrift>
-        <velocityGaussianNoise>0.1 0.1 0.1</velocityGaussianNoise>
+        <topicName>/gps/fix</topicName>
+        <velocityTopicName>/gps/vel</velocityTopicName>
+        <drift>0.0 0.0 0.0</drift>
+        <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
+        <velocityDrift>0 0 0</velocityDrift>
+        <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
+    </plugin>
+
+    <plugin name="custom_magnetometer_sim" filename="libhector_gazebo_ros_magnetic.so">
+        <alwaysOn>1</alwaysOn>
+        <updateRate>50.0</updateRate>
+        <bodyName>gps_imu_link</bodyName>
+        <topicName>/rover/magnetometer</topicName>
+        <magnitude> 60 </magnitude>
+        <offset>0 0 0</offset>
+        <drift>0 0 0</drift>
+        <gaussianNoise>0 0 0</gaussianNoise>
     </plugin>
   </model>
 </sdf>

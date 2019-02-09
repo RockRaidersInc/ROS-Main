@@ -114,7 +114,7 @@ class motornode:
         else:
             #rospy.loginfo('%s recieved M1_pwm, not connected', self.address)
             pass
-            
+          
     def callbackM2_pwm(self, msg):
         if self.connected:
             self.timeout = int(round(time.time() * 1000))
