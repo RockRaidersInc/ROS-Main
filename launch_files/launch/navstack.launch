@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <launch>
     <!-- ROSbags -->
-    <node name="sensor_bag"
+    <!-- <node name="sensor_bag"
           pkg="rosbag" 
           type="play"
-          args="/home/david/Documents/14_rockraiders/src/rosbags/rosbag-gps-walk-field-4.bag"/>
+          args="$(find rosbags)/rosbag-gps-walk-field-4.bag"/> -->
 
 
     <!-- 3D Sensors -->

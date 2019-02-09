@@ -31,6 +31,9 @@ def mag_callback(in_msg):
 
 def imu_callback(in_msg):
     in_msg.header.frame_id = "imu0_link"
+    x, y = in_msg.linear_acceleration.x, in_msg.linear_acceleration.y
+    in_msg.linear_acceleration.x = y
+    in_msg.linear_acceleration.y = -x
     imu_publisher.publish(in_msg)
 
 
