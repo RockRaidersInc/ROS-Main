@@ -21,7 +21,7 @@
 
 
     <!-- Sensor fusion for IMUs -->
-    <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node" >
+    <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node">
         <!-- Dynamically Reconfigurable Parameters -->
         <param name="gain" value="0.1"/>
         <param name="zeta" value="0"/>
@@ -36,6 +36,10 @@
         <remap from="/imu/mag" to="/imu/mag"/>
     </node>
 
+    <node name="imu_quaternion_to_rpy" pkg="utils" type="quaternion_to_rpy_imu.py">
+        <remap from="~imu_msg_in" to="/imu/data"/>
+        <remap from="~rpy_msg_out" to="/debug/imu_rpy"/>
+    </node>
 
     <!-- Robot Localization -->
     <!-- GPS coordinates to odometry -->
@@ -47,15 +51,15 @@
         <!-- Need to tune, yaw should == 0 when facing east -->
         <param name="yaw_offset" value="3.14159265"/> 
         <param name="zero_altitude" value="true"/> 
-        <param name="publish_filtered_gps" value="true" />
+        <param name="publish_filtered_gps" value="true"/>
         <param name="broadcast_utm_transform" value="true"/>
-        <param name="wait_for_datum" value="false" />
+        <param name="wait_for_datum" value="false"/>
 
         <!-- Output -->
 
         <!-- Input -->
-        <remap from="/imu/data" to="/imu/data" />
-        <remap from="/gps/fix" to="/gps/fix" />
+        <remap from="/imu/data" to="/imu/data"/>
+        <remap from="/gps/fix" to="/gps/fix"/>
         <remap from="/odometry/filtered" to="/odometry/filtered"/>
     </node>
 
@@ -135,4 +139,10 @@
          </rosparam>
 
     </node>
+
+    <node name="odom_msg_to_to_xyz_rpy" pkg="utils" type="odom_msg_to_xyz_rpy.py">
+        <remap from="~odom_msg_in" to="/odometry/filtered"/>
+        <remap from="~xyz_rpy_msg_out" to="/debug/odom_filtered_xyz_rpy"/>
+    </node>
+
 </launch>
