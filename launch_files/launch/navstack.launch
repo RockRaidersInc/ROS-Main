@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <launch>
     <!-- ROSbags -->
-    <node name="sensor_bag"
+<!--     <node name="sensor_bag"
           pkg="rosbag" 
           type="play"
-          args="/home/david/Documents/14_rockraiders/src/rosbags/rosbag-gps-walk-field-4.bag"/>
+          args="/home/david/Documents/14_rockraiders/src/rosbags/rosbag-gps-walk-field-4.bag"/> -->
 
 
     <!-- 3D Sensors -->
@@ -75,21 +75,21 @@
         <param name="odom0" value="/odometry/gps"/>
         <param name="imu0" value="/imu/data"/>
 
-        <rosparam param="odom0_config">[true,  false,  false, 
+        <rosparam param="odom0_config">[true , true , false, 
                                         false, false, false, 
                                         false, false, false, 
                                         false, false, false,
                                         false, false, false]
         </rosparam>
-        <param name="odom0_differential" value="true"/>
+        <!-- <param name="odom0_differential" value="false"/> -->
 
         <rosparam param="imu0_config">[false, false, false, 
                                        false, false,  true, 
                                        false, false, false, 
                                        false, false,  true,
-                                       true , false, false]
+                                       true , true, false]
         </rosparam>
-        <param name="imu0_differential" value="true"/>
+        <!-- <param name="imu0_differential" value="false"/> -->
         <param name="imu0_remove_gravitational_acceleration" value="true"/>
 
         <!-- Covariances -->
