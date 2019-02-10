@@ -88,7 +88,7 @@ void GazeboRosGps::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // default parameters
-  frame_id_ = "/world";
+  frame_id_ = "gps0_link";
   fix_topic_ = "fix";
   velocity_topic_ = "fix_velocity";
 
