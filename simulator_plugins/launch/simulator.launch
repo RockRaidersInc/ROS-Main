@@ -1,7 +1,7 @@
 <launch>
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find simulator_motor_driver)/../model_database/sim.world"/>
+    <arg name="world_name" value="$(find simulator_plugins)/../model_database/sim.world"/>
     <!-- <remap from="/gazebo_motor_node/backLeft" to="/motors/backLeft"/>
     <remap from="/gazebo_motor_node/frontLeft" to="/motors/frontLeft"/>
     <remap from="/gazebo_motor_node/backRight" to="/motors/backRight"/>

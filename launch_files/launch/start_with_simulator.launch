@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+    <include file="$(find launch_files)/launch/software_components.launch" pass_all_args="true"/> 
+
+    <include file="$(find launch_files)/launch/hardware_simulated.launch" pass_all_args="true"/> 
+
+</launch>

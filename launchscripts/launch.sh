@@ -1,6 +1,13 @@
 #!/bin/bash
 
 
+green='\e[0;32m'
+red='\e[0;31m'
+endColor='\e[0m'
+
+echo -e ${red}"this file is depreicated, strongly consider starting start_with_hardware.launch and base_station.launch instead (on different machines if desired)."${endcolor}
+
+
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 echo $SCRIPTPATH
 cd $SCRIPTPATH
@@ -19,4 +26,4 @@ echo "IP address is:"
 echo $text1
 echo 
 echo
-roslaunch launch_files start_rover.launch
+roslaunch launch_files start_with_hardware.launch

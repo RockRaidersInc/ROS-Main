@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(simulator_motor_driver)
+project(simulator_plugins)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11 -g3)
@@ -120,7 +120,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES simulator_motor_driver
+#  LIBRARIES simulator_plugins
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
 )
@@ -139,7 +139,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/simulator_motor_driver.cpp
+#   src/${PROJECT_NAME}/simulator_plugins.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -221,7 +221,7 @@ target_link_libraries(SimGpsPlugin ${catkin_LIBRARIES} ${GAZEBO_libraries})
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_simulator_motor_driver.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_simulator_plugins.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

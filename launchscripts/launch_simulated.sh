@@ -20,5 +20,5 @@ echo "IP address is:"
 echo $text1
 echo 
 echo
-roslaunch launch_files start_simulator.launch
+roslaunch launch_files start_with_simulator.launch
 
