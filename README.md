@@ -6,10 +6,9 @@ from your workspace
 
 The following commands should be run to install required packages:
 ```
-# installing catkin
+# installing catkin (the newer version with `catkin build`)
 sudo apt-get install cmake python-catkin-pkg python-empy python-nose libgtest-dev
-sudo apt install python-pip
-pip install -U catkin_pkg
+sudo apt-get install python-catkin-tools
 
 # joystick node
 sudo apt install ros-kinetic-joy
