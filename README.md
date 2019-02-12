@@ -4,9 +4,23 @@ This respository should be your src file in your ROS workspace.  So when cloning
   `git clone .... src`
 from your workspace
 
+The following commands should be run to install required packages:
+```
+# installing catkin (the newer version with `catkin build`)
+sudo apt-get install cmake python-catkin-pkg python-empy python-nose libgtest-dev
+sudo apt-get install python-catkin-tools
 
-##Starting everything up
+# joystick node
+sudo apt install ros-kinetic-joy
+```
+
+##Starting up a simulator
 The easiest way is to simply call the bash script `launch_simulated.sh` from the folder launchscripts
+Then, in a new terminal, source devel/setup.bash and run `roslaunch launch_files base_station.launch` to get joystick support.
+
+##Starting up the actual rover
+This is a slightly more involved. On the rover run `roslaunch launch_files launch_with_hardware.launch`. 
+Then, on the base station, run `source launchscripts/export_remote_ros_vars.sh` then `roslaunch launch_files base_station.launch` in the same terminal
 
 
 ##Setup and usage for usb_cam submodule
