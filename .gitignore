@@ -2,3 +2,5 @@
 *.idea*
 .idea/*
 *cmake-build-debug*
+*catkin_tools_prebuild*
+*.pyc

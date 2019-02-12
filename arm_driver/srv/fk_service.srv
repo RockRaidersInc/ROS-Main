@@ -1,6 +1,0 @@
-# joint angles starting from the base (in radians)
-float32[] joint_angles
----
-# xyz is in format [x, y, z] and rotation_matrix is 3x3
-float32[] xyz
-float32[] rotation_matrix
