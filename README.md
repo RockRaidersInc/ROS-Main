@@ -4,6 +4,18 @@ This respository should be your src file in your ROS workspace.  So when cloning
   `git clone .... src`
 from your workspace
 
+The following commands should be run to install required packages:
+```
+# installing catkin
+sudo apt-get install cmake python-catkin-pkg python-empy python-nose libgtest-dev
+sudo apt install python-pip
+pip install -U catkin_pkg
+
+# joystick node
+sudo apt install ros-kinetic-joy
+
+
+```
 
 ##Starting everything up
 The easiest way is to simply call the bash script `launch_simulated.sh` from the folder launchscripts
