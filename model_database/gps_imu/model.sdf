@@ -68,6 +68,9 @@
         <gaussianNoise>1.0 1.0 1.0</gaussianNoise>
         <velocityDrift>1.0 1.0 1.0</velocityDrift>
         <velocityGaussianNoise>1.0 1.0 1.0</velocityGaussianNoise>
+
+        <referenceLatitude> 42.729957 </referenceLatitude>
+        <referenceLongitude> -73.679659 </referenceLongitude>
     </plugin>
 
     <plugin name="custom_magnetometer_sim" filename="libhector_gazebo_ros_magnetic.so">
