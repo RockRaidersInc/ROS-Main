@@ -61,6 +61,7 @@ sudo apt install ros-kinetic-gpsd-client
 sudo apt install ros-kinetic-tf2-geometry-msgs
 sudo apt install ros-kinetic-nmea-navsat-driver
 
+sudo apt-get install libignition-math2-dev
+
 ## Simulation installs
 sudo apt-get install ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control
-
