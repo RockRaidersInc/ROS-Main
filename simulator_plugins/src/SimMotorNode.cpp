@@ -182,10 +182,10 @@ namespace gazebo {
         this->model->GetJoint("right_back_wheel_hinge")->SetForce(joint_axis,  mapMotorTorque(backRightMotorVal));
         this->model->GetJoint("right_front_wheel_hinge")->SetForce(joint_axis, mapMotorTorque(frontRightMotorVal));
 */
-        this->model->GetJoint("left_back_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(leftMotorVel));
-        this->model->GetJoint("left_front_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(leftMotorVel));
-        this->model->GetJoint("right_back_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(rightMotorVel));
-        this->model->GetJoint("right_front_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(rightMotorVel));
+        this->model->GetJoint("left_back_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(rightMotorVel));
+        this->model->GetJoint("left_front_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(rightMotorVel));
+        this->model->GetJoint("right_back_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(leftMotorVel));
+        this->model->GetJoint("right_front_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(leftMotorVel));
     }
 
     double MotorNodePlugin::mapMotorVel(double inval) {
