@@ -48,7 +48,6 @@
         <rpyOffset> 0 0 0 </rpyOffset>
 
         <rateOffset>0.0 0.0 0.0</rateOffset>
-        <rateDrift>0.0 0.0 0.0</rateDrift>
         <rateDriftFrequency>0.0 0.0 0.0</rateDriftFrequency>
         <rateGaussianNoise>0.0 0.0 0.0</rateGaussianNoise>
 
