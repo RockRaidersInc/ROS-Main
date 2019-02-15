@@ -1,24 +1,10 @@
 <?xml version="1.0"?>
 <launch>
-    <!-- ROSbags -->
-
-    <!-- <node name="sensor_bag"
-          pkg="rosbag" 
-          type="play"
-          args="$(find rosbags)/rosbag-gps-walk-field-4.bag"/> -->
-
-
-    <!-- 3D Sensors -->
-
-    <!-- Localization Sensors -->
-    <!-- <include file="$(find launch_files)/launch/start_sensors.launch"/> -->
-
     <!-- Transforms -->
     <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 map odom 100" />
     <!-- TEMPORARY, DELETE LATER -->
     <node pkg="tf" type="static_transform_publisher" name="base_to_gps" args="0 0 0 0 0 0 base_link gps0_link 100" />
     <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 0 base_link imu0_link 100" />
-
 
     <!-- Sensor fusion for IMUs -->
     <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node">
@@ -36,11 +22,6 @@
         <remap from="/imu/mag" to="/imu/mag"/>
     </node>
 
-    <node name="imu_quaternion_to_rpy" pkg="utils" type="quaternion_to_rpy_imu.py">
-        <remap from="~imu_msg_in" to="/imu/data"/>
-        <remap from="~rpy_msg_out" to="/debug/imu_rpy"/>
-    </node>
-
     <!-- Robot Localization -->
     <!-- GPS coordinates to odometry -->
     <node name="navsat_tf" pkg="robot_localization" type="navsat_transform_node" respawn="true">
@@ -49,7 +30,8 @@
              Refer to https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml-->
         <param name="magnetic_declination_radians" value="0.226893"/> <!-- 0.235910337  -->
         <!-- Need to tune, yaw should == 0 when facing east -->
-        <param name="yaw_offset" value="3.14159265"/> 
+        <!-- <param name="yaw_offset" value="3.14159265"/>  -->
+        <param name="yaw_offset" value="0"/> 
         <param name="zero_altitude" value="true"/> 
         <param name="publish_filtered_gps" value="true"/>
         <param name="broadcast_utm_transform" value="true"/>
@@ -63,8 +45,8 @@
         <remap from="/odometry/filtered" to="/odometry/filtered"/>
     </node>
 
-    <!-- Kalman Filter localization -->
-    <node name="localization_node" pkg="robot_localization" type="ekf_localization_node" respawn="true">
+    <!-- Kalman Filter localization - Map Frame-->
+    <node name="map_localization" pkg="robot_localization" type="ekf_localization_node" respawn="true">
         <!-- Settings -->
         <param name="frequency" value="10"/>  
         <param name="sensor_timeout" value="0.2"/>  
@@ -91,10 +73,10 @@
         <param name="odom0_differential" value="false"/>
 
         <rosparam param="imu0_config">[false, false, false, 
-                                       true, true,  false, 
+                                       false, false, false,
                                        false, false, false, 
-                                       true, true,  true,
-                                       true , true, true]
+                                       true , true ,  true,
+                                       true , true ,  true]
         </rosparam>
         <param name="imu0_differential" value="false"/>
         <param name="imu0_relative" value="false"/>
@@ -140,9 +122,15 @@
 
     </node>
 
+    <!-- Used for Debugging -->
     <node name="odom_msg_to_to_xyz_rpy" pkg="utils" type="odom_msg_to_xyz_rpy.py">
         <remap from="~odom_msg_in" to="/odometry/filtered"/>
         <remap from="~xyz_rpy_msg_out" to="/debug/odom_filtered_xyz_rpy"/>
+    </node>
+
+    <node name="imu_quaternion_to_rpy" pkg="utils" type="quaternion_to_rpy_imu.py">
+        <remap from="~imu_msg_in" to="/imu/data"/>
+        <remap from="~rpy_msg_out" to="/debug/imu_rpy"/>
     </node>
 
 </launch>
