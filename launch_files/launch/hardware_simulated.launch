@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-    <include file="$(find simulator_plugins)/launch/simulator.launch" pass_all_args="true"/>
+    <!--<include file="$(find simulator_plugins)/launch/simulator.launch" pass_all_args="true"/>-->
+    <include file="$(find simulator_plugins)/launch/sim_86_field.launch" pass_all_args="true"/>
 
     <!--<node name="imu_raw_data_republisher" pkg="topic_tools" type="relay" args="/rover/imu/data /imu/data_raw"/>-->
     <node name="magnetometer_republisher" pkg="simulator_plugins" type="magnetometer_republisher.py">

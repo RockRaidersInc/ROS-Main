@@ -1,0 +1,17 @@
+material ground_texture/Diffuse
+{
+  receive_shadows off
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture ground_texture.png
+        filtering anistropic
+        max_anisotropy 16
+      }
+      
+    }
+  }
+}

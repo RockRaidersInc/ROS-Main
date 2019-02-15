@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="86_field">
+
+    <static> true </static>  <!-- make the model imovable -->
+
+    <link name="ground">
+      <inertial>
+        <mass>10000</mass>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <plane>
+              <normal>0 0 1</normal>
+              <size>234 140</size>
+          </plane>
+        </geometry>
+      <material>
+        <script>
+          <uri>model://86_field/materials/scripts</uri>
+          <uri>model://86_field/materials/textures</uri>
+          <name>ground_texture/Diffuse</name>
+        </script>
+      </material>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <plane>
+              <normal>0 0 1</normal>
+              <size>234 140</size>
+          </plane>
+        </geometry>
+      </collision>
+    </link>
+    
+  </model>
+</sdf>
