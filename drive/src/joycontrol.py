@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+This node converts joystick messages to twist messages
+"""
 
 import rospy
 import roboclaw

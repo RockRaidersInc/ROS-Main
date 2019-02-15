@@ -1,6 +1,9 @@
 #!/usr/bin/env python
-#TO DO: Add subscriber to orientation data with callback to calc_motor_limits, properly define motor limits
+"""
+This node converts twist messages to motor speeds
+"""
 
+#TO DO: Add subscriber to orientation data with callback to calc_motor_limits, properly define motor limits
 
 #Last edited by Connor McGowan 1/18/19
 
@@ -18,7 +21,8 @@ class joycontrol:
         self.motor_min = -12.7
 
         #Should go in a config file
-        self.min_turn_radius = 35.485/24
+        # self.min_turn_radius = 35.485/24
+        self.min_turn_radius = 0.0001
         self.track = 35.485/12
 
         rospy.init_node('joycontrol')
@@ -46,7 +50,7 @@ class joycontrol:
         
         #We can't do zero point turning, so velocity must be nonzero
         if data.linear.x==0 and data.angular.z!=0:
-            data.linear.x=0.5
+            data.linear.x=0.00001
 
         #Get initial wheel angular velocities from IK
         temp_left, temp_right = kinematics.inverse_kinematics(data.linear.x, data.angular.z)
