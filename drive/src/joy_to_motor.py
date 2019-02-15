@@ -54,7 +54,7 @@ class joycontrol:
             data.linear.x=0.00001
 
         #Get initial wheel angular velocities from IK
-        temp_left, temp_right = kinematics.inverse_kinematics(data.linear.x, data.angular.z, track=self.track)
+        temp_left, temp_right = kinematics.inverse_kinematics( -1 * data.linear.x, data.angular.z, track=self.track)
 
         #angular velocities to encoder ticks
         self.left = temp_left / (2 * 3.14) * 12 * 81

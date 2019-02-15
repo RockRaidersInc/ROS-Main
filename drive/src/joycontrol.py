@@ -38,7 +38,7 @@ class joycontrol:
     def publish_stuff(self, event):
         twist_msg = Twist()
         twist_msg.linear.x = self.left_y * self.MAX_LINEAR_SPEED
-        twist_msg.angular.z = -1 * self.left_x * self.MAX_ANGULAR_SPEED
+        twist_msg.angular.z = self.left_x * self.MAX_ANGULAR_SPEED
         self.twist_pub.publish(twist_msg)
 
 

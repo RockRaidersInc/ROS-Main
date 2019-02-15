@@ -50,6 +50,7 @@ add_message_files(
   Twist2D.msg
   RollPitchYaw.msg
   XYZRollPitchYaw.msg
+  imu_degrees.msg
 )
 
 ## Generate services in the 'srv' folder

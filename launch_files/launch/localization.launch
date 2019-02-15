@@ -30,8 +30,8 @@
              Refer to https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml-->
         <param name="magnetic_declination_radians" value="0.226893"/> <!-- 0.235910337  -->
         <!-- Need to tune, yaw should == 0 when facing east -->
-        <!-- <param name="yaw_offset" value="3.14159265"/>  -->
-        <param name="yaw_offset" value="0"/> 
+         <param name="yaw_offset" value="3.14159265"/>  
+        <!--<param name="yaw_offset" value="0"/> -->
         <param name="zero_altitude" value="true"/> 
         <param name="publish_filtered_gps" value="true"/>
         <param name="broadcast_utm_transform" value="true"/>
