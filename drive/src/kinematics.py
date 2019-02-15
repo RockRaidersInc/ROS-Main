@@ -3,10 +3,10 @@
 #Last edited by Connor McGowan 1/18/19
 
 #These should go in a config file
-track = 35.485/12  # Horizontal distance between wheels (ft)
-diameter = 1.0  # Wheel diameter (ft)
+track_default = 35.485/12  # Horizontal distance between wheels (ft)
+diameter_default = 1.0  # Wheel diameter (ft)
 
-def forward_kinematics(left, right):
+def forward_kinematics(left, right, track=track_default, diameter=diameter_default):
     """
     Convert wheel speeds to vehicle linear and angular velocities.
     """
@@ -19,7 +19,7 @@ def forward_kinematics(left, right):
     return v, omega
 
 
-def inverse_kinematics(v, omega):
+def inverse_kinematics(v, omega, track=track_default, diameter=diameter_default):
     """
     Convert vehicle linear and angular velocities to wheel speeds.
     """
