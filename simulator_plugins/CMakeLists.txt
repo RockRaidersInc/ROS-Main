@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(simulator_plugins)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11 -g3)
+add_compile_options(-std=c++11 -g2)
 
 
 set(GAZEBOINCLUDEDIRS /usr/include;/usr/include/gazebo-7;/usr/include/gazebo-7/gazebo;/usr/include/sdformat-4.0)
@@ -154,7 +154,6 @@ include_directories(
 
 add_library(SimMotorNode SHARED src/SimMotorNode.cpp)
 add_library(FixFrictionNode SHARED src/world_fix_friction_plugin.cpp)
-add_library(SimGpsPlugin SHARED src/SimGpsPlugin.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -166,19 +165,12 @@ add_library(SimGpsPlugin SHARED src/SimGpsPlugin.cpp)
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-# add_dependencies(SimGpsPlugin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
 
 # Specify libraries to link a library or executable target against
-target_link_libraries(SimMotorNode ${catkin_LIBRARIES}
-FixFrictionNode ${catkin_LIBRARIES}
-)
+target_link_libraries(SimMotorNode ${catkin_LIBRARIES})
 
-target_link_libraries(SimMotorNode ${GAZEBO_libraries}
-FixFrictionNode ${catkin_LIBRARIES}
-)
+target_link_libraries(FixFrictionNode ${catkin_LIBRARIES})
 
-target_link_libraries(SimGpsPlugin ${catkin_LIBRARIES} ${GAZEBO_libraries})
 
 
 #############
