@@ -1,8 +1,8 @@
 <launch>
-    <node pkg="tf" type="static_transform_publisher" name="swri_transform" args="0 0 0 0 0 0 world dummy 10"  />
+    <node pkg="tf" type="static_transform_publisher" name="swri_transform" args="0 0 0 0 0 0 map dummy 10"  />
 
     <node pkg="swri_transform_util" type="initialize_origin.py" name="initialize_origin" >
-        <param name="local_xy_frame" value="world"/>
+        <param name="local_xy_frame" value="map"/>
         <param name="local_xy_origin" value="Spata"/>
         <rosparam param="local_xy_origins">
             [{ name: Spata,
