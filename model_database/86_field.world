@@ -34,20 +34,22 @@
 
     <include>
       <uri>model://sun</uri>
-      <pose>0 0 100   0 0 0</pose>
+      <pose>0 0 500   0 0 0</pose>
     </include>
+
 
     <include>
       <uri>model://Robot_Base</uri>
       <name>rover</name>
       <pose> 0 0 0.5   0 0 0</pose>
-    </include>
+    </include>  
 
 
     <include>
       <uri>model://86_field_populated</uri>
       <name>86_field</name>
-      <pose> -0.25 62 5.33805   0 0 0</pose>
+      <pose> 0 0 0   0 0 0</pose>
+      <!-- <pose> -0.25 62 5.33805   0 0 0</pose> -->
     </include>
     
 

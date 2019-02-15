@@ -30,7 +30,9 @@ namespace gazebo {
 
         /// \brief Constructor
     public:
-        MotorNodePlugin() {}
+        MotorNodePlugin() {
+             std::cerr << std::endl << "The motor controll plugin constructor just ran" << std::endl;
+        }
 
         /// \brief The load function is called by Gazebo when the plugin is
         /// inserted into simulation
@@ -85,7 +87,6 @@ namespace gazebo {
 
         double map(double x, double in_min, double in_max, double out_min, double out_max);
 
-
     };
 
     // Tell Gazebo about this plugin, so that Gazebo can call Load on this plugin.
@@ -93,6 +94,8 @@ namespace gazebo {
 
 
     void MotorNodePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
+         std::cerr << std::endl << "Motor controll plugin is starting to load [" << _model->GetName() << "]" << std::endl;
+
         for(int i = 0; i < 6; i++) {
                 armJointVals.push_back(0);
         }

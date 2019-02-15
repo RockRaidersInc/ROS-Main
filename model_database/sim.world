@@ -34,15 +34,14 @@
 
     <include>
       <uri>model://sun</uri>
-      <pose>0 0 100   0 0 0</pose>
+      <pose>0 0 500   0 0 0</pose>
     </include>
 
     <include>
       <uri>model://Robot_Base</uri>
       <name>rover</name>
-      <pose> -76 0 0.5   0 0 0</pose>
+      <pose> 0 0 0.5   0 0 0</pose>
     </include>
-    <!-- <plugin name="SimMotorNode" filename="libSimMotorNode.so"/> -->
 
 
     <include>
