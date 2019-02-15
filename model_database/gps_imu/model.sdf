@@ -84,6 +84,7 @@
         <offset>0 0 0</offset>
         <drift>0 0 0</drift>
         <gaussianNoise>0 0 0</gaussianNoise>
+        <referenceHeading> 90 </referenceHeading>
     </plugin>
   </model>
 </sdf>
