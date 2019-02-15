@@ -4,11 +4,10 @@
 	<!--  This launch file is for software-only nodes (eg, no motor driver or sensor nodes) that run on the rover.
           Base station code should go in base_station.launch  -->
 
-
     <include file="$(find launch_files)/launch/base_station.launch" pass_all_args="true"/>
 
-    <node name="joy_control" pkg="drive" type="joycontrol.py"/>
-    <node name="joy_to_motor" pkg="drive" type="joy_to_motor.py">
+    <node name="joy_to_twist" pkg="drive" type="joycontrol.py"/>
+    <node name="twist_to_motor" pkg="drive" type="joy_to_motor.py">
         <remap from="left_motor_power" to="/motors/left_vel"/>
         <remap from="right_motor_power" to="/motors/right_vel"/>
     </node>
