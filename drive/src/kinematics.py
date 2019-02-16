@@ -25,8 +25,8 @@ def inverse_kinematics(v, omega, track=track_default, diameter=diameter_default)
     """
 
     # Compute motor rotation rates from linear and angular car velocities
-    omega_r = (2*v+track*omega)/diameter
-    omega_l = (2*v-track*omega)/diameter
+    omega_r = (2*v-track*omega)/diameter
+    omega_l = (2*v+track*omega)/diameter
 
     # Put the wheel speeds in a message and publish
     return omega_l, omega_r

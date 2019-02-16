@@ -4,16 +4,16 @@
     <!-- this launch file contains motor drivers and sensors -->
 
     <node name="motornode_left" pkg="drive" type="motornode.py">
-        <param name="controller_name" value="front"/>
+        <param name="controller_name" value="left"/>
         <param name="m1_name" value="/motors/left"/>
         <param name="m2_name" value="/motors/left"/>
-        <param name="address" value="129"/>
+        <param name="address" value="128"/>
     </node>
     <node name="motornode_right" pkg="drive" type="motornode.py">
-        <param name="controller_name" value="back"/>
+        <param name="controller_name" value="right"/>
         <param name="m1_name" value="/motors/right"/>
         <param name="m2_name" value="/motors/right"/>
-        <param name="address" value="128"/>
+        <param name="address" value="129"/>
     </node>
     
 </launch>
