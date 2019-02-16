@@ -9,6 +9,7 @@
     <!-- Sensor fusion for IMUs -->
     <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node">
         <!-- Dynamically Reconfigurable Parameters -->
+        <param name="world_frame" value="enu"/>
         <param name="gain" value="0.1"/>
         <param name="zeta" value="0"/>
         <param name="orientation_stddev" value=".1"/>
@@ -28,9 +29,9 @@
         <!-- Parameters -->
         <!-- Need to tune, I have no idea what t/his is 
              Refer to https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml-->
-        <param name="magnetic_declination_radians" value="0.226893"/> <!-- 0.235910337  -->
+        <!-- <param name="magnetic_declination_radians" value="0.226893"/> -->  <!--0.235910337  -->
         <!-- Need to tune, yaw should == 0 when facing east -->
-         <param name="yaw_offset" value="3.14159265"/>  
+         <param name="yaw_offset" value="1.5707963"/>  
         <!--<param name="yaw_offset" value="0"/> -->
         <param name="zero_altitude" value="true"/> 
         <param name="publish_filtered_gps" value="true"/>
@@ -128,9 +129,14 @@
         <remap from="~xyz_rpy_msg_out" to="/debug/odom_filtered_xyz_rpy"/>
     </node>
 
-    <node name="imu_quaternion_to_rpy" pkg="utils" type="quaternion_to_rpy_imu.py">
+    <node name="imu_quaternion_to_rpy" pkg="utils" type="imu_msg_to_xyz_rpy.py">
         <remap from="~imu_msg_in" to="/imu/data"/>
-        <remap from="~rpy_msg_out" to="/debug/imu_rpy"/>
+        <remap from="~imu_msg_out" to="/debug/imu_rpy"/>
+    </node>
+
+    <node name="imu_raw_quaternion_to_rpy" pkg="utils" type="imu_msg_to_xyz_rpy.py">
+        <remap from="~imu_msg_in" to="/imu/data_raw"/>
+        <remap from="~imu_msg_out" to="/debug/imu_raw_rpy"/>
     </node>
 
 </launch>

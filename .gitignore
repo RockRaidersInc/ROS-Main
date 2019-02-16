@@ -5,3 +5,6 @@
 *catkin_tools_prebuild*
 *.pyc
 *.catkin_tools*
+simulator_plugins/build*
+simulator_plugins/devel*
+

@@ -16,6 +16,8 @@ from sensor_msgs.msg import MagneticField as Mag_msg
 from sensor_msgs.msg import Imu as Imu_msg
 from dependent_messages.msg import RollPitchYaw as RPY_msg
 
+from quaternion_to_rpy import quat_to_rpy
+
 
 def signal_handler(sig, frame):
     print('control c detected, exiting')
@@ -29,9 +31,14 @@ def callback(in_msg):
     w = in_msg.orientation.w
     out_msg = RPY_msg()
     # out_msg.header = in_msg.header
-    out_msg.roll  = atan2(2*y*w + 2*x*z, 1 - 2*y*y - 2*z*z) * 180 / pi
-    out_msg.pitch = atan2(2*x*w + 2*y*z, 1 - 2*x*x - 2*z*z) * 180 / pi
-    out_msg.yaw   = -asin(2*x*y + 2*z*w) * 180 / pi
+    # out_msg.roll  = atan2(2*y*w + 2*x*z, 1 - 2*y*y - 2*z*z) * 180 / pi
+    # out_msg.pitch = atan2(2*x*w + 2*y*z, 1 - 2*x*x - 2*z*z) * 180 / pi
+    # out_msg.yaw   = asin(2*x*y + 2*z*w) * 180 / pi
+    roll, pitch, yaw = quat_to_rpy(in_msg.pose.pose.orientation)
+    out_msg.roll = roll
+    out_msg.pitch = pitch
+    out_msg.yaw = yaw
+
     pub.publish(out_msg)
 
 
