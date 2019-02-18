@@ -1,129 +1,30 @@
 <?xml version="1.0"?>
 <launch>
-    <!-- Transforms -->
-    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 map odom 100" />
     <!-- TEMPORARY, DELETE LATER -->
     <node pkg="tf" type="static_transform_publisher" name="base_to_gps" args="0 0 0 0 0 0 base_link gps0_link 100" />
     <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 0 base_link imu0_link 100" />
 
     <!-- Sensor fusion for IMUs -->
-    <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node">
-        <!-- Dynamically Reconfigurable Parameters -->
-        <param name="world_frame" value="enu"/>
-        <param name="gain" value="0.1"/>
-        <param name="zeta" value="0"/>
-        <param name="orientation_stddev" value=".1"/>
-        <param name="mag_bias_x" value="0"/>
-        <param name="mag_bias_y" value="0"/>
-        <param name="mag_bias_z" value="0"/>
-        <!-- Not Dynamically Reconfigurable Parameters -->
-        <param name="fixed_frame" value="odom"/>
-        <!-- Remapping -->
-        <remap from="/imu/data_raw" to="imu/data_raw"/>
-        <remap from="/imu/mag" to="/imu/mag"/>
-    </node>
+    <rosparam command="load" file="$(find launch_files)/params/imu_filter_params.yaml"/>
+    <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node"/>
 
-    <!-- Robot Localization -->
-    <!-- GPS coordinates to odometry -->
-    <node name="navsat_tf" pkg="robot_localization" type="navsat_transform_node" respawn="true">
-        <!-- Parameters -->
-        <!-- Need to tune, I have no idea what t/his is 
-             Refer to https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml-->
-        <!-- <param name="magnetic_declination_radians" value="0.226893"/> -->  <!--0.235910337  -->
-        <!-- Need to tune, yaw should == 0 when facing east -->
-         <param name="yaw_offset" value="1.5707963"/>  
-        <!--<param name="yaw_offset" value="0"/> -->
-        <param name="zero_altitude" value="true"/> 
-        <param name="publish_filtered_gps" value="true"/>
-        <param name="broadcast_utm_transform" value="true"/>
-        <param name="wait_for_datum" value="false"/>
-
-        <!-- Output -->
-
-        <!-- Input -->
-        <remap from="/imu/data" to="/imu/data"/>
-        <remap from="/gps/fix" to="/gps/fix"/>
-        <remap from="/odometry/filtered" to="/odometry/filtered"/>
-    </node>
-
+    <!-- Kalman Filter localization - Odom Frame-->
+    <rosparam command="load" file="$(find launch_files)/params/odom_ekf_params.yaml"/>
+    <node name="odom_ekf" pkg="robot_localization" type="ekf_localization_node" respawn="true"/>
+        
     <!-- Kalman Filter localization - Map Frame-->
-    <node name="map_localization" pkg="robot_localization" type="ekf_localization_node" respawn="true">
-        <!-- Settings -->
-        <param name="frequency" value="10"/>  
-        <param name="sensor_timeout" value="0.2"/>  
-        <param name="two_d_mode" value="true"/>
-        <param name="print_diagnostics" value="true"/>
-
-        <!-- Transforms -->
-        <param name="map_frame" value="map"/>
-        <param name="odom_frame" value="odom"/>
-        <param name="base_link_frame" value="base_link"/>
-        <param name="world_frame" value="odom"/>
-
-        <!-- Sensor sources -->
-        <param name="odom0" value="/odometry/gps"/>
-        <param name="imu0" value="/imu/data"/>
-
-        <rosparam param="odom0_config">[true , true , false, 
-                                        false, false, false, 
-                                        false, false, false, 
-                                        false, false, false,
-                                        false, false, false]
-        </rosparam>
-        <param name="odom0_queue_size" value="10"/>
-        <param name="odom0_differential" value="false"/>
-
-        <rosparam param="imu0_config">[false, false, false, 
-                                       true, true, true,
-                                       false, false, false, 
-                                       true , true ,  true,
-                                       true , true ,  true]
-        </rosparam>
-        <param name="imu0_differential" value="false"/>
-        <param name="imu0_relative" value="false"/>
-        <param name="imu0_queue_size" value="10"/>
-        <param name="imu0_remove_gravitational_acceleration" value="true"/>
-
-        <!-- Covariances -->
-        <rosparam param="process_noise_covariance">
-            [0.05, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-             0,    0.05, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-             0,    0,    0.06, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-             0,    0,    0,    0.03, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-             0,    0,    0,    0,    0.03, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-             0,    0,    0,    0,    0,    0.06, 0,     0,     0,    0,    0,    0,    0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0.025, 0,     0,    0,    0,    0,    0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0,     0.025, 0,    0,    0,    0,    0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0,     0,     0.04, 0,    0,    0,    0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0,     0,     0,    0.01, 0,    0,    0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0.01, 0,    0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0.02, 0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0.01, 0,    0,
-             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0.01, 0,
-             0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0.015]
-        </rosparam>
-
-        <rosparam param="initial_estimate_covariance">
-            [1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
-             0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
-             0,    0,    1e-9, 0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
-             0,    0,    0,    1e-9, 0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
-             0,    0,    0,    0,    1e-9, 0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
-             0,    0,    0,    0,    0,    1e-9, 0,    0,    0,    0,     0,     0,     0,    0,    0,
-             0,    0,    0,    0,    0,    0,    1e-9, 0,    0,    0,     0,     0,     0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0,    1e-9, 0,    0,     0,     0,     0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,     0,     0,     0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9,  0,     0,     0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     1e-9,  0,     0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     1e-9,  0,    0,    0,
-             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     1e-9, 0,    0,
-             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    1e-9, 0,
-             0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    1e-9]
-         </rosparam>
-
+    <rosparam command="load" file="$(find launch_files)/params/map_ekf_params.yaml"/>
+    <node name="map_ekf" pkg="robot_localization" type="ekf_localization_node" respawn="true">
+        <remap from="/odometry/filtered" to="/odometry/filtered_map"/>
     </node>
 
-    <!-- Used for Debugging -->
+    <!-- GPS coordinates to odometry -->
+    <rosparam command="load" file="$(find launch_files)/params/navsat_params.yaml"/>
+    <node name="navsat_tf" pkg="robot_localization" type="navsat_transform_node" respawn="true">
+        <remap from="/odometry/filtered" to="/odometry/filtered_map"/>
+    </node>
+
+    <!-- =========================== Debugging =========================== -->
     <node name="odom_msg_to_to_xyz_rpy" pkg="utils" type="odom_msg_to_xyz_rpy.py">
         <remap from="~odom_msg_in" to="/odometry/filtered"/>
         <remap from="~xyz_rpy_msg_out" to="/debug/odom_filtered_xyz_rpy"/>

@@ -1,0 +1,9 @@
+imu_filter:
+  world_frame: enu
+  gain: 0.1
+  zeta: 0
+  orientation_stddev: 1
+  mag_bias_x: 0
+  mag_bias_y: 0
+  mag_bias_z: 0
+  fixed_frame: /map
