@@ -213,6 +213,7 @@ namespace gazebo {
 
         auto out_msg = nav_msgs::Odometry();
         out_msg.header.seq = odomMessageSequenceNum;
+        out_msg.header.frame_id = "base_link";
         out_msg.twist.twist.linear.x = linear_vel;
         out_msg.twist.twist.angular.z = omega;
 
