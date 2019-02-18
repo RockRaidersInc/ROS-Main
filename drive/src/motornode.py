@@ -29,6 +29,9 @@ class motornode:
     m1_vel = None
     m2_vel = None
 
+    m1_pos = None
+    m2_pos = None
+
 
     def __init__(self, name, m1_name='M1', m2_name='M2', publish_enc=False, address=0x80):
         self.name = name
@@ -40,12 +43,11 @@ class motornode:
         #rospy.Subscriber(m2_name + '_pwm', Int8, self.callbackM2_pwm)
 
         #Signed velocity in encoder ticks/second
-        rospy.Subscriber(m1_name + '_vel', Int16, self.callbackM1_vel)
-        rospy.Subscriber(m2_name + '_vel', Int16, self.callbackM2_vel)
+        rospy.Subscriber(m1_name + '_vel', Int32, self.callbackM1_vel)
+        rospy.Subscriber(m2_name + '_vel', Int32, self.callbackM2_vel)
 
-        #TODO: Need accel, speed, decel, and pos
-        #rospy.Subscriber(m1_name + '_pos', Int8, self.callbackM1_pos)
-        #rospy.Subscriber(m2_name + '_pos', Int8, self.callbackM2_pos)
+        rospy.Subscriber(m1_name + '_pos', Int32, self.callbackM1_pos)
+        rospy.Subscriber(m2_name + '_pos', Int32, self.callbackM2_pos)
 
         if publish_enc:
             self.m1_enc_pub = rospy.Publisher(m1_name + '_enc', Int8, queue_size = 1)
@@ -77,12 +79,21 @@ class motornode:
                 if self.m2_pwm is not None:
                     roboclaw.ForwardBackwardM2(self.address, self.m2_pwm)
                     self.m2_pwm = None
+
                 if self.m1_vel is not None:
                     roboclaw.SpeedM1(self.address, self.m1_vel)
                     self.m1_vel = None
                 if self.m2_vel is not None:
                     roboclaw.SpeedM2(self.address, self.m2_vel)
                     self.m2_vel = None
+
+                # TODO: Move QPPS to configuration file per motor
+                if self.m1_pos is not None:
+                    roboclaw.SpeedAccelDeccelPositionM1(self.address, 0, QPPS, 0, self.m1_pos, False)
+                    self.m1_pos = None
+                if self.m2_pos is not None:
+                    roboclaw.SpeedAccelDeccelPositionM2(self.address, 0, QPPS, 0, self.m2_pos, False)
+                    self.m2_pos = None
 
 
     def connect(self):
@@ -114,7 +125,7 @@ class motornode:
         else:
             #rospy.loginfo('%s recieved M1_pwm, not connected', self.address)
             pass
-          
+            
     def callbackM2_pwm(self, msg):
         if self.connected:
             self.timeout = int(round(time.time() * 1000))
@@ -141,9 +152,18 @@ class motornode:
             pass
 
     def callbackM1_pos(self, msg):
-        pass
+        if self.connected:
+            self.timeout = int(round(time.time() * 1000))
+            self.m1_pos = msg.data
+        else: 
+            pass
+
     def callbackM2_pos(self, msg):
-        pass
+        if self.connected:
+            self.timeout = int(round(time.time() * 1000))
+            self.m2_pos = msg.data
+        else: 
+            pass
 
 
 if __name__ == '__main__':

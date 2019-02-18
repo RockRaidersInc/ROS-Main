@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+
+    <node name="arm_control" pkg="arm_code" type="arm_ik.py" output="screen"/>
+</launch>

@@ -91,7 +91,8 @@ q3_zero=np.arctan(1/37) + np.arccos((388.0625-(LA3_ZERO_POSITION)**2)/(13.5*np.s
 #vector from origin to axis of first horizontal joint
 p_12 = np.array([[0],[7.683],[-1.5]]) 
 #vector from axis of horizontal shoulder joint to axis of elbow joint when in zero configuration
-p_23 = rotx(q2_zero).dot(np.array([[0],[0],[24.5]])) 
+#p_23 = rotx(q2_zero).dot(np.array([[0],[0],[24.5]])) 
+p_23 = rotx(q2_zero).dot(np.array([[0],[24.5],[0]])) 
 #vector from axis of elbow joint to end of second link when in zero configuration
 p_3T_No_EE = rotx(q2_zero+q3_zero+np.pi/2).dot(np.array([[0],[0],[22]])) 
 
