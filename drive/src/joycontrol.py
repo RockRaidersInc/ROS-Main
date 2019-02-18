@@ -26,7 +26,7 @@ class joycontrol:
 
 
     def __init__(self):
-        rospy.init_node('joycontrol')
+        rospy.init_node('joy_to_twist')
 
         self.twist_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
 
