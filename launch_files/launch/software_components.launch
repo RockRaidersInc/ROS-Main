@@ -1,15 +1,20 @@
 <?xml version="1.0"?>
 <launch>
-   
+    
+    <!-- load the rover's wheel diameter, distance between wheels, number of encoder ticks per revolution, ect -->
+    <rosparam command="load" file="$(find launch_files)/params/rover_dimensions.yaml" />
+
+
 	<!--  This launch file is for software-only nodes (eg, no motor driver or sensor nodes) that run on the rover.
           Base station code should go in base_station.launch  -->
 
     <include file="$(find launch_files)/launch/base_station.launch" pass_all_args="true"/>
 
-    <node name="joy_to_twist" pkg="drive" type="joycontrol.py"/>
-    <node name="twist_to_motor" pkg="drive" type="joy_to_motor.py">
+    <node name="joy_to_twist" pkg="drive" type="joycontrol.py" required="true"/>
+    <node name="twist_to_motor" pkg="drive" type="joy_to_motor.py" required="true">
         <remap from="left_motor_power" to="/motors/left_vel"/>
         <remap from="right_motor_power" to="/motors/right_vel"/>
     </node>
+
   
 </launch>
