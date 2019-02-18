@@ -14,18 +14,20 @@ import kinematics
 
 class joycontrol:
     def __init__(self):
+        rospy.init_node('joycontrol')
+
         self.left = 0
         self.right = 0
 
         self.motor_max = 12.7
         self.motor_min = -12.7
 
-        #Should go in a config file
-        # self.min_turn_radius = 35.485/24
-        self.min_turn_radius = 0.0001
-        self.track = 35.485/12
-
-        rospy.init_node('joycontrol')
+        self.min_turn_radius = 35.485/24
+        # self.min_turn_radius = 0.0001
+        # self.track = 35.485/12
+        self.track = rospy.get_param("/rover_constants/wheel_base_width")
+        self.wheel_diameter = rospy.get_param("/rover_constants/wheel_diameter")
+        self.encoder_ticks_per_rotation = rospy.get_param("/rover_constants/encoder_ticks_per_rot")
 
         self.left_pub = rospy.Publisher('left_motor_power', Int16, queue_size=1)
         self.right_pub = rospy.Publisher('right_motor_power', Int16, queue_size=1)
@@ -54,11 +56,11 @@ class joycontrol:
             data.linear.x=0.00001
 
         #Get initial wheel angular velocities from IK
-        temp_left, temp_right = kinematics.inverse_kinematics(data.linear.x, data.angular.z, track=self.track)
+        temp_left, temp_right = kinematics.inverse_kinematics(data.linear.x, data.angular.z, track=self.track, diameter=self.wheel_diameter)
 
         #angular velocities to encoder ticks
-        self.left = temp_left / (2 * 3.14) * 12 * 81
-        self.right = temp_right / (2 * 3.14) * 12 * 81
+        self.left = temp_left * self.encoder_ticks_per_rotation
+        self.right = temp_right * self.encoder_ticks_per_rotation
 
     def twist_callback(self, data):
         
@@ -67,7 +69,7 @@ class joycontrol:
             data.linear.x=0.00001
 
         #Get initial wheel angular velocities from IK
-        temp_left, temp_right = kinematics.inverse_kinematics(data.linear.x, data.angular.z)
+        temp_left, temp_right = kinematics.inverse_kinematics(data.linear.x, data.angular.z, track=self.track, diameter=self.wheel_diameter)
 
         #Don't bother doing all this if we're stopped
         if temp_right!=0 or temp_left!=0:
@@ -111,8 +113,10 @@ class joycontrol:
         #self.right = temp_right
 
         #angular velocities to encoder ticks
-        self.left = temp_left / (2 * 3.14) * 12 * 81
-        self.right = temp_right / (2 * 3.14) * 12 * 81
+        # self.left = temp_left / (2 * 3.14) * 12 * 81
+        # self.right = temp_right / (2 * 3.14) * 12 * 81
+        self.left = temp_left * self.encoder_ticks_per_rotation
+        self.right = temp_right * self.encoder_ticks_per_rotation
 
 if __name__ == '__main__':
     joy = joycontrol()

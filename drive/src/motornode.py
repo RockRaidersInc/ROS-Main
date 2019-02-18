@@ -4,6 +4,7 @@ import rospy
 import roboclaw
 from std_msgs.msg import Int8
 from std_msgs.msg import Int16
+from std_msgs.msg import Int32
 
 import serial.tools.list_ports
 import time
@@ -50,8 +51,8 @@ class motornode:
         rospy.Subscriber(m2_name + '_pos', Int32, self.callbackM2_pos)
 
         if publish_enc:
-            self.m1_enc_pub = rospy.Publisher(m1_name + '_enc', Int8, queue_size = 1)
-            self.m2_enc_pub = rospy.Publisher(m2_name + '_enc', Int8, queue_size = 1)
+            self.m1_enc_pub = rospy.Publisher(m1_name + '_enc', Int32, queue_size = 1)
+            self.m2_enc_pub = rospy.Publisher(m2_name + '_enc', Int32, queue_size = 1)
 
         while not rospy.is_shutdown():
             # Try to connect every second

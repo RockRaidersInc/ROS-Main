@@ -1,0 +1,4 @@
+rover_constants:
+  wheel_base_width: 2.957         # Horizontal distance between wheels (ft), 35.485/12
+  wheel_diameter: 1.0             # Wheel diameter (ft)
+  encoder_ticks_per_rot: 154.7    # number of encoder ticks per wheel rotation
