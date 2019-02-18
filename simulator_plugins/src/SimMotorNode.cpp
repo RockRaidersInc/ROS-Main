@@ -148,7 +148,7 @@ namespace gazebo {
 
         
         // publish wheel odometry for the localization code
-        OdomPub = rosNodeHandle->advertise<nav_msgs::Odometry>("/odometery/wheel", 1000);
+        OdomPub = rosNodeHandle->advertise<nav_msgs::Odometry>("/odometrey/wheel", 1000);
         OdomPubTimer = rosNodeHandle->createTimer(ros::Duration(0.01), boost::bind(&gazebo::MotorNodePlugin::OdomPubCallback, this, _1));
 
 
@@ -213,6 +213,7 @@ namespace gazebo {
 
         auto out_msg = nav_msgs::Odometry();
         out_msg.header.seq = odomMessageSequenceNum;
+        out_msg.header.frame_id = "base_link";
         out_msg.twist.twist.linear.x = linear_vel;
         out_msg.twist.twist.angular.z = omega;
 
