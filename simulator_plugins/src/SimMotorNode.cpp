@@ -7,6 +7,7 @@
 #include <chrono>
 #include <vector>
 #include <functional>
+#include <limits>
 
 #include <ros/ros.h>
 #include <gazebo/gazebo.hh>
@@ -16,7 +17,7 @@
 #include "ros/callback_queue.h"
 #include "ros/subscribe_options.h"
 #include "std_msgs/Int16.h"
-#include "nav_msgs/Odometry.h"
+#include "std_msgs/Int32.h"
 
 
 // #include "SimMotorNode.h"
@@ -70,15 +71,18 @@ namespace gazebo {
         ros::Subscriber ArmSub4;
         ros::Subscriber ArmSub5;
 
-        ros::Publisher OdomPub;
+        ros::Publisher OdomPubLeft;
+        ros::Publisher OdomPubRight;
         ros::Timer OdomPubTimer;
 
         double leftMotorVel = 0;
         double rightMotorVel = 0;
         std::vector<double> armJointVals;
-        std::atomic<long long> odomMessageSequenceNum{0};
-        std::atomic<double> leftMotorSpeed{0};
-        std::atomic<double> rightMotorSpeed{0};
+        int odomMessageSequenceNum{0};
+        double leftMotorRotations{0};
+        double rightMotorRotations{0};
+        double encoderTicksPerRevolution = 1000;
+        ros::Time last_time;
 
 
         void leftMotorCallback(const std_msgs::Int16::ConstPtr& msg);
@@ -127,6 +131,8 @@ namespace gazebo {
 
         this->j2_controller = new physics::JointController(this->model);
 
+        last_time = ros::Time::now();
+
         // All ROS stuff
         rosNodeHandle.reset(new ros::NodeHandle("gazebo_motor_node"));
 
@@ -145,12 +151,13 @@ namespace gazebo {
         this->model->GetJoint("left_front_wheel_hinge")->SetParam("max_force", 0, 10000);
         this->model->GetJoint("right_back_wheel_hinge")->SetParam("max_force", 0, 10000);
         this->model->GetJoint("right_front_wheel_hinge")->SetParam("max_force", 0, 10000);
-
         
         // publish wheel odometry for the localization code
-        OdomPub = rosNodeHandle->advertise<nav_msgs::Odometry>("/odometrey/wheel", 1000);
+        rosNodeHandle->getParam("//rover_constants/encoder_ticks_per_rad", encoderTicksPerRevolution);
+        std::cerr << "encoderTicksPerRevolution: " << encoderTicksPerRevolution << std::endl;
+        OdomPubLeft = rosNodeHandle->advertise<std_msgs::Int32>("/motors/left_enc", 1000);
+        OdomPubRight = rosNodeHandle->advertise<std_msgs::Int32>("/motors/right_enc", 1000);
         OdomPubTimer = rosNodeHandle->createTimer(ros::Duration(0.01), boost::bind(&gazebo::MotorNodePlugin::OdomPubCallback, this, _1));
-
 
         // ROS_INFO("Simulator Motor Node Started");
     }
@@ -191,33 +198,17 @@ namespace gazebo {
         armJointVals.at(5) = (double) msg->data;
     }
 
-
-    // std::vector<double> armJointVals;
-    // static std::atomic<long long> odomMessageSequenceNum;
-    // static std::atomic<double> leftMotorSpeed;
-    // static std::atomic<double> rightMotorSpeed;
-
     int MotorNodePlugin::OdomPubCallback(const ros::TimerEvent& time_obj) {
-        double left_vel = leftMotorSpeed;
-        double right_vel = rightMotorSpeed;
-        double dt = (time_obj.current_real - time_obj.last_real).toSec();
+        
 
-        double linear_vel = (left_vel + right_vel) / 2;
+        auto left_msg = std_msgs::Int32();
+        auto right_msg = std_msgs::Int32();
 
-        //TODO: make these not constants, maybe use rosparam?
+        left_msg.data = (int) (leftMotorRotations * encoderTicksPerRevolution);
+        right_msg.data = (int) (rightMotorRotations * encoderTicksPerRevolution);
 
-        double track = 35.485/12;  // Horizontal distance between wheels (ft)
-        double diameter = 1.0;  // Wheel diameter (ft)
-
-        double omega = (right_vel - left_vel)*diameter/(2*track);
-
-        auto out_msg = nav_msgs::Odometry();
-        out_msg.header.seq = odomMessageSequenceNum;
-        out_msg.header.frame_id = "base_link";
-        out_msg.twist.twist.linear.x = linear_vel;
-        out_msg.twist.twist.angular.z = omega;
-
-        OdomPub.publish(out_msg);
+        OdomPubLeft.publish(left_msg);
+        OdomPubRight.publish(right_msg);
     }
 
 
@@ -229,13 +220,17 @@ namespace gazebo {
         this->model->GetJoint("right_back_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(rightMotorVel));
         this->model->GetJoint("right_front_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(rightMotorVel));
 
-        leftMotorSpeed = mapMotorVel(leftMotorVel);
-        rightMotorSpeed = mapMotorVel(rightMotorVel);
+        ros::Time current_time = ros::Time::now();
+        double dt = (current_time - last_time).toSec();
+        leftMotorRotations += mapMotorVel(leftMotorVel) * dt;
+        rightMotorRotations += mapMotorVel(rightMotorVel) * dt;
+        last_time = current_time;
+        // std::cerr << mapMotorVel(leftMotorVel) << " " << leftMotorRotations << " " << rightMotorRotations << " " << dt << std::endl;
     }
 
     double MotorNodePlugin::mapMotorVel(double inval) {
         // This line makes the simulated wheels turn at the same speed as the actual wheels
-        return inval * 2 * 3.14 / (12 * 81) * 2;
+        return inval / encoderTicksPerRevolution;
     }
 
     // shamelessly coppied from the arduino standard library

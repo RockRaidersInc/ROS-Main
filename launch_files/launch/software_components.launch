@@ -12,9 +12,14 @@
 
     <node name="joy_to_twist" pkg="drive" type="joycontrol.py" required="true"/>
     <node name="twist_to_motor" pkg="drive" type="joy_to_motor.py" required="true">
-        <remap from="left_motor_power" to="/motors/left_vel"/>
-        <remap from="right_motor_power" to="/motors/right_vel"/>
+        <remap from="left_motor_vel" to="/motors/left_vel"/>
+        <remap from="right_motor_vel" to="/motors/right_vel"/>
     </node>
 
+    <node name="motor_to_twist" pkg="drive" type="motor_to_twist.py" required="true">
+        <remap from="left_motor_in" to="/motors/left_enc"/>
+        <remap from="right_motor_in" to="/motors/right_enc"/>
+        <remap from="twist_publisher" to="/odometrey/wheel"/>
+    </node>
   
 </launch>

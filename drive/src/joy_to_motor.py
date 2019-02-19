@@ -27,15 +27,15 @@ class joycontrol:
         # self.track = 35.485/12
         self.track = rospy.get_param("/rover_constants/wheel_base_width")
         self.wheel_diameter = rospy.get_param("/rover_constants/wheel_diameter")
-        self.encoder_ticks_per_rotation = rospy.get_param("/rover_constants/encoder_ticks_per_rot")
+        self.encoder_ticks_per_rad = rospy.get_param("/rover_constants/encoder_ticks_per_rad")
 
-        self.left_pub = rospy.Publisher('left_motor_power', Int16, queue_size=1)
-        self.right_pub = rospy.Publisher('right_motor_power', Int16, queue_size=1)
+        self.left_pub = rospy.Publisher('left_motor_vel', Int16, queue_size=1)
+        self.right_pub = rospy.Publisher('right_motor_vel', Int16, queue_size=1)
 
         #rospy.Subscriber('/cmd_vel', Twist, self.twist_callback)
         rospy.Subscriber('/cmd_vel', Twist, self.twist_callback_no_limits)
 
-        self.publish_timer = rospy.Timer(rospy.Duration(0.05), self.publish_to_motors)  # publish joystick angles every 0.05 seconds
+        self.publish_timer = rospy.Timer(rospy.Duration(0.05), self.publish_to_motors)
 
     def publish_to_motors(self, event):
 
@@ -50,17 +50,12 @@ class joycontrol:
         self.motor_min = self.motor_min
 
     def twist_callback_no_limits(self, data):
-        
-        #We can't do zero point turning, so velocity must be nonzero
-        if data.linear.x==0 and data.angular.z!=0:
-            data.linear.x=0.00001
-
         #Get initial wheel angular velocities from IK
         temp_left, temp_right = kinematics.inverse_kinematics(data.linear.x, data.angular.z, track=self.track, diameter=self.wheel_diameter)
 
         #angular velocities to encoder ticks
-        self.left = temp_left * self.encoder_ticks_per_rotation
-        self.right = temp_right * self.encoder_ticks_per_rotation
+        self.left = temp_left * self.encoder_ticks_per_rad
+        self.right = temp_right * self.encoder_ticks_per_rad
 
     def twist_callback(self, data):
         
@@ -115,8 +110,8 @@ class joycontrol:
         #angular velocities to encoder ticks
         # self.left = temp_left / (2 * 3.14) * 12 * 81
         # self.right = temp_right / (2 * 3.14) * 12 * 81
-        self.left = temp_left * self.encoder_ticks_per_rotation
-        self.right = temp_right * self.encoder_ticks_per_rotation
+        self.left = temp_left * self.encoder_ticks_per_rad
+        self.right = temp_right * self.encoder_ticks_per_rad
 
 if __name__ == '__main__':
     joy = joycontrol()

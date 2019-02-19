@@ -988,7 +988,7 @@
 
 
     <link name='left_front_wheel'>
-      <pose frame=''>0.3937 -0.38101 0.758032 2.98885 1.57079 2.98885</pose>
+      <pose frame=''>0.45 -0.38101 0.758032 2.98885 1.57079 2.98885</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -1007,7 +1007,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2033</radius>
+            <radius>0.1525</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -1030,7 +1030,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2033</radius>
+            <radius>0.1525</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -1083,7 +1083,7 @@
     </link>
 
         <link name='right_front_wheel'>
-      <pose frame=''>-0.393692 -0.380961 0.758096 2.91124 1.57079 2.91123</pose>
+      <pose frame=''>-0.45 -0.380961 0.758096 2.91124 1.57079 2.91123</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -1102,7 +1102,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2032</radius>
+            <radius>0.1525</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -1125,7 +1125,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2032</radius>
+            <radius>0.1525</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -1178,7 +1178,7 @@
     </link>
 
     <link name='left_back_wheel'>
-      <pose frame=''>0.393708 0.380992 0.758093 2.99584 1.57079 2.99582</pose>
+      <pose frame=''>0.45 0.380992 0.758093 2.99584 1.57079 2.99582</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -1197,7 +1197,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2032</radius>
+            <radius>0.1525</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -1220,7 +1220,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2032</radius>
+            <radius>0.1525</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -1273,7 +1273,7 @@
     </link>
 
     <link name='right_back_wheel'>
-      <pose frame=''>-0.393692 0.381037 0.758158 2.91782 1.57079 2.9178</pose>
+      <pose frame=''>-0.45 0.381037 0.758158 2.91782 1.57079 2.9178</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -1292,7 +1292,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2032</radius>
+            <radius>0.1525</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -1315,7 +1315,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.2032</radius>
+            <radius>0.1525</radius>
             <length>0.1</length>
           </cylinder>
         </geometry>
@@ -1839,7 +1839,7 @@
     <joint name='left_back_wheel_hinge' type='revolute'>
       <parent>left_back_leg</parent>
       <child>left_back_wheel</child>
-      <pose frame=''>0 0 0 0 -0 0</pose>
+      <pose frame='left_back_wheel_hinge_frame'>0 0 0 0 -0 0</pose>
       <axis>
         <xyz>0 0 -1</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
