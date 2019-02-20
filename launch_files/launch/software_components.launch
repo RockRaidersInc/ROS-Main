@@ -19,7 +19,7 @@
     <node name="motor_to_twist" pkg="drive" type="motor_to_twist.py" required="true">
         <remap from="left_motor_in" to="/motors/left_enc"/>
         <remap from="right_motor_in" to="/motors/right_enc"/>
-        <remap from="twist_publisher" to="/odometrey/wheel"/>
+        <remap from="twist_publisher" to="/odometry/wheel"/>
     </node>
   
 </launch>
