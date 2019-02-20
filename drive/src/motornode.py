@@ -44,34 +44,45 @@ class motornode:
         #rospy.Subscriber(m2_name + '_pwm', Int8, self.callbackM2_pwm)
 
         #Signed velocity in encoder ticks/second
-        rospy.Subscriber(m1_name + '_vel', Int32, self.callbackM1_vel)
-        rospy.Subscriber(m2_name + '_vel', Int32, self.callbackM2_vel)
+        rospy.Subscriber(m1_name + '_vel', Int16, self.callbackM1_vel)
+        rospy.Subscriber(m2_name + '_vel', Int16, self.callbackM2_vel)
 
         rospy.Subscriber(m1_name + '_pos', Int32, self.callbackM1_pos)
         rospy.Subscriber(m2_name + '_pos', Int32, self.callbackM2_pos)
 
         if publish_enc:
             self.m1_enc_pub = rospy.Publisher(m1_name + '_enc', Int32, queue_size = 1)
-            self.m2_enc_pub = rospy.Publisher(m2_name + '_enc', Int32, queue_size = 1)
+            self.m2_enc_pub = rospy.Publisher(m2_name + '_enc2', Int32, queue_size = 1)
 
         while not rospy.is_shutdown():
             # Try to connect every second
             self.connected = self.connect()
             if self.connected:
-                rospy.loginfo('%s has connected', self.address)
+                rospy.loginfo('%s has connected (' + str(name) + ')', self.address)
                 #print("connected")
                 break
             rospy.sleep(1.0)
 
         while not rospy.is_shutdown():
+            time.sleep(0.1)
             # Publish encoder readings
             if self.m1_enc_pub is not None:
-                m1_msg = Int32()
-                m1_msg.data = oboclaw.ReadEncM1(self.address)
-                m2_msg = Int32()
-                m2_msg.data = oboclaw.ReadEncM2(self.address)
-                self.m1_enc_pub.publish(m1_msg)
-                self.m2_enc_pub.publish(m2_msg)
+                try:
+                    response_1 = roboclaw.ReadEncM1(self.address)
+                    response_2 = roboclaw.ReadEncM2(self.address)
+
+                    if response_1[0] == 0 or response_1[0] == 0:
+                        rospy.logerr(str(name) + ": error returned from encoder reading: " + str(response_1) + " " + str(response_2))
+                    else:
+                        m1_msg = Int32()
+                        m1_msg.data = int(response_1[1])
+                        m2_msg = Int32()
+                        m2_msg.data = int(response_2[1])
+                        self.m1_enc_pub.publish(m1_msg)
+                        self.m2_enc_pub.publish(m2_msg)
+                        rospy.logerr(str(name) + ": sucessfully published an encoder reading")
+                except Exception as e:
+                    rospy.logerr(str(name) + ": error reading encoder values " + str(e))
 
             # Timeout if no command recieved for more than TIMEOUT_TIME
             if int(round(time.time() * 1000)) - self.timeout > self.TIMEOUT_TIME:
@@ -87,6 +98,7 @@ class motornode:
 
                 if self.m1_vel is not None:
                     roboclaw.SpeedM1(self.address, self.m1_vel)
+                    rospy.logerr(str(name) + ": wrote motor velocity " + str(self.m1_vel))
                     self.m1_vel = None
                 if self.m2_vel is not None:
                     roboclaw.SpeedM2(self.address, self.m2_vel)
@@ -113,7 +125,7 @@ class motornode:
                 print(' ')
                 if (c1 is not 0) or (c2 is not 0):
                     self.device = usb.device
-                    rospy.loginfo('%s has connected to roboclaw with address %s', self.device, self.address)
+                    rospy.logerr('%s has connected to roboclaw with address %s', self.device, self.address)
                     #print(self.name + ' ' + self.device)
                     return True
                 else:
@@ -145,7 +157,7 @@ class motornode:
             self.timeout = int(round(time.time() * 1000))
             self.m1_vel = msg.data
         else:
-            rospy.loginfo('%s recieved M1_vel, not connected', self.address)
+            rospy.logerr('%s recieved M1_vel, not connected', self.address)
             pass
 
     def callbackM2_vel(self, msg):
@@ -153,7 +165,7 @@ class motornode:
             self.timeout = int(round(time.time() * 1000))
             self.m2_vel = msg.data
         else:
-            rospy.loginfo('%s recieved M2_vel, not connected', self.address)
+            rospy.logerr('%s recieved M2_vel, not connected', self.address)
             pass
 
     def callbackM1_pos(self, msg):
@@ -173,7 +185,7 @@ class motornode:
 
 if __name__ == '__main__':
     rospy.init_node('motornode', anonymous=True)
-    name = rospy.get_param('~controller_name', 'motornode')
+    name = rospy.get_param('controller_name', 'motornode')
     m1Name = rospy.get_param('~m1_name', 'M1')
     m2Name = rospy.get_param('~m2_name', 'M2')
     pub_enc = rospy.get_param('~pub_enc', False)
