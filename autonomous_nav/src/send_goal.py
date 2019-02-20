@@ -26,7 +26,7 @@ def main2():
 
 	olat=42.729957
 	olon=-73.679659
-	target_lat = 42.73
+	target_lat = 42.7301
 	target_lon = -73.679659
 	xg2,yg2 = gc.ll2xy(target_lat,target_lon,olat,olon)
 	checkpoint = (xg2,yg2)
