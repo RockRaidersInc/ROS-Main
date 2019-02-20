@@ -66,8 +66,8 @@ class motornode:
         while not rospy.is_shutdown():
             # Publish encoder readings
             if self.m1_enc_pub is not None:
-                self.m1_enc_pub.pub(roboclaw.ReadEncM1(self.address))
-                self.m2_enc_pub.pub(roboclaw.ReadEncM2(self.address))
+                self.m1_enc_pub.publish(roboclaw.ReadEncM1(self.address))
+                self.m2_enc_pub.publish(roboclaw.ReadEncM2(self.address))
 
             # Timeout if no command recieved for more than TIMEOUT_TIME
             if int(round(time.time() * 1000)) - self.timeout > self.TIMEOUT_TIME:
