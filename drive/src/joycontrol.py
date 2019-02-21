@@ -17,11 +17,19 @@ class joycontrol:
 
     LEFT_STICK_X_INDEX = 0
     LEFT_STICK_Y_INDEX = 1
+    LEFT_BUMPER_INDEX = 4
     RIGHT_STICK_X_INDEX = 3
     RIGHT_STICK_Y_INDEX = 4
+    RIGHT_BUMPER_INDEX = 5
+    A_BUTTON_INDEX = 0
+    B_BUTTON_INDEX = 1
+    X_BUTTON_INDEX = 2
+    Y_BUTTON_INDEX = 3
 
-    MAX_LINEAR_SPEED = 2.0
-    MAX_ANGULAR_SPEED = 1.0
+    MAX_LINEAR_SPEED = 0.5
+    MAX_ANGULAR_SPEED = 0.5
+    TURBO_MAX_LINEAR_SPEED = 1.5
+    TURBO_MAX_ANGULAR_SPEED = 1.5
 
     def __init__(self):
         rospy.init_node('joy_to_twist')
@@ -31,8 +39,12 @@ class joycontrol:
 
     def publish_stuff(self, event):
         twist_msg = Twist()
-        twist_msg.linear.x = self.left_y * self.MAX_LINEAR_SPEED
-        twist_msg.angular.z = self.left_x * self.MAX_ANGULAR_SPEED
+        if self.button_x:
+            twist_msg.linear.x = self.left_y * self.TURBO_MAX_LINEAR_SPEED
+            twist_msg.angular.z = self.left_x * self.TURBO_MAX_ANGULAR_SPEED
+        else:
+            twist_msg.linear.x = self.left_y * self.MAX_LINEAR_SPEED
+            twist_msg.angular.z = self.left_x * self.MAX_ANGULAR_SPEED
         self.twist_pub.publish(twist_msg)
 
     def callback(self, data):
@@ -40,6 +52,13 @@ class joycontrol:
         self.left_x = data.axes[self.LEFT_STICK_X_INDEX]
         self.right_y = data.axes[self.RIGHT_STICK_Y_INDEX]
         self.right_x = data.axes[self.RIGHT_STICK_X_INDEX]
+        self.bumper_l = True if data.buttons[self.LEFT_BUMPER_INDEX] == 1 else False
+        self.bumper_r = True if data.buttons[self.RIGHT_BUMPER_INDEX] == 1 else False
+        
+        self.button_a = True if data.buttons[self.A_BUTTON_INDEX] == 1 else False
+        self.button_b = True if data.buttons[self.B_BUTTON_INDEX] == 1 else False
+        self.button_x = True if data.buttons[self.X_BUTTON_INDEX] == 1 else False
+        self.button_y = True if data.buttons[self.Y_BUTTON_INDEX] == 1 else False
 
         self.publish_stuff(None)
 
