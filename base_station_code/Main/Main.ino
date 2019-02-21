@@ -39,6 +39,7 @@ BS_Actuator actuator(Sabertooth, ACTUATOR_ADC_PIN);
 
 void setup() {
   //Begin all communication
+  Serial.begin(9600);   //THIS IS ONLY HERE WHILE SERIAL IS BEING USED
   Sabertooth.begin(9600);
   gps.begin();
   mag.init();
@@ -69,6 +70,8 @@ void loop() {
 
   //Update GPS if possible
   gps.read();
+
+  receiveData();  //THIS IS ONLY HERE WHILE SERIAL IS BEING USED
 
   //Do all measurements and calculations every 50ms
   if(mag.read(mag_flag)){
@@ -157,4 +160,66 @@ float get_distance(){
   return 2*atan2(sqrt(a), sqrt(1-a))*6371000;
 }
 
+void receiveData(){ //THIS IS ONLY HERE WHILE SERIAL IS BEING USED
+  char input=';';
+  int decimal_places=0;
+  if(Serial.available()){
+    command=Serial.read();
+    if(command=='x'){
+      rover_lat=0;
+      while(!Serial.available());
+      Serial.read();
+      while(!Serial.available());
+      input=Serial.read();
+      while(input!='.'){
+        rover_lat=rover_lat*10+input-'0';
+        while(!Serial.available());
+        input=Serial.read();
+      }
+      while(!Serial.available());
+      input=Serial.read();
+      while(input!=','){
+        decimal_places++;
+        rover_lat+=(float)(input-'0')/pow(10, decimal_places);
+        while(!Serial.available());
+        input=Serial.read();
+      }
+      decimal_places=0;
+      rover_lon=0;
+      while(!Serial.available());
+      input=Serial.read();
+      while(input!='.'){
+        rover_lon=rover_lon*10+input-'0';
+        while(!Serial.available());
+        input=Serial.read();
+      }
+      while(!Serial.available());
+      input=Serial.read();
+      while(input!=','){
+        decimal_places++;
+        rover_lon+=(float)(input-'0')/pow(10, decimal_places);
+        while(!Serial.available());
+        input=Serial.read();
+      }
+      decimal_places=0;
+      rover_alt=0;
+      while(!Serial.available());
+      input=Serial.read();
+      while(input!='.'){
+        rover_alt=rover_alt*10+input-'0';
+        while(!Serial.available());
+        input=Serial.read();
+      }
+      while(!Serial.available());
+      input=Serial.read();
+      while(input!=','){
+        decimal_places++;
+        rover_alt+=(float)(input-'0')/pow(10, decimal_places);
+        while(!Serial.available());
+        input=Serial.read();
+      }
+      decimal_places=0;
+    }
+  }
+}
 

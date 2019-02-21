@@ -17,7 +17,7 @@ public:
     BS_Actuator(SoftwareSerial& s, uint8_t pin);
     
     float getElevation() const {return adc_to_angle(position);}
-    unsigned int read() {position=analogRead(adc_pin);}
+    void read() {position=analogRead(adc_pin);}
     
     //Reads pot, updates position, does PID, actuates
     void update(float desired);
