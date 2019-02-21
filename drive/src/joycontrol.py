@@ -20,8 +20,8 @@ class joycontrol:
     RIGHT_STICK_X_INDEX = 3
     RIGHT_STICK_Y_INDEX = 4
 
-    MAX_LINEAR_SPEED = 1.0
-    MAX_ANGULAR_SPEED = .5
+    MAX_LINEAR_SPEED = 2.0
+    MAX_ANGULAR_SPEED = 1.0
 
     def __init__(self):
         rospy.init_node('joy_to_twist')

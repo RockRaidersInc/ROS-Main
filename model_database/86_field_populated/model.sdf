@@ -2,6 +2,68 @@
 <sdf version='1.6'>
   <model name='86_field_populated'>
 
+    <!-- 42.72995653, -73.6795367 -->
+    <include>
+      <uri>model://number1</uri>
+      <name>number1</name>
+      <pose> 10 0 2   0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://number1</uri>
+      <name>number1_1</name>
+      <pose> 10 0 -0.25   0 0 0</pose>
+    </include>
+
+    <!-- 42.7300461, -73.6795372 -->
+    <include>
+      <uri>model://number2</uri>
+      <name>number2</name>
+      <pose> 10 10 2   0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://number2</uri>
+      <name>number2_1</name>
+      <pose> 10 10 -0.25   0 0 0</pose>
+    </include>
+
+    <!-- 42.7300467, -73.6796588 -->
+    <include>
+      <uri>model://number3</uri>
+      <name>number3</name>
+      <pose> 0 10 2   0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://number3</uri>
+      <name>number3_1</name>
+      <pose> 0 10 -0.25  0 0 0</pose>
+    </include>
+
+    <!-- 42.73031685, -73.67965688 -->
+    <include>
+      <uri>model://number4</uri>
+      <name>number4</name>
+      <pose> 0 40 2   0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://number4</uri>
+      <name>number4_1</name>
+      <pose> 0 40 -0.25  0 0 0</pose>
+    </include>
+
+    <!-- 42.730227236, -73.67984215 -->
+    <include>
+      <uri>model://number5</uri>
+      <name>number5</name>
+      <pose> -15 30 2   0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://number5</uri>
+      <name>number5_1</name>
+      <pose> -15 30 -0.25  0 0 0</pose>
+    </include>
+
+
+
     <include>
       <uri>model://lamp_post</uri>
       <name>lamp_post_1</name>
