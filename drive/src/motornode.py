@@ -8,6 +8,37 @@ from std_msgs.msg import Int32
 
 import serial.tools.list_ports
 import time
+import pdb
+import signal
+import os
+import random
+import threading, sys, traceback
+
+
+def handle_pdb(sig, frame):
+    # pdb.Pdb().set_trace(frame)
+    print "got signal"
+
+def SIGALARM_handler(signum, frame):
+    print "watchdog ran out!"
+    stacks = dumpstacks(signum, frame)
+    rospy.logerr(str(os.getpid()) + ": serial timeout, call stack written to log")
+    print stacks
+    raise Exception("end of time")
+
+
+# from https://stackoverflow.com/questions/132058/showing-the-stack-trace-from-a-running-python-application
+# prints stack traces for all threads
+def dumpstacks(signal, frame):
+    id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
+    code = []
+    for threadId, stack in sys._current_frames().items():
+        code.append("\n# Thread: %s(%d)" % (id2name.get(threadId,""), threadId))
+        for filename, lineno, name, line in traceback.extract_stack(stack):
+            code.append('File: "%s", line %d, in %s' % (filename, lineno, name))
+            if line:
+                code.append("  %s" % (line.strip()))
+    return "\n".join(code)
 
 
 class motornode:
@@ -58,31 +89,35 @@ class motornode:
             # Try to connect every second
             self.connected = self.connect()
             if self.connected:
-                rospy.loginfo('%s has connected (' + str(name) + ')', self.address)
+                rospy.loginfo('%s has connected (' + str((self.name, os.getpid())) + ')', self.address)
                 #print("connected")
                 break
             rospy.sleep(1.0)
 
+        update_rate = 0.05
         while not rospy.is_shutdown():
-            time.sleep(0.1)
+            start_time = time.time()
+            self.update()
+            time.sleep(max(start_time + update_rate - time.time(), 0))
+    
+    def update(self):
+        signal.setitimer(signal.ITIMER_REAL, 0.25)  # set the watchdog for 0.25 seconds
+
+        try:
             # Publish encoder readings
             if self.m1_enc_pub is not None:
-                try:
-                    response_1 = roboclaw.ReadEncM1(self.address)
-                    response_2 = roboclaw.ReadEncM2(self.address)
+                response_1 = roboclaw.ReadEncM1(self.address)
+                response_2 = roboclaw.ReadEncM2(self.address)
 
-                    if response_1[0] == 0 or response_1[0] == 0:
-                        rospy.logerr(str(name) + ": error returned from encoder reading: " + str(response_1) + " " + str(response_2))
-                    else:
-                        m1_msg = Int32()
-                        m1_msg.data = int(response_1[1])
-                        m2_msg = Int32()
-                        m2_msg.data = int(response_2[1])
-                        self.m1_enc_pub.publish(m1_msg)
-                        self.m2_enc_pub.publish(m2_msg)
-                        rospy.logerr(str(name) + ": sucessfully published an encoder reading")
-                except Exception as e:
-                    rospy.logerr(str(name) + ": error reading encoder values " + str(e))
+                if response_1[0] == 0 or response_1[0] == 0:
+                    rospy.logerr(str((self.name, os.getpid())) + ": error returned from encoder reading: " + str(response_1) + " " + str(response_2))
+                else:
+                    m1_msg = Int32()
+                    m1_msg.data = int(response_1[1])
+                    m2_msg = Int32()
+                    m2_msg.data = int(response_2[1])
+                    self.m1_enc_pub.publish(m1_msg)
+                    self.m2_enc_pub.publish(m2_msg)
 
             # Timeout if no command recieved for more than TIMEOUT_TIME
             if int(round(time.time() * 1000)) - self.timeout > self.TIMEOUT_TIME:
@@ -98,7 +133,6 @@ class motornode:
 
                 if self.m1_vel is not None:
                     roboclaw.SpeedM1(self.address, self.m1_vel)
-                    rospy.logerr(str(name) + ": wrote motor velocity " + str(self.m1_vel))
                     self.m1_vel = None
                 if self.m2_vel is not None:
                     roboclaw.SpeedM2(self.address, self.m2_vel)
@@ -111,10 +145,13 @@ class motornode:
                 if self.m2_pos is not None:
                     roboclaw.SpeedAccelDeccelPositionM2(self.address, 0, QPPS, 0, self.m2_pos, False)
                     self.m2_pos = None
+        except Exception as e:
+            rospy.logerr("SIGLARAM: " + str((self.name, os.getpid())) + ": " + str(e))
 
 
     def connect(self):
         ports = serial.tools.list_ports.comports()
+        random.shuffle(ports)
         for usb in ports:
             try:
                 # Open up the serial port and see if data is available at the desired address
@@ -184,10 +221,16 @@ class motornode:
 
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGUSR1, handle_pdb)
+    # sigalarm is used as a watchdog timer, if the main loop takes more than a second to run then it is interupted
+    signal.signal(signal.SIGALRM, SIGALARM_handler)
+
     rospy.init_node('motornode', anonymous=True)
-    name = rospy.get_param('controller_name', 'motornode')
+    name = rospy.get_param('~controller_name', 'asdf')
     m1Name = rospy.get_param('~m1_name', 'M1')
     m2Name = rospy.get_param('~m2_name', 'M2')
     pub_enc = rospy.get_param('~pub_enc', False)
     address = int(rospy.get_param('~address', 0x80))
     controller = motornode(name, m1Name, m2Name, pub_enc, address)
+    
+    rospy.spin()
