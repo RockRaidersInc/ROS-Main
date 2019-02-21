@@ -15,10 +15,6 @@ import random
 import threading, sys, traceback
 
 
-def handle_pdb(sig, frame):
-    # pdb.Pdb().set_trace(frame)
-    print "got signal"
-
 def SIGALARM_handler(signum, frame):
     print "watchdog ran out!"
     stacks = dumpstacks(signum, frame)
@@ -99,10 +95,9 @@ class motornode:
             start_time = time.time()
             self.update()
             time.sleep(max(start_time + update_rate - time.time(), 0))
-    
-    def update(self):
-        signal.setitimer(signal.ITIMER_REAL, 0.25)  # set the watchdog for 0.25 seconds
 
+    def update(self):
+        signal.setitimer(signal.ITIMER_REAL, 0.1)  # set the watchdog for 0.25 seconds
         try:
             # Publish encoder readings
             if self.m1_enc_pub is not None:
@@ -221,7 +216,6 @@ class motornode:
 
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGUSR1, handle_pdb)
     # sigalarm is used as a watchdog timer, if the main loop takes more than a second to run then it is interupted
     signal.signal(signal.SIGALRM, SIGALARM_handler)
 

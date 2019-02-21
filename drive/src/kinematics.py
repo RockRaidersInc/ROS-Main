@@ -13,10 +13,9 @@ def forward_kinematics(left, right, track=track_default, diameter=diameter_defau
     """
     Convert wheel speeds to vehicle linear and angular velocities.
     """
-
     # Compute linear and angular velocities of car
-    v = (left+right)*diameter/4
-    omega = (right - left)*diameter/(2*track)
+    v = (left + right) * diameter / 4
+    omega = (right - left) * diameter / (2 * track)
     theta = atan2(track, track_length)
     omega_component = omega * sin(theta)
 
@@ -24,17 +23,15 @@ def forward_kinematics(left, right, track=track_default, diameter=diameter_defau
     return v, omega_component
 
 
-def inverse_kinematics(v, omega_component, track=track_default, diameter=diameter_default, track_length=track_length_default):
+def inverse_kinematics(v, omega_raw, track=track_default, diameter=diameter_default, track_length=track_length_default):
     """
     Convert vehicle linear and angular velocities to wheel speeds.
     """
-
     theta = atan2(track, track_length)
-    omega = omega_component / sin(theta)
-
+    omega = omega_raw / sin(theta)
     # Compute motor rotation rates from linear and angular car velocities
-    omega_r = (2*v-track*omega)/diameter
-    omega_l = (2*v+track*omega)/diameter
+    omega_l = (2*v-track*omega)/diameter
+    omega_r = (2*v+track*omega)/diameter
 
     # Put the wheel speeds in a message and publish
     return omega_l, omega_r
