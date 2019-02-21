@@ -4,6 +4,18 @@
 //Author: Connor McGowan
 //---------------------------------
 
+
+//Serial Controls
+//"w" Tilt antenna one step up
+//"s" Tilt antenna one step down
+//"a" Rotate antenna one step counterclockwise
+//"d" Rotate antenna one step clockwise
+//"x,latitude,longitude,altitude," Rotate to point at given position
+//Format for autonomy:
+//There MUST be a comma at the end
+//No spaces
+//latitude, longitude, and altitude are float and MUST contain a decimal point
+
 #include "BS_GPS.h"
 #include "BS_Mag.h"
 #include "BS_Motor.h"
