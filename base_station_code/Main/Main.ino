@@ -12,6 +12,11 @@
 //The analog pin that the actuator's potentiometer is connected to
 #define ACTUATOR_ADC_PIN A0
 
+//Size in degrees of one manual step of elevation
+#define ACTUATOR_MANUAL_STEP 1
+//Size in degrees of one manual step of azimuth
+#define MOTOR_MANUAL_STEP 15
+
 //Flag and timer for reading magnetometer
 bool mag_flag=false;
 
@@ -22,6 +27,8 @@ float rover_alt=0;
 
 float desired_heading=0;
 float desired_elevation=0;
+
+char command='i';
 
 BS_GPS gps;
 BS_Mag mag;
@@ -65,10 +72,43 @@ void loop() {
 
   //Do all measurements and calculations every 50ms
   if(mag.read(mag_flag)){
+    //update actuator reading
+    actuator.read();
 
-    
-    desired_heading=-1*get_bearing();
-    desired_elevation=atan((rover_alt-gps.getAltitude())/get_distance())*180/PI;
+    switch(command){
+      case 'e': //autonomous mode
+        desired_heading=-1*get_bearing();
+        desired_elevation=atan((rover_alt-gps.getAltitude())/get_distance())*180/PI;
+        break;
+        
+      case 'w': //move up one step
+        desired_heading=mag.getHeading();
+        desired_elevation=actuator.getElevation()+ACTUATOR_MANUAL_STEP;
+        command='i';
+        break;
+
+      case 's': //move down one step
+        desired_heading=mag.getHeading();
+        desired_elevation=actuator.getElevation()-ACTUATOR_MANUAL_STEP;
+        command='i';
+        break;
+
+      case 'a': //move counterclockwise one step
+        desired_heading=mag.getHeading()+MOTOR_MANUAL_STEP;
+        if(desired_heading>180)
+          desired_heading-=360;
+        desired_elevation=actuator.getElevation();
+        command='i';
+        break;
+
+      case 'd': //move clockwise one step
+        desired_heading=mag.getHeading()-MOTOR_MANUAL_STEP;
+        if(desired_heading<-180)
+          desired_heading+=360;
+        desired_elevation=actuator.getElevation();
+        command='i';
+        break;
+    }
 
     
     motor.update(mag.getHeading(),desired_heading);

@@ -6,9 +6,11 @@ BS_Actuator::BS_Actuator(SoftwareSerial& s, uint8_t pin){
     position=integral=prev_error=0;
 }
 
-void BS_Actuator::update(const float& desired){
-    //Read pot
-    read();
+void BS_Actuator::update(float desired){
+    if(desired>15)
+      desired=15;
+    else if(desired<-15)
+      desired=-15;
     //Calculate error
     int error=angle_to_adc(desired)-position;
     //Do PID
