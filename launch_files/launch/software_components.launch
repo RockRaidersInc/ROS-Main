@@ -10,13 +10,13 @@
 
     <include file="$(find launch_files)/launch/base_station.launch" pass_all_args="true"/>
 
-    <node name="joy_to_twist" pkg="drive" type="joycontrol.py" required="true"/>
-    <node name="twist_to_motor" pkg="drive" type="joy_to_motor.py" required="true">
+    <node name="joy_to_twist" pkg="drive" type="joycontrol.py" respawn="true"/>
+    <node name="twist_to_motor" pkg="drive" type="joy_to_motor.py" respawn="true">
         <remap from="left_motor_vel" to="/motors/left_vel"/>
         <remap from="right_motor_vel" to="/motors/right_vel"/>
     </node>
 
-    <node name="motor_to_twist" pkg="drive" type="motor_to_twist.py" required="true">
+    <node name="motor_to_twist" pkg="drive" type="motor_to_twist.py" respawn="true">
         <remap from="left_motor_in" to="/motors/left_enc"/>
         <remap from="right_motor_in" to="/motors/right_enc"/>
         <remap from="twist_publisher" to="/odometry/wheel"/>
