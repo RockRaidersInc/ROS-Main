@@ -8,7 +8,7 @@
 	<!--  This launch file is for software-only nodes (eg, no motor driver or sensor nodes) that run on the rover.
           Base station code should go in base_station.launch  -->
 
-    <include file="$(find launch_files)/launch/base_station.launch" pass_all_args="true"/>
+    <!-- <include file="$(find launch_files)/launch/base_station.launch" pass_all_args="true"/> -->
 
     <node name="joy_to_twist" pkg="drive" type="joycontrol.py" respawn="true"/>
     <node name="twist_to_motor" pkg="drive" type="joy_to_motor.py" respawn="true">
