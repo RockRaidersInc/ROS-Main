@@ -17,9 +17,10 @@ public:
     BS_Actuator(SoftwareSerial& s, uint8_t pin);
     
     float getElevation() const {return adc_to_angle(position);}
+    void read() {position=analogRead(adc_pin);}
     
     //Reads pot, updates position, does PID, actuates
-    void update(const float& desired);
+    void update(float desired);
 
 private:
     SoftwareSerial* sabertooth; //pointer to motor controller serial connection
@@ -28,7 +29,6 @@ private:
     unsigned int position;  //Latest ADC reading
     
     void drive(int signal); //Actuates
-    void read() {position=analogRead(adc_pin);}
     
     //Helper functions to convert between ADC value and angle of elevation
     float adc_to_angle(unsigned int adc) const;
