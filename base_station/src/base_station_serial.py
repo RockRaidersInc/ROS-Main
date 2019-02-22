@@ -14,7 +14,7 @@ from nmea_msgs.msg import Sentence
 class BaseStationSerial:
 
     def __init__(self, dev='/dev/ttyACM0'):
-        rospy.Subscriber('/sensor/nmea_sentences', Sentence, self.callback_sentence)
+        rospy.Subscriber('/gps/nmea_sentences', Sentence, self.callback_sentence)
 
         self.ser = serial.Serial(dev)
 
