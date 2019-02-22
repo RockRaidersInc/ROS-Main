@@ -6,8 +6,8 @@
         <param name="local_xy_origin" value="Spata"/>
         <rosparam param="local_xy_origins">
             [{ name: Spata,
-             latitude: 42.729306,
-             longitude: -73.680906,
+             latitude: 42.729957 ,
+             longitude: -73.679659,
              altitude: 129.69,
              heading: 0.0}]
         </rosparam>
