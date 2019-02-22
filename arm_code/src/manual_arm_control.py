@@ -47,8 +47,8 @@ class ManualArmControl:
 
         rospy.Subscriber('joy', Joy, self.callback_joy)
 
-        self.shoulder_pos = self.SHOULDER_INITIAL_POS
-        self.elbow_pos = self.SHOULDER_INITIAL_POS
+        self.shoulder_pos = rospy.wait_for_message('shoulder_enc', Int32)
+        self.elbow_pos = rospy.wait_for_message('elbow_enc2', Int32)
         self.turret_pwm = self.TURRET_STOPPED
 
         while not rospy.is_shutdown():
