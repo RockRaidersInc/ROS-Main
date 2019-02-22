@@ -3,7 +3,7 @@ navsat_tf:
   delay: 3.0
   # Need to tune. Refer to https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml
   magnetic_declination_radians: 0 #0.226893
-  yaw_offset: 1.5707963
+  yaw_offset: 0
   zero_altitude: true
   broadcast_utm_transform: true
   publish_filtered_gps: true

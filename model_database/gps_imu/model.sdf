@@ -83,7 +83,7 @@
         <offset>0 0 0</offset>
         <drift>0 0 0</drift>
         <gaussianNoise>0 0 0</gaussianNoise>
-        <referenceHeading> 90 </referenceHeading>
+        <referenceHeading> 0 </referenceHeading>
         <!--<declination> 0.226893 </declination>-->
     </plugin>
   </model>
