@@ -3,9 +3,9 @@
 
     <node pkg="swri_transform_util" type="initialize_origin.py" name="initialize_origin" >
         <param name="local_xy_frame" value="map"/>
-        <param name="local_xy_origin" value="Spata"/>
+        <param name="local_xy_origin" value="86Field"/>
         <rosparam param="local_xy_origins">
-            [{ name: Spata,
+            [{ name: 86Field,
              latitude: 42.729957 ,
              longitude: -73.679659,
              altitude: 129.69,
