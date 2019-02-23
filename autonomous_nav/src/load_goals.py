@@ -18,8 +18,8 @@ def main():
 	waypoint_navigator = WaypointNavigator(orig_lat, orig_lon)
 	for goal_num, (goal_lat, goal_lon) in enumerate(gps_goals):
 		waypoint_navigator.send_gps_goal(goal_lat, goal_lon)
-
 		time.sleep(1)		
+
 	sys.exit()
 
 

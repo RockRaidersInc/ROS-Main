@@ -5,9 +5,7 @@ import sys
 from utils.waypoint_nav import *
 
 
-def main():
-	rospy.init_node('input_goals')
-
+def get_origin():
 	while True:
 		try:	
 			orig_lat = float(input('Input Origin Latitude: '))
@@ -20,6 +18,12 @@ def main():
 		except:
 			rospy.loginfo('Invalid origin, try again')
 
+	return orig_lat, orig_lon
+
+def main():
+	rospy.init_node('input_goals')
+	orig_lat, orig_lon = get_origin()
+	set_mapviz_origin(orig_lat, orig_lon)
 	waypoint_navigator = WaypointNavigator(orig_lat, orig_lon)
 	while True:
 		try:	
@@ -31,7 +35,7 @@ def main():
 
 			waypoint_navigator.send_gps_goal(goal_lat, goal_lon)
 
-			if str(input('Stop (y)? ')) == 'y':
+			if str(raw_input('Stop (y)? ')) == 'y':
 				break
 		except:
 			rospy.loginfo('Invalid goal, try again')
