@@ -40,6 +40,8 @@ def dumpstacks(signal, frame):
 class motornode:
     TIMEOUT_TIME = 1000
 
+    QPPS = 500
+
     name = ''
     address = 0x80
     device = ''
@@ -67,8 +69,8 @@ class motornode:
         self.timeout = int(round(time.time() * 1000))
 
         #PWM from 0 to 127
-        #rospy.Subscriber(m1_name + '_pwm', Int8, self.callbackM1_pwm)
-        #rospy.Subscriber(m2_name + '_pwm', Int8, self.callbackM2_pwm)
+        rospy.Subscriber(m1_name + '_pwm', Int8, self.callbackM1_pwm)
+        rospy.Subscriber(m2_name + '_pwm', Int8, self.callbackM2_pwm)
 
         #Signed velocity in encoder ticks/second
         rospy.Subscriber(m1_name + '_vel', Int16, self.callbackM1_vel)
@@ -79,7 +81,7 @@ class motornode:
 
         if publish_enc:
             self.m1_enc_pub = rospy.Publisher(m1_name + '_enc', Int32, queue_size = 1)
-            self.m2_enc_pub = rospy.Publisher(m2_name + '_enc2', Int32, queue_size = 1)
+            self.m2_enc_pub = rospy.Publisher(m2_name + ("_enc2" if m1_name == m2_name else "_enc"), Int32, queue_size = 1)
 
         while not rospy.is_shutdown():
             # Try to connect every second
@@ -90,14 +92,14 @@ class motornode:
                 break
             rospy.sleep(1.0)
 
-        update_rate = 0.05
+        update_rate = 0.1
         while not rospy.is_shutdown():
             start_time = time.time()
             self.update()
             time.sleep(max(start_time + update_rate - time.time(), 0))
 
     def update(self):
-        signal.setitimer(signal.ITIMER_REAL, 0.1)  # set the watchdog for 0.25 seconds
+        signal.setitimer(signal.ITIMER_REAL, 0.25)  # set the watchdog for 0.25 seconds
         try:
             # Publish encoder readings
             if self.m1_enc_pub is not None:
@@ -135,10 +137,10 @@ class motornode:
 
                 # TODO: Move QPPS to configuration file per motor
                 if self.m1_pos is not None:
-                    roboclaw.SpeedAccelDeccelPositionM1(self.address, 0, QPPS, 0, self.m1_pos, False)
+                    roboclaw.SpeedAccelDeccelPositionM1(self.address, 0, self.QPPS, 0, self.m1_pos, False)
                     self.m1_pos = None
                 if self.m2_pos is not None:
-                    roboclaw.SpeedAccelDeccelPositionM2(self.address, 0, QPPS, 0, self.m2_pos, False)
+                    roboclaw.SpeedAccelDeccelPositionM2(self.address, 0, self.QPPS, 0, self.m2_pos, False)
                     self.m2_pos = None
         except Exception as e:
             rospy.logerr("SIGLARAM: " + str((self.name, os.getpid())) + ": " + str(e))

@@ -78,7 +78,8 @@ void print_space_if_positive(float x) {
 
 void setup(void)
 {
-  Serial.begin(115200);
+//  Serial.begin(115200);
+  Serial.begin(19200);
   Serial.println(F("Adafruit 9DOF Tester")); Serial.println("");
   
   /* Initialise the sensors */

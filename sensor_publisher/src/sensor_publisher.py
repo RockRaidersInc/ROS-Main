@@ -52,7 +52,8 @@ def main(imu_pub, mag_pub):
     else:
         no_print = False
 
-    ser = serial.Serial('/dev/serial/by-id/' + arduino_serial_id, 115200, timeout=1)
+    ser = serial.Serial('/dev/serial/by-id/' + arduino_serial_id, 19200, timeout=1)
+    # ser = serial.Serial('/dev/serial/by-id/' + arduino_serial_id, 115200, timeout=1)
 
     # this is an easy way to parse the data coming out of the IMU. The Arduino prints the data
     # as text instad of in binary so that it would be human readable (and much easier to debug)
