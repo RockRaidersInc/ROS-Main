@@ -36,8 +36,10 @@ def createSettingsWindow():
     
 # Get the camera/video file
 if(len(sys.argv) > 1):
+    print("opening video file")
     cap = cv2.VideoCapture(sys.argv[1])
 else:
+    print("opening webcam?")
     cap = cv2.VideoCapture(0)    
 if not cap.isOpened():
     usageStatement()
