@@ -5,3 +5,6 @@
 	path = imu_tools
 	url = https://github.com/ccny-ros-pkg/imu_tools.git
 	branch = kinetic
+[submodule "yolo-9000"]
+	path = yolo-9000
+	url = https://github.com/philipperemy/yolo-9000.git

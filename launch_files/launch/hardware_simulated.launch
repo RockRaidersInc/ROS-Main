@@ -11,6 +11,6 @@
         <remap from="~imu_msg_out" to="/imu/data_raw"/>
     </node>
 
-    <node name="camera_transform_publisher" pkg="tf" type="static_transform_publisher" args="0 0 0.58 0 0 -1.57 map camera_link 10" />
+    <node name="camera_transform_publisher" pkg="tf" type="static_transform_publisher" args="0 0 0.58 -1.57 0 -1.57 base_link camera_link 10" restart="true"/>
     <!-- <node name="rviz_sim" pkg="rviz" type="rviz" output="screen" /> -->
 </launch>
