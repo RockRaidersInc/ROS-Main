@@ -159,7 +159,7 @@ class motornode:
                 print(' ')
                 if (c1 is not 0) or (c2 is not 0):
                     self.device = usb.device
-                    rospy.logerr('%s has connected to roboclaw with address %s', self.device, self.address)
+                    rospy.logerr('%s (%s) has connected to roboclaw with address %s', self.device, self.name, self.address)
                     #print(self.name + ' ' + self.device)
                     return True
                 else:
