@@ -52,10 +52,11 @@ class ManualArmControl:
 
         rospy.Subscriber('joy', Joy, self.callback_joy)
 
+        rospy.loginfo('Waiting for encoder messages')
         self.shoulder_pos = rospy.wait_for_message('/motors/shoulder_enc', Int32)
-        print("self.shoulder_pos: ", self.shoulder_pos.data)
         self.elbow_pos = rospy.wait_for_message('/motors/elbow_enc', Int32)
-        print("self.elbow_pos: ", self.elbow_pos.data)
+        rospy.loginfo("self.shoulder_pos: ", self.shoulder_pos.data)
+        rospy.loginfo("self.elbow_pos: ", self.elbow_pos.data)
         self.turret_pwm = self.TURRET_STOPPED
 
         while not rospy.is_shutdown():
@@ -72,9 +73,9 @@ class ManualArmControl:
             elif self.elbow_pos.data < self.ELBOW_MIN:
                 self.elbow_pos.data = self.ELBOW_MIN
 
-            print("self.shoulder_pos: ", self.shoulder_pos.data)
-            print("self.elbow_pos: ", self.elbow_pos.data)
-            print("self.turret_pwm: ", self.turret_pwm)
+            # print("self.shoulder_pos: ", self.shoulder_pos.data)
+            # print("self.elbow_pos: ", self.elbow_pos.data)
+            # print("self.turret_pwm: ", self.turret_pwm)
 
             turret_msg = Int8()
             turret_msg.data = self.turret_pwm
@@ -99,8 +100,8 @@ class ManualArmControl:
         else:
             self.elbow_dir = right_x / abs(right_x)
 
-        print("self.shoulder_dir: ", self.shoulder_dir)
-        print("self.elbow_dir: ", self.elbow_dir)
+        # print("self.shoulder_dir: ", self.shoulder_dir)
+        # print("self.elbow_dir: ", self.elbow_dir)
         
         l_button = msg.buttons[self.LEFT_BUTTON_INDEX]
         r_button = msg.buttons[self.RIGHT_BUTTON_INDEX]

@@ -1,5 +1,7 @@
+#!/usr/bin/env python
+
 import rospy
-import rospack
+import rospkg
 import yaml
 from move_base_msgs.msg import MoveBaseGoal
 
@@ -23,26 +25,14 @@ def make_goal(x=0, y=0, thetaZ=1, w=0.):
 	return goal
 
 def set_mapviz_origin(orig_lat,orig_lon):
-	origin_name = rospy.get_param('local_xy_origin')
-	origins = rospy.get_param('local_xy_origins')
-	for origin in origins:
-		if origin_name == origin['name']:
-			origin['latitude'] = orig_lat
-			origin['longitude'] = orig_lon
-			break
-	rospy.set_param('local_xy_origins', origins)
-
-def get_origin():
-	while True:
-		try:	
-			orig_lat = float(input('Input Origin Latitude: '))
-			orig_lon = float(input('Input Origin Longitude: '))
-			if orig_lat < -90 or orig_lat > 90 or \
-			   orig_lon <-180 or orig_lon > 180:
-			   	raise Exception
-			else:
+	try:
+		origin_name = rospy.get_param('local_xy_origin')
+		origins = rospy.get_param('local_xy_origins')
+		for origin in origins:
+			if origin_name == origin['name']:
+				origin['latitude'] = orig_lat
+				origin['longitude'] = orig_lon
 				break
-		except:
-			rospy.loginfo('Invalid origin, try again')
-
-	return orig_lat, orig_lon
+		rospy.set_param('local_xy_origins', origins)
+	except KeyError:
+		pass

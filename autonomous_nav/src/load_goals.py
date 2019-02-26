@@ -3,14 +3,14 @@
 import rospy
 import sys
 import time
-from utils.waypoint_nav import *
+from utils.waypoint_nav import WaypointNavigator
+from utils.general import load_coordinates
 
 
 def main():
 	rospy.init_node('load_goals')
 
-	# coordinates_filename = rospy.get_param('coordinates')
-	coordinates_filename = '86_field'
+	coordinates_filename = rospy.get_param('coordinates_file')
 	coordinates = load_coordinates(coordinates_filename)
 	orig_lat, orig_lon = coordinates['origin']
 	gps_goals = coordinates['gps_goals']
