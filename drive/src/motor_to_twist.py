@@ -41,9 +41,9 @@ class motor_to_twist:
         self.right_positions.append((new_pos, rospy.Time.now()))
     
     def publish_data(self, time_obj):
-        while self.left_positions[0][1].to_sec() - self.left_positions[-1][1].to_sec() > 0.25:
+        while self.left_positions[-1][1].to_sec() - self.left_positions[0][1].to_sec() > 0.25:
             self.left_positions.pop(0)
-        while self.right_positions[0][1].to_sec() - self.right_positions[-1][1].to_sec() > 0.25:
+        while self.right_positions[-1][1].to_sec() - self.right_positions[0][1].to_sec() > 0.25:
             self.right_positions.pop(0)
 
         out_msg = Odometry()
@@ -51,7 +51,7 @@ class motor_to_twist:
         out_msg.child_frame_id = "base_link"
 
         try:
-            if len(self.left_positions) == 2 and len(self.right_positions) == 2:
+            if len(self.left_positions) > 2 and len(self.right_positions) > 2:
                 # left_vel = (self.left_positions[1][0] - self.left_positions[0][0]) / (self.left_positions[1][1] - self.left_positions[0][1]).to_sec()
                 # right_vel = (self.right_positions[1][0] - self.right_positions[0][0]) / (self.right_positions[1][1] - self.right_positions[0][1]).to_sec()
 
@@ -81,9 +81,7 @@ class motor_to_twist:
         """ calculates the first derivative of noisy data with a linear regression """
         time = np.array([d[1].to_sec() for d in data])
         position = np.array([d[0] for d in data])
-
         m, b = np.polyfit(time, position, 1)
-
         return m
 
 
