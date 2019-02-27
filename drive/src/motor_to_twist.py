@@ -15,9 +15,11 @@ class motor_to_twist:
     This data is used by the localization nodes.
     """
 
-    def __init__(self):
+    def __init__(self, linear_cov_factor, angular_cov_factor):
         self.left_positions = list()
         self.right_positions = list()
+        self.linear_cov_factor = linear_cov_factor
+        self.angular_cov_factor = angular_cov_factor
 
         self.track = rospy.get_param("/rover_constants/wheel_base_width")
         self.wheel_diameter = rospy.get_param("/rover_constants/wheel_diameter")
@@ -53,7 +55,6 @@ class motor_to_twist:
                 v, omega = kinematics.forward_kinematics(left_vel, right_vel, track=self.track, diameter=self.wheel_diameter)
                 out_msg.twist.twist.linear.x = v
                 out_msg.twist.twist.angular.z = omega
-                self.pub.publish(out_msg)
 
                 # don't use old data
                 self.left_positions.pop(0)
@@ -63,12 +64,29 @@ class motor_to_twist:
                 # if no data is being recieved then the motor control node is probably not running. Publish zero velocity.
                 out_msg.twist.twist.linear.x = 0
                 out_msg.twist.twist.angular.z = 0
-                self.pub.publish(out_msg)
+            
+            self.set_covariance(out_msg)
+            self.pub.publish(out_msg)
         except:
             pass
 
 
+    def set_covariance(self, msg):
+        linear_factor = msg.twist.twist.linear.x * self.linear_cov_factor
+        angular_factor = msg.twist.twist.angular.z * self.angular_cov_factor
+
+        # set the x and y covariance. Set y because the rover might slip sideways if it goes over rough terrain
+        msg.twist.covariance[0*6 + 0] = linear_factor
+        msg.twist.covariance[1*6 + 1] = linear_factor
+        msg.twist.covariance[3*6 + 5] = angular_factor
+
+
+
 if __name__ == '__main__':
     rospy.init_node('motor_to_twist')
-    controller = motor_to_twist()
+    linear_cov_factor = rospy.get_param('~linear_covariance_scale_factor', 0)
+    angular_cov_factor = rospy.get_param('~angular_covariance_scale_factor', 0)
+    rospy.logerr("linear_cov_factor: " + str(linear_cov_factor))
+    rospy.logerr("angular_cov_factor: " + str(angular_cov_factor))
+    controller = motor_to_twist(linear_cov_factor, angular_cov_factor)
     rospy.spin()

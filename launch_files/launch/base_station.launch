@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <launch>
 
+    <!-- Limit the message send rate, it can reach over 7000 msgs/sec when unlimited -->
     <node name="joy" pkg="joy" type="joy_node" respawn="true">
-		<!-- Limit the message send rate, it can reach over 7000 msgs/sec when unlimited -->
         <param name="dev" value="/dev/input/js0"/>
         <param name="deadzone" value="0.1"/>
 	</node>

@@ -20,6 +20,8 @@
         <remap from="left_motor_in" to="/motors/left_enc"/>
         <remap from="right_motor_in" to="/motors/right_enc"/>
         <remap from="twist_publisher" to="/odometry/wheel"/>
+        <param name="linear_covariance_scale_factor" value="0.1"/>
+        <param name="angular_covariance_scale_factor" value="0.5"/>
     </node>
   
 </launch>
