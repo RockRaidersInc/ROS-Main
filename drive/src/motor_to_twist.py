@@ -41,6 +41,9 @@ class motor_to_twist:
         self.right_positions.append((new_pos, rospy.Time.now()))
     
     def publish_data(self, time_obj):
+	if len(self.left_positions) < 3 or len(self.right_positions) < 3:
+		return
+
         while self.left_positions[-1][1].to_sec() - self.left_positions[0][1].to_sec() > 0.5:
             self.left_positions.pop(0)
         while self.right_positions[-1][1].to_sec() - self.right_positions[0][1].to_sec() > 0.5:
