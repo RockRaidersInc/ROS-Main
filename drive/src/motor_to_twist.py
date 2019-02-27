@@ -30,7 +30,7 @@ class motor_to_twist:
         rospy.Subscriber("left_motor_in", Int32, self.left_callback)
         rospy.Subscriber("right_motor_in", Int32, self.right_callback)
         self.pub = rospy.Publisher("twist_publisher", Odometry, queue_size = 1)
-        self.publish_timer = rospy.Timer(rospy.Duration(0.05), self.publish_data)
+        self.publish_timer = rospy.Timer(rospy.Duration(0.1), self.publish_data)
 
     def left_callback(self, data):
         new_pos = data.data / self.encoder_ticks_per_rad
@@ -41,9 +41,9 @@ class motor_to_twist:
         self.right_positions.append((new_pos, rospy.Time.now()))
     
     def publish_data(self, time_obj):
-        while self.left_positions[-1][1].to_sec() - self.left_positions[0][1].to_sec() > 0.25:
+        while self.left_positions[-1][1].to_sec() - self.left_positions[0][1].to_sec() > 0.5:
             self.left_positions.pop(0)
-        while self.right_positions[-1][1].to_sec() - self.right_positions[0][1].to_sec() > 0.25:
+        while self.right_positions[-1][1].to_sec() - self.right_positions[0][1].to_sec() > 0.5:
             self.right_positions.pop(0)
 
         out_msg = Odometry()
@@ -65,6 +65,7 @@ class motor_to_twist:
                 # don't use old data
                 self.left_positions.pop(0)
                 self.right_positions.pop(0)
+                # rospy.logerr("motor_to_twist setting twists: " + str(v) + " " + str(omega))
             
             else:
                 # if no data is being recieved then the motor control node is probably not running. Publish zero velocity.
@@ -73,6 +74,7 @@ class motor_to_twist:
             
             self.set_covariance(out_msg)
             self.pub.publish(out_msg)
+            # rospy.logerr("motor_to_twist published")
         except:
             pass
 
