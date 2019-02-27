@@ -166,6 +166,7 @@ class motornode:
                     roboclaw.port.close()
             except IOError:
                 continue
+            time.sleep(0.1)
         return False
 
 
