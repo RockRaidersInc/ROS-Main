@@ -5,6 +5,8 @@ from std_msgs.msg import Int32
 import std_msgs.msg
 from nav_msgs.msg import Odometry
 
+import numpy as np
+
 import kinematics
 import numpy as np
 
@@ -39,9 +41,9 @@ class motor_to_twist:
         self.right_positions.append((new_pos, rospy.Time.now()))
     
     def publish_data(self, time_obj):
-        while len(self.left_positions) > 2:
+        while self.left_positions[0][1].to_sec() - self.left_positions[-1][1].to_sec() > 0.25:
             self.left_positions.pop(0)
-        while len(self.right_positions) > 2:
+        while self.right_positions[0][1].to_sec() - self.right_positions[-1][1].to_sec() > 0.25:
             self.right_positions.pop(0)
 
         out_msg = Odometry()
@@ -50,8 +52,12 @@ class motor_to_twist:
 
         try:
             if len(self.left_positions) == 2 and len(self.right_positions) == 2:
-                left_vel = (self.left_positions[1][0] - self.left_positions[0][0]) / (self.left_positions[1][1] - self.left_positions[0][1]).to_sec()
-                right_vel = (self.right_positions[1][0] - self.right_positions[0][0]) / (self.right_positions[1][1] - self.right_positions[0][1]).to_sec()
+                # left_vel = (self.left_positions[1][0] - self.left_positions[0][0]) / (self.left_positions[1][1] - self.left_positions[0][1]).to_sec()
+                # right_vel = (self.right_positions[1][0] - self.right_positions[0][0]) / (self.right_positions[1][1] - self.right_positions[0][1]).to_sec()
+
+                left_vel = self.linear_reg_slope(self.left_positions)
+                right_vel = self.linear_reg_slope(self.right_positions)
+
                 v, omega = kinematics.forward_kinematics(left_vel, right_vel, track=self.track, diameter=self.wheel_diameter)
                 out_msg.twist.twist.linear.x = v
                 out_msg.twist.twist.angular.z = omega
@@ -69,6 +75,16 @@ class motor_to_twist:
             self.pub.publish(out_msg)
         except:
             pass
+
+
+    def linear_reg_slope(self, data):
+        """ calculates the first derivative of noisy data with a linear regression """
+        time = np.array([d[1].to_sec() for d in data])
+        position = np.array([d[0] for d in data])
+
+        m, b = np.polyfit(time, position, 1)
+
+        return b
 
 
     def set_covariance(self, msg):
