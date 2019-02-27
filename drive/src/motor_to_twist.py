@@ -72,8 +72,8 @@ class motor_to_twist:
 
 
     def set_covariance(self, msg):
-        linear_factor = msg.twist.twist.linear.x * self.linear_cov_factor
-        angular_factor = msg.twist.twist.angular.z * self.angular_cov_factor
+        linear_factor = abs(msg.twist.twist.linear.x * self.linear_cov_factor)
+        angular_factor = abs(msg.twist.twist.angular.z * self.angular_cov_factor)
 
         # set the x and y covariance. Set y because the rover might slip sideways if it goes over rough terrain
         msg.twist.covariance[0*6 + 0] = linear_factor
