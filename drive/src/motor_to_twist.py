@@ -84,7 +84,7 @@ class motor_to_twist:
 
         m, b = np.polyfit(time, position, 1)
 
-        return b
+        return m
 
 
     def set_covariance(self, msg):
