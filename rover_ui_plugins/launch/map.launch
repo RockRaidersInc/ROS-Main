@@ -3,13 +3,18 @@
 
     <node pkg="swri_transform_util" type="initialize_origin.py" name="initialize_origin" >
         <param name="local_xy_frame" value="map"/>
-        <param name="local_xy_origin" value="86Field"/>
+        <param name="local_xy_origin" value="86Field_Garage"/>
         <rosparam param="local_xy_origins">
-            [{ name: 86Field,
-             latitude: 42.729957 ,
-             longitude: -73.679659,
-             altitude: 129.69,
-             heading: 0.0}]
+            [{ name: 86Field_Garage,
+               latitude: 42.72990113092738,
+               longitude: -73.67916658941294,
+               altitude: 129.69,
+               heading: 0.0},
+             { name: 86Field,
+               latitude: 42.729957 ,
+               longitude: -73.679659,
+               altitude: 129.69,
+               heading: 0.0}]
         </rosparam>
     </node>
 
