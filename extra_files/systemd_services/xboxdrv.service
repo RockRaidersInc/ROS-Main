@@ -4,7 +4,7 @@ After=local-fs.target
 
 [Service]
 Restart=always
-ExecStart=/usr/bin/xboxdrv --detach-kernel-driver --silent --axismap lt=-X2,X2=-Y2,Y2=rt,rt=lt
+ExecStart=/usr/bin/xboxdrv --detach-kernel-driver --silent --axismap lt=X2,-X2=Y2,-Y2=rt,rt=lt
 # Type=forking
 KillSignal=SIGINT
 
