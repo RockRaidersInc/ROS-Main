@@ -80,9 +80,9 @@ class ManualArmControl:
             turret_msg = Int8()
             turret_msg.data = self.turret_pwm
 
-            # self.shoulder_pub.publish(self.shoulder_pos)
-            # self.elbow_pub.publish(self.elbow_pos)
-            # self.turret_pub.publish(turret_msg)
+            self.shoulder_pub.publish(self.shoulder_pos)
+            self.elbow_pub.publish(self.elbow_pos)
+            self.turret_pub.publish(turret_msg)
 
             rospy.sleep(.05)
 
