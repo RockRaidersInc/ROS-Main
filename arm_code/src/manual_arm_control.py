@@ -55,8 +55,8 @@ class ManualArmControl:
         rospy.loginfo('Waiting for encoder messages')
         self.shoulder_pos = rospy.wait_for_message('/motors/shoulder_enc', Int32)
         self.elbow_pos = rospy.wait_for_message('/motors/elbow_enc', Int32)
-        rospy.loginfo("self.shoulder_pos: ", self.shoulder_pos.data)
-        rospy.loginfo("self.elbow_pos: ", self.elbow_pos.data)
+        rospy.loginfo("self.shoulder_pos: %f", self.shoulder_pos.data)
+        rospy.loginfo("self.elbow_pos: %f", self.elbow_pos.data)
         self.turret_pwm = self.TURRET_STOPPED
 
         while not rospy.is_shutdown():
