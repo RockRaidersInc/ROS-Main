@@ -29,7 +29,12 @@ Once you have cloned your repository, if you intend on working with the USB came
 git submodule init
 git submodule update
 ```
-This will clone the usb_cam pakage into the correct directory.  You will then need to run `catkin_make` to build the new package and it should be ready to go
+Also install the usb_cam package
+```
+sudo apt install usb_cam
+```
+
+This will clone the usb_cam pakage into the correct directory.  You will then need to run `catkin build` to build the new package and it should be ready to go
 
 To start getting your images from the camera, you need to run the usb_cam_node as follows:
 ```
@@ -51,7 +56,6 @@ To run ROS with UI, you must download and install rqt (http://wiki.ros.org/rqt),
 # Other stuff that needs to be installed
 
 ```
-sudo apt install usb_cam
 sudo apt install ros-kinetic-joy
 ```
 

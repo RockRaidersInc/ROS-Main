@@ -5,6 +5,8 @@ After=local-fs.target
 [Service]
 Restart=always
 ExecStart=/usr/bin/xboxdrv --detach-kernel-driver --silent
+# Type=forking
+KillSignal=SIGINT
 
 [Install]
 WantedBy=multi-user.target
