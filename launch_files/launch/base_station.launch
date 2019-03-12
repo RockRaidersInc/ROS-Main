@@ -2,9 +2,15 @@
 <launch>
 
     <!-- Limit the message send rate, it can reach over 7000 msgs/sec when unlimited -->
-    <node name="joy" pkg="joy" type="joy_node" respawn="true">
+    <node name="joy_0" pkg="joy" type="joy_node" respawn="true">
         <param name="dev" value="/dev/input/js0"/>
-        <param name="deadzone" value="0.1"/>
+        <param name="deadzone" value="0.1"/>  <!-- appears to be broken -->
+	</node>
+
+    <!-- Limit the message send rate, it can reach over 7000 msgs/sec when unlimited -->
+    <node name="joy_1" pkg="joy" type="joy_node" respawn="true">
+        <param name="dev" value="/dev/input/js1"/>
+        <param name="deadzone" value="0.1"/>  <!-- appears to be broken -->
 	</node>
 
     <!-- this has UI components and other things that should run as part of the base station -->

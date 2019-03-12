@@ -1,0 +1,10 @@
+[Unit]
+Description=Start the xboxdrv xbox joystick driver
+After=local-fs.target
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/xboxdrv --detach-kernel-driver --silent
+
+[Install]
+WantedBy=multi-user.target
