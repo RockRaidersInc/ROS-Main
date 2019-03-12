@@ -19,12 +19,12 @@ def signal_handler(sig, frame):
     print('control c detected, exiting')
     sys.exit(0)
 
-def set_covariance_as_identity(val):
+def set_covariance(val, cov):
     for i in range(9):
         val[i] = 0
-    val[0] = 1
-    val[4] = 1
-    val[8] = 1
+    val[0] = cov
+    val[4] = cov
+    val[8] = cov
 
 
 def get_line_from_list(chars):
@@ -148,13 +148,13 @@ def process_imu_data(line, regex):
         imu_msg.linear_acceleration.x = map_to(accel_x, -0.4, 10.3, 0, 9.81)
         imu_msg.linear_acceleration.y = map_to(accel_y, 0.2, 9.7, 0, 9.81)
         imu_msg.linear_acceleration.z = map_to(accel_z, 0, 10.75, 0, 9.81)
-        set_covariance_as_identity(imu_msg.linear_acceleration_covariance)
+        set_covariance(imu_msg.linear_acceleration_covariance, 1.0)
 
         gyro_x, gyro_y, gyro_z = float(match.group('gyro_x')), float(match.group('gyro_y')), float(match.group('gyro_z'))
         imu_msg.angular_velocity.x = gyro_x - 0.01
-        imu_msg.angular_velocity.y = gyro_y - 0.03
-        imu_msg.angular_velocity.z = gyro_z - 0.06
-        set_covariance_as_identity(imu_msg.angular_velocity_covariance)
+        imu_msg.angular_velocity.y = gyro_y + 0.01
+        imu_msg.angular_velocity.z = gyro_z - 0.04
+        set_covariance(imu_msg.angular_velocity_covariance, 1.0)
 
         mag_msg = MagneticField_msg()
         mag_msg.header.stamp = rospy.get_rostime()
@@ -163,7 +163,11 @@ def process_imu_data(line, regex):
         mag_msg.magnetic_field.x = float(match.group('mag_x')) - 150.75
         mag_msg.magnetic_field.y = float(match.group('mag_y')) - 7.205
         mag_msg.magnetic_field.z = float(match.group('mag_z')) - -106.045
+<<<<<<< HEAD
         set_covariance_as_identity(mag_msg.magnetic_field_covariance)
+=======
+        set_covariance(mag_msg.magnetic_field_covariance, 1.0)
+>>>>>>> 25b042d03bf46c0c7e26e0875298592fa794924e
 
         imu_pub.publish(imu_msg)
         mag_pub.publish(mag_msg)

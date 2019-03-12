@@ -92,7 +92,7 @@ class motornode:
                 break
             rospy.sleep(1.0)
 
-        update_rate = 0.1
+        update_rate = 0.05
         while not rospy.is_shutdown():
             start_time = time.time()
             self.update()
@@ -166,7 +166,7 @@ class motornode:
                     roboclaw.port.close()
             except IOError:
                 continue
-            time.sleep(0.1)
+            # time.sleep(0.1)
         return False
 
 
