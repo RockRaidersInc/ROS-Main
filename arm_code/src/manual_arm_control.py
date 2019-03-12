@@ -73,9 +73,9 @@ class ManualArmControl:
             elif self.elbow_pos.data < self.ELBOW_MIN:
                 self.elbow_pos.data = self.ELBOW_MIN
 
-            # print("self.shoulder_pos: ", self.shoulder_pos.data)
-            # print("self.elbow_pos: ", self.elbow_pos.data)
-            # print("self.turret_pwm: ", self.turret_pwm)
+            print("self.shoulder_pos: ", self.shoulder_pos.data)
+            print("self.elbow_pos: ", self.elbow_pos.data)
+            print("self.turret_pwm: ", self.turret_pwm)
 
             turret_msg = Int8()
             turret_msg.data = self.turret_pwm
