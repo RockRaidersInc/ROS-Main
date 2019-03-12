@@ -29,10 +29,10 @@ class ManualArmControl:
     # TURRET_LEFT_SPEED = -300
     # TURRET_RIGHT_SPEED = 300
 
-    SHOULDER_MIN = 670
-    SHOULDER_MAX = 1800
+    SHOULDER_MIN = 600
+    SHOULDER_MAX = 1400
 
-    ELBOW_MIN = 200
+    ELBOW_MIN = 400
     ELBOW_MAX = 1400
 
     deadzone = 0.1
@@ -80,9 +80,9 @@ class ManualArmControl:
             turret_msg = Int8()
             turret_msg.data = self.turret_pwm
 
-            self.shoulder_pub.publish(self.shoulder_pos)
-            self.elbow_pub.publish(self.elbow_pos)
-            self.turret_pub.publish(turret_msg)
+            # self.shoulder_pub.publish(self.shoulder_pos)
+            # self.elbow_pub.publish(self.elbow_pos)
+            # self.turret_pub.publish(turret_msg)
 
             rospy.sleep(.05)
 
@@ -100,8 +100,8 @@ class ManualArmControl:
         else:
             self.elbow_dir = right_x / abs(right_x)
 
-        # print("self.shoulder_dir: ", self.shoulder_dir)
-        # print("self.elbow_dir: ", self.elbow_dir)
+        print("self.shoulder_dir: ", self.shoulder_dir)
+        print("self.elbow_dir: ", self.elbow_dir)
         
         l_button = msg.buttons[self.LEFT_BUTTON_INDEX]
         r_button = msg.buttons[self.RIGHT_BUTTON_INDEX]
