@@ -1,16 +1,15 @@
 # ROS-Main
 
-This respository should be your src file in your ROS workspace.  So when cloning, call
-  `git clone .... src`
-from your workspace
+This respository should be your src file in your ROS workspace.  So when cloning, call this from your workspace
+```
+git clone https://github.com/RockRaidersInc/ROS-Main.git src
+```
 
 The following commands should be run to install required packages:
 ```
 # installing catkin (the newer version with `catkin build`)
-sudo apt-get install cmake python-catkin-pkg python-empy python-nose libgtest-dev
-sudo apt-get install python-catkin-tools
+sudo apt install cmake python-catkin-pkg python-empy python-nose libgtest-dev install python-catkin-tools
 
-# joystick node
 sudo apt install ros-kinetic-joy
 ```
 
@@ -19,7 +18,7 @@ The easiest way is to simply call the bash script `launch_simulated.sh` from the
 Then, in a new terminal, source devel/setup.bash and run `roslaunch launch_files base_station.launch` to get joystick support.
 
 ##Starting up the actual rover
-This is a slightly more involved. On the rover run `roslaunch launch_files launch_with_hardware.launch`. 
+On the rover run `roslaunch launch_files launch_with_hardware.launch`. 
 Then, on the base station, run `source launchscripts/export_remote_ros_vars.sh` then `roslaunch launch_files base_station.launch` in the same terminal
 
 
@@ -51,24 +50,47 @@ To run ROS with UI, you must download and install rqt (http://wiki.ros.org/rqt),
 
 # Other stuff that needs to be installed
 
+```
 sudo apt install usb_cam
-
 sudo apt install ros-kinetic-joy
+```
 
 ## autonomous traversal stuff
-sudo apt install gpsd
-sudo apt install ros-kinetic-gpsd-client
+```
+sudo apt install gpsd ros-kinetic-gpsd-client
 sudo apt install ros-kinetic-tf2-geometry-msgs ros-kinetic-move-base sudo apt install ros-kinetic-map-server
 sudo apt install ros-kinetic-nmea-navsat-driver
+```
 
 ## simulation stuff
-sudo apt-get install libignition-math2-dev
+```
+sudo apt install libignition-math2-dev ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control
+```
 
-sudo apt-get install ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control
 
+## xbox controller setup
+A driver needs to be running to handle xbox controllers. It can be installed with
+```
+sudo apt install xboxdrv
+```
+To use an Xbox controller, run this in a separate terminal:
+
+```sudo xboxdrv --detach-kernel-driver```
+
+The previous command can be auto-started on boot like so:
+```
+# navigate to the source directory and run 
+cd extra_files/systemd_services && sudo ./install_services.sh
+
+# make sure the service is running with
+sudo systemctl status xboxdrv.service
+```
+
+To remove the xbox controller service 
+```
+cd extra_files/systemd_services && sudo ./remove_services.sh
+```
 
 # Random useful commands
 
-To install the xbox controller driver: `sudo apt install xboxdrv`
-To use an Xbox controller, run this in a separate terminal: `sudo xboxdrv --detach-kernel-driver`
 
