@@ -160,9 +160,9 @@ def process_imu_data(line, regex):
         mag_msg.header.stamp = rospy.get_rostime()
         mag_msg.header.stamp.secs = int(data_collection_time)
         mag_msg.header.stamp.nsecs = int((data_collection_time - imu_msg.header.stamp.secs) * 1000000000)
-        mag_msg.magnetic_field.x = float(match.group('mag_x'))
-        mag_msg.magnetic_field.y = float(match.group('mag_y'))
-        mag_msg.magnetic_field.z = float(match.group('mag_z'))
+        mag_msg.magnetic_field.x = float(match.group('mag_x')) - 150.75
+        mag_msg.magnetic_field.y = float(match.group('mag_y')) - 7.205
+        mag_msg.magnetic_field.z = float(match.group('mag_z')) - -106.045
         set_covariance_as_identity(mag_msg.magnetic_field_covariance)
 
         imu_pub.publish(imu_msg)

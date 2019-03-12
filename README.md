@@ -65,3 +65,10 @@ sudo apt-get install libignition-math2-dev
 
 ## Simulation installs
 sudo apt-get install ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control
+
+
+# Random useful commands
+
+To install the xbox controller driver: `sudo apt install xboxdrv`
+To use an Xbox controller, run this in a separate terminal: `sudo xboxdrv --detach-kernel-driver`
+

@@ -1,4 +1,18 @@
 # Kalman Filter from odom -> base_link
+
+# map -> odom
+#     Accounts for the robot's global pose
+#     Tracks the offset needed to compensate for overall sensor drift as the robot drives around, allowing the robot to more robustly create global path plans
+#     Is discontinuous (jumps around)
+#     Is published by the AMCL node (or any other global pose estimators!)
+
+# odom -> base_link
+#     Accounts for the robot's local pose
+#     Is best for local obstacle avoidance
+#     Is continuous, but drifts over time due to sensor drift
+#     Is published by the odometry node (which should be taking into account encoders, IMUs and other sensors like laser scan matching nodes, etc.)
+
+
 odom_ekf:
   # General Settings
   frequency: 30
@@ -40,6 +54,7 @@ odom_ekf:
   imu0_relative: false
   imu0_queue_size: 10
   imu0_remove_gravitational_acceleration: true
+
 
   # Covariance Settings
   process_noise_covariance: [0.05, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,

@@ -41,14 +41,15 @@
         <frameId> imu0_link </frameId>
 
         <accelOffset>0.0 0.0 0.0</accelOffset>
-        <accelDrift>0.0 0.0 0.0</accelDrift>
-        <accelDriftFrequency>0.0 0.0 0.0</accelDriftFrequency>
-        <accelGaussianNoise>0.0 0.0 0.0</accelGaussianNoise>
+        <accelDrift>0.2 0.2 0.2</accelDrift>
+        <accelDriftFrequency>0.2 0.2 0.2</accelDriftFrequency>
+        <accelGaussianNoise>0.2 0.2 0.2</accelGaussianNoise>
         <xyzOffset> 0 0 0 </xyzOffset>
         <rpyOffset> 0 0 0 </rpyOffset>
 
         <rateOffset>0.0 0.0 0.0</rateOffset>
-        <rateDriftFrequency>0.0 0.0 0.0</rateDriftFrequency>
+        <rateDrift>0.02 0.02 0.02</rateDrift>
+        <rateDriftFrequency>0.1 0.1 0.1</rateDriftFrequency>
         <rateGaussianNoise>0.0 0.0 0.0</rateGaussianNoise>
 
         <yawOffset>0.0</yawOffset>
@@ -64,9 +65,9 @@
         <topicName>/gps/fix</topicName>
         <velocityTopicName>/gps/vel</velocityTopicName>
         <frameId> gps0_link </frameId>
-        <drift>0 0 0</drift>
-        <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
-        <velocityDrift>0 0 0</velocityDrift>
+        <drift>0.0 0.0 0.0</drift>
+        <gaussianNoise>0.1 0.1 0.1</gaussianNoise>
+        <velocityDrift>0.0 0.0 0.0</velocityDrift>
         <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
         <referenceLatitude> 42.729957 </referenceLatitude>
         <referenceLongitude> -73.679659 </referenceLongitude>
@@ -79,12 +80,12 @@
         <bodyName>gps_imu_link</bodyName>
         <topicName>/rover/magnetometer</topicName>
         <frameId> imu0_link </frameId>
-        <magnitude> 60 </magnitude>
-        <offset>0 0 0</offset>
-        <drift>0 0 0</drift>
+        <magnitude> 10 </magnitude>
+        <offset>1 1 1</offset>
+        <drift>1 1 1</drift>
         <gaussianNoise>0 0 0</gaussianNoise>
         <referenceHeading> 0 </referenceHeading>
-        <!--<declination> 0.226893 </declination>-->
+        <declination> 0.226893 </declination>
     </plugin>
   </model>
 </sdf>
