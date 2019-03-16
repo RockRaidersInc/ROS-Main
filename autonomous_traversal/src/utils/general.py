@@ -8,7 +8,7 @@ from move_base_msgs.msg import MoveBaseGoal
 
 def load_coordinates(filename):
 	rospack = rospkg.RosPack()
-	AT_file_path = rospack.get_path('autonomous_nav')
+	AT_file_path = rospack.get_path('autonomous_traversal')
 	file_path = '{}/coordinates/{}.yaml'.format(AT_file_path, filename)
 	with open(file_path) as file:
 		coordinates = yaml.safe_load(file)

@@ -5,21 +5,21 @@
     <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 0 base_link imu0_link 100" />
 
     <!-- Sensor fusion for IMUs -->
-    <rosparam command="load" file="$(find launch_files)/params/imu_filter_params.yaml"/>
+    <rosparam command="load" file="$(find autonomous_traversal)/params/imu_filter_params.yaml"/>
     <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node"/>
 
     <!-- Kalman Filter localization - Odom Frame-->
-    <rosparam command="load" file="$(find launch_files)/params/odom_ekf_params.yaml"/>
+    <rosparam command="load" file="$(find autonomous_traversal)/params/odom_ekf_params.yaml"/>
     <node name="odom_ekf" pkg="robot_localization" type="ekf_localization_node" respawn="true"/>
         
     <!-- Kalman Filter localization - Map Frame-->
-    <rosparam command="load" file="$(find launch_files)/params/map_ekf_params.yaml"/>
+    <rosparam command="load" file="$(find autonomous_traversal)/params/map_ekf_params.yaml"/>
     <node name="map_ekf" pkg="robot_localization" type="ekf_localization_node" respawn="true">
         <remap from="/odometry/filtered" to="/odometry/filtered_map"/>
     </node>
 
     <!-- GPS Coordinates to Odometry (x,y) -->
-    <rosparam command="load" file="$(find launch_files)/params/navsat_params.yaml"/>
+    <rosparam command="load" file="$(find autonomous_traversal)/params/navsat_params.yaml"/>
     <node name="navsat_tf" pkg="robot_localization" type="navsat_transform_node" respawn="true">
         <remap from="/odometry/filtered" to="/odometry/filtered_map"/>
     </node>
