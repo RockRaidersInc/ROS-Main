@@ -2,7 +2,7 @@
 <launch>
     
     <!-- load the rover's wheel diameter, distance between wheels, number of encoder ticks per revolution, ect -->
-    <rosparam command="load" file="$(find launch_files)/params/rover_dimensions.yaml" />
+    <rosparam command="load" file="$(find rover)/params/rover_dimensions.yaml" />
 
 
 	<!--  This launch file is for software-only nodes (eg, no motor driver or sensor nodes) that run on the rover.
