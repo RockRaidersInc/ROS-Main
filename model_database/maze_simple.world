@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version='1.6'>
-  <world name='sim'>
+  <world name='maze_simple'>
     <gravity>0 0 -9.8</gravity>
     <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
     <atmosphere type='adiabatic'/>
@@ -33,7 +33,7 @@
     </physics>
     
     <scene>
-      <ambient>0.6 0.6 0.6 1</ambient>
+      <ambient>1 1 1 1</ambient>
       <background>0.7 0.7 0.7 1</background>
       <shadows>1</shadows>
     </scene>
@@ -58,25 +58,22 @@
 
     <include>
       <uri>model://sun</uri>
-      <pose>0 0 500   0 0 0</pose>
+      <pose>0 0 20   0 0 0</pose>
     </include>
 
-
+    
     <include>
       <uri>model://Robot_Base</uri>
       <name>rover</name>
       <pose> 0 0 0.5   0 0 -1.5707</pose>
     </include>  
-
-
-    <include>
-      <uri>model://86_field_populated</uri>
-      <name>86_field</name>
-      <pose> 0 0 0   0 0 0</pose>
-      <!-- <pose> -0.25 62 5.33805   0 0 0</pose> -->
-    </include>
     
 
+    <include>
+      <uri>model://maze_simple</uri>
+      <pose> 0 0 0   0 0 0</pose>
+    </include>
+    
     <plugin name='FixFrictionNode' filename='libFixFrictionNode.so'/>
 
   </world>
