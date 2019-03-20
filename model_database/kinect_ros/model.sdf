@@ -45,8 +45,8 @@
           <cameraInfoTopicName>/camera/depth/camera_info</cameraInfoTopicName>
           <depthImageTopicName>/camera/depth/image_raw</depthImageTopicName>
           <depthImageInfoTopicName>/camera/depth/camera_info</depthImageInfoTopicName>
-          <pointCloudTopicName>/camera/depth/points</pointCloudTopicName>
-          <frameName>camera_link</frameName>
+          <pointCloudTopicName>/zed/depth/depth_registered</pointCloudTopicName>
+          <frameName>zed_camera_center</frameName>
           <pointCloudCutoff>0.05</pointCloudCutoff>
           <distortionK1>0</distortionK1>
           <distortionK2>0</distortionK2>
