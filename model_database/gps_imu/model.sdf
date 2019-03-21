@@ -30,6 +30,16 @@
           </box>
         </geometry>
       </collision>
+
+      <sensor name='gazebo_gps_sensor' type='gps'>
+        <plugin name="rock_gps_plugin" filename="libRockGpsPlugin.so">
+          <frameId> gps0_link </frameId>
+          <topicName> /gps/fix </topicName>
+        </plugin>
+        <always_on> 1 </always_on>
+        <update_rate> 1 </update_rate>
+      </sensor>
+
     </link>
 
     <plugin name="custom_imu_sim" filename="libhector_gazebo_ros_imu.so">
@@ -58,7 +68,7 @@
         <yawGaussianNoise>0.0</yawGaussianNoise>
     </plugin>
 
-    <plugin name="custom_gps_sim" filename="libhector_gazebo_ros_gps.so">
+    <!--<plugin name="custom_gps_sim" filename="libhector_gazebo_ros_gps.so">
         <alwaysOn>1</alwaysOn>
         <updateRate>1.0</updateRate>
         <bodyName>gps_imu_link</bodyName>
@@ -72,7 +82,7 @@
         <referenceLatitude> 42.729957 </referenceLatitude>
         <referenceLongitude> -73.679659 </referenceLongitude>
         <referenceHeading> 90 </referenceHeading>
-    </plugin>
+    </plugin>-->
 
     <plugin name="custom_magnetometer_sim" filename="libhector_gazebo_ros_magnetic.so">
         <alwaysOn>1</alwaysOn>

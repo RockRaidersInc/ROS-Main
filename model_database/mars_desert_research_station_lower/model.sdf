@@ -7,7 +7,7 @@
           <geometry>
             <heightmap>
               <uri>file://mars_desert_research_station_lower/materials/heightmap2.png</uri>
-              <size>1026 1026 57.9</size>
+              <size>1609 1609 57.9</size>
               <pos> 0 0 0</pos>
               <sampling> 1 </sampling>
             </heightmap>
@@ -19,10 +19,10 @@
             <heightmap>
               <texture>
                 <diffuse>file://mars_desert_research_station_lower/materials/visual_diffuse2.png</diffuse>
-                <size>1026</size>
+                <size>1609</size>
               </texture>
               <uri>file://mars_desert_research_station_lower/materials/heightmap2.png</uri>
-              <size>1026 1026 57.9</size>
+              <size>1609 1609 57.9</size>
               <pos> 0 0 0</pos>
 
               <use_terrain_paging> false </use_terrain_paging>

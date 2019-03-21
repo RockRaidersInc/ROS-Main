@@ -43,7 +43,7 @@
       <latitude_deg> 042.729306 </latitude_deg>
       <longitude_deg> -73.680906 </longitude_deg>
       <elevation>0</elevation>
-      <heading_deg>0</heading_deg>
+      <heading_deg>180</heading_deg>
     </spherical_coordinates>
 
 

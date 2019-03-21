@@ -154,6 +154,7 @@ include_directories(
 
 add_library(SimMotorNode SHARED src/SimMotorNode.cpp)
 add_library(FixFrictionNode SHARED src/world_fix_friction_plugin.cpp)
+add_library(RockGpsPlugin SHARED src/RockGpsPlugin.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -170,6 +171,8 @@ add_library(FixFrictionNode SHARED src/world_fix_friction_plugin.cpp)
 target_link_libraries(SimMotorNode ${catkin_LIBRARIES})
 
 target_link_libraries(FixFrictionNode ${catkin_LIBRARIES})
+
+target_link_libraries(RockGpsPlugin ${catkin_LIBRARIES})
 
 
 
@@ -220,3 +223,4 @@ target_link_libraries(FixFrictionNode ${catkin_LIBRARIES})
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
