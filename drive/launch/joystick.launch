@@ -2,6 +2,12 @@
 <launch>
    
 	<node pkg="drive" name ="joynode" type="joycontrol.py"/>
-	<node pkg="drive" name = "heartnode" type = "heart.py"/>
+	<!-- <node pkg="drive" name = "heartnode" type = "heart.py"/> -->
+
+    <!-- Limit the message send rate, it can reach over 7000 msgs/sec when unlimited -->
+    <node name="joy_0" pkg="joy" type="joy_node" respawn="true">
+        <param name="dev" value="/dev/input/js0"/>
+        <param name="deadzone" value="0.1"/>  <!-- appears to be broken -->
+    </node>
   
 </launch>
