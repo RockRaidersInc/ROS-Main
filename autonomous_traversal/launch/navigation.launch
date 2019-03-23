@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find autonomous_traversal)/maps/empty.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find autonomous_traversal)/maps/maze_simple.yaml"/>
+
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
         <rosparam file="$(find autonomous_traversal)/params/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
         <rosparam file="$(find autonomous_traversal)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />

@@ -3,5 +3,6 @@
     <include file="$(find drive)/launch/kinematics.launch"/> 
 
     <include file="$(find rover_simulated)/launch/hardware_simulated.launch" pass_all_args="true"/> 
-
+    
+    <node name="joy_0" pkg="joy" type="joy_node"/>
 </launch>
