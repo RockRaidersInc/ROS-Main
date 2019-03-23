@@ -35,8 +35,12 @@ elif [ ${1} == "maze_simple" ]
 then
     export map="\$(find model_database)/../model_database/maze_simple.world"
 
+elif [ ${1} == "maze_medium" ]
+then
+    export map="\$(find model_database)/../model_database/maze_medium.world"
+
 else
-    echo -e ${red}The allowed maps are empyt, mdrs, 86_filed, mountain, or maze_simple ${endColor}
+    echo -e ${red}The allowed maps are empyt, mdrs, 86_filed, mountain, maze_simple, or maze_medium ${endColor}
     echo -e ${red}example usage: ./launch_simulated.sh maze_simple ${endColor}
     exit
 fi
@@ -52,7 +56,7 @@ fi
 # roslaunch. I'm not entirely sure how it works, but it does. 
 #       - David Michelman, Rock Raiders Vice President and OG Supreme Dictator
 # 
-#   PS: let me know if you read this (shoot me an email at daweim0@gmail.com), I'm really curious if anybody ever will. 
+#   PS: let me know if you read this (shoot me an email at daweim0@gmail.com). I sorta doubt anybody ever will. 
 #***********************************************************************************************************************
 
 
@@ -71,14 +75,16 @@ fi
 
     # catch control-c and kill gzserver (ROS has trouble killing it)
     other_commands() {
-        printf "\nSIGTERM or SIGINT caught, killing gzserver\n"
+        echo -e ${red} "\nSIGTERM or SIGINT caught, killing gzserver and gzclient\n" ${endColor}
         pkill gzserver
+        pkill gzclient
         kill $PID
 
         wait  # this wait waits for everythign to finish before the shell script exits
               # otherwise the bash prompt doesn't print after this script finishes
     }
 
+    # I don't think both sigterm and sigint are needed
     trap 'other_commands' SIGINT
     trap 'other_commands' SIGTERM
 
