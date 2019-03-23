@@ -39,8 +39,12 @@ elif [ ${1} == "maze_medium" ]
 then
     export map="\$(find model_database)/../model_database/maze_medium.world"
 
+elif [ ${1} == "maze_ramp" ]
+then
+    export map="\$(find model_database)/../model_database/maze_ramp.world"
+
 else
-    echo -e ${red}The allowed maps are empyt, mdrs, 86_filed, mountain, maze_simple, or maze_medium ${endColor}
+    echo -e ${red}The allowed maps are empyt, mdrs, 86_filed, mountain, maze_simple, maze_medium, or maze_ramp ${endColor}
     echo -e ${red}example usage: ./launch_simulated.sh maze_simple ${endColor}
     exit
 fi
