@@ -1,22 +1,18 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(simulator_plugins)
+project(model_database)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11 -g2)
+# add_compile_options(-std=c++11 -g2)
 
 
-set(GAZEBOINCLUDEDIRS /usr/include;/usr/include/gazebo-7;/usr/include/gazebo-7/gazebo;/usr/include/sdformat-4.0)
-set(GAZEBOLIBRARYDIRS /usr/lib/x86_64-linux-gnu;/usr/lib/x86_64-linux-gnu/gazebo-7/gazebo/plugins)
+# set(GAZEBOINCLUDEDIRS /usr/include;/usr/include/gazebo-7;/usr/include/gazebo-7/gazebo;/usr/include/sdformat-4.0)
+# set(GAZEBOLIBRARYDIRS /usr/lib/x86_64-linux-gnu;/usr/lib/x86_64-linux-gnu/gazebo-7/gazebo/plugins)
 
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  std_msgs
-  gazebo_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -24,11 +20,11 @@ find_package(catkin REQUIRED COMPONENTS
 
 
 # Find Gazebo
-find_package(gazebo REQUIRED)
-include_directories(
-  include ${catkin_INCLUDE_DIRS}${GAZEBO_INCLUDE_DIRS})
-link_directories(${GAZEBO_LIBRARY_DIRS})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
+# find_package(gazebo REQUIRED)
+# include_directories(
+#   include ${catkin_INCLUDE_DIRS}${GAZEBO_INCLUDE_DIRS})
+# link_directories(${GAZEBO_LIBRARY_DIRS})
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 
 
@@ -120,7 +116,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES simulator_plugins
+#  LIBRARIES simulator
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
 )
@@ -131,15 +127,15 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-)
+# include_directories(
+# # include
+#   ${catkin_INCLUDE_DIRS}
+# )
 
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/simulator_plugins.cpp
+#   src/${PROJECT_NAME}/simulator.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -151,10 +147,6 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 #add_executable(SimMotorNode src/SimMotorNode.cpp)
-
-add_library(SimMotorNode SHARED src/SimMotorNode.cpp)
-add_library(FixFrictionNode SHARED src/world_fix_friction_plugin.cpp)
-add_library(RockGpsPlugin SHARED src/RockGpsPlugin.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -168,11 +160,6 @@ add_library(RockGpsPlugin SHARED src/RockGpsPlugin.cpp)
 
 
 # Specify libraries to link a library or executable target against
-target_link_libraries(SimMotorNode ${catkin_LIBRARIES})
-
-target_link_libraries(FixFrictionNode ${catkin_LIBRARIES})
-
-target_link_libraries(RockGpsPlugin ${catkin_LIBRARIES})
 
 
 
@@ -216,7 +203,7 @@ target_link_libraries(RockGpsPlugin ${catkin_LIBRARIES})
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_simulator_plugins.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_simulator.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

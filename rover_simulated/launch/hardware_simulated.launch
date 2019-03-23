@@ -1,20 +1,18 @@
 <?xml version="1.0"?>
 <launch>
-    <!--<include file="$(find simulator_plugins)/launch/simulator.launch" pass_all_args="true"/> -->
-    <include file="$(find simulator_plugins)/launch/sim_86_field.launch" pass_all_args="true"/> 
-    <!--<include file="$(find simulator_plugins)/launch/sim_mountain.launch" pass_all_args="true"/> -->
-    <!--<include file="$(find simulator_plugins)/launch/maze_simple.launch" pass_all_args="true"/> -->
-    <!--<include file="$(find simulator_plugins)/launch/mars_desert_research_station_lower.launch" pass_all_args="true"/> -->
+    <arg name="sim_world_file"/>
+
+    <include file="$(find simulator)/launch/sim_any_map.launch" pass_all_args="true"/> 
 
     <!--<node name="wheel_odom_republisher" pkg="topic_tools" type="relay" args="/rover/imu/data /imu/data_raw"/>-->
-    <node name="magnetometer_republisher" pkg="simulator_plugins" type="magnetometer_republisher.py">
+    <node name="magnetometer_republisher" pkg="simulator" type="magnetometer_republisher.py">
         <remap from="~vect3_msg" to="/rover/magnetometer"/>
         <remap from="~mag_msg" to="/imu/mag"/>
         <remap from="~imu_msg_in" to="/rover/imu"/>
         <remap from="~imu_msg_out" to="/imu/data_raw"/>
     </node>
 
-    <node name="camera_transform_publisher" pkg="tf" type="static_transform_publisher" args="0 0 0.58 -1.57 0 -1.57 base_link zed_camera_center 10" restart="true"/>
+    <node name="camera_transform_publisher" pkg="tf" type="static_transform_publisher" args="0 0 0.58 -1.57 0 -1.57 base_link zed_camera_center 10"/>
     
     <!-- <node name="rviz_sim" pkg="rviz" type="rviz" output="screen" /> -->
 </launch>

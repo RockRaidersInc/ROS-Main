@@ -1,6 +1,6 @@
 <launch>
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find simulator_plugins)/../model_database/mountain_populated.world"/>
+    <arg name="world_name" value="$(find simulator)/../model_database/mars_desert_research_station_lower.world"/>
   </include>
 </launch>
