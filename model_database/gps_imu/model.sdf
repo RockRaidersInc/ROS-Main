@@ -108,13 +108,17 @@
         <topicName>/rover/magnetometer</topicName>
         <frameId> imu0_link </frameId>
         <magnitude> 10 </magnitude>
-<!--         <offset>1 1 1</offset>
-        <drift>1 1 1</drift> -->
         <offset>0 0 0</offset>
         <drift>0 0 0</drift>
         <gaussianNoise>0 0 0</gaussianNoise>
         <referenceHeading> 0 </referenceHeading>
         <declination> 0.226893 </declination>
-    </plugin>-->
+    </plugin>
+      <plugin name="exact_odom_plugin" filename="libExactOdomPlugin.so">
+        <alwaysOn>1</alwaysOn>
+        <bodyName>gps_imu_link</bodyName>
+        <topicName>/odom/odometry_perfect</topicName>
+        <frameId> imu0_link </frameId>
+    </plugin>
   </model>
 </sdf>

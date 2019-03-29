@@ -43,8 +43,12 @@ elif [ ${1} == "maze_ramp" ]
 then
     export map="\$(find model_database)/../model_database/maze_ramp.world"
 
+elif [ ${1} == "mars" ]
+then
+    export map="\$(find model_database)/../model_database/mars_terrain_sample.world"
+
 else
-    echo -e ${red}The allowed maps are empyt, mdrs, 86_filed, mountain, maze_simple, maze_medium, or maze_ramp ${endColor}
+    echo -e ${red}The allowed maps are empyt, mdrs, mars, 86_filed, mountain, maze_simple, maze_medium, or maze_ramp ${endColor}
     echo -e ${red}example usage: ./launch_simulated.sh maze_simple ${endColor}
     exit
 fi
@@ -79,7 +83,7 @@ fi
 
     # catch control-c and kill gzserver (ROS has trouble killing it)
     other_commands() {
-        echo -e ${red} "\nSIGTERM or SIGINT caught, killing gzserver and gzclient\n" ${endColor}
+        echo -e ${red} "\nSIGTERM or SIGINT caught, killing gzserver and gzclient" ${endColor}
         pkill gzserver
         pkill gzclient
         kill $PID

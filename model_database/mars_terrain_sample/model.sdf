@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+<model name="heightmap">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <heightmap>
+              <uri>file://mars_terrain_sample/materials/heightmap.png</uri>
+              <size>300 300 50</size>
+              <pos> 0 0 0</pos>
+              <sampling> 1 </sampling>
+            </heightmap>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <heightmap>
+              <texture>
+                <diffuse>file://mars_terrain_sample/materials/visual_diffuse.png</diffuse>
+                <size>300</size>
+              </texture>
+              <uri>file://mars_terrain_sample/materials/heightmap.png</uri>
+              <size>300 300 50</size>
+              <pos> 0 0 0</pos>
+
+              <use_terrain_paging> false </use_terrain_paging>
+              <sampling> 1 </sampling>
+            </heightmap>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+</sdf>
+
+
+<!-- <pos>-247.0 -173.0 -13</pos> -->

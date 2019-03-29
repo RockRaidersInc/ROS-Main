@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+<sdf version='1.6'>
+  <world name='mars_terrain_sample'>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <!--
+    <physics name='default_physics' default='0' type='ode'>
+      <max_step_size>0.0025</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+    -->
+
+    <physics type="ode">
+      <max_step_size>0.002</max_step_size>
+      <!-- <real_time_factor>0.1</real_time_factor> -->
+      <real_time_update_rate>500</real_time_update_rate>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>50</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.300000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <contact_max_correcting_vel>100.000000</contact_max_correcting_vel>
+          <contact_surface_layer>0.001000</contact_surface_layer>
+        </constraints>
+      </ode>
+    </physics>
+    
+    <scene>
+      <ambient>1 1 1 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+    </scene>
+    <!-- this doesn't actually do anything since we're using the hector GPS plugin in -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg> 042.729306 </latitude_deg>
+      <longitude_deg> -73.680906 </longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>180</heading_deg>
+    </spherical_coordinates>
+
+
+<!-- gazebo 7 doesn't seem to support changing the default camera location, this should be uncommented if we move to gazebo 9+ -->
+<!--
+    <gui>
+      <camera>
+        <pose> -80 -7 7 0 -0.8 1.57</pose>
+      </camera>
+    </gui>
+-->
+
+    <include>
+      <uri>model://sun</uri>
+      <pose>0 0 20   0 0 0</pose>
+    </include>
+
+    
+    <include>
+      <uri>model://Robot_Base</uri>
+      <name>rover</name>
+      <pose> 0 0 0.5   0 0 -1.5707</pose>
+    </include>  
+    
+
+    <include>
+      <uri>model://mars_terrain_sample</uri>
+      <pose> 0 0 0   0 0 0</pose>
+    </include>
+    
+    <plugin name='FixFrictionNode' filename='libFixFrictionNode.so'/>
+
+  </world>
+</sdf>
