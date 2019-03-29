@@ -27,7 +27,7 @@ private:
 
   std::unique_ptr<ros::NodeHandle> node_handle_;
   ros::Publisher odom_publisher;
-  ros::Publisher test_publisher;
+  ros::Publisher map_publisher;
 
   std::string namespace_;
   std::string link_name_;
@@ -99,8 +99,8 @@ void GazeboExactOdomPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   node_handle_.reset(new ros::NodeHandle("gazebo_perfect_odom_node"));
-  odom_publisher = node_handle_->advertise<nav_msgs::Odometry>(topic, 2);
-  test_publisher = node_handle_->advertise<std_msgs::Int32>("/asdf", 2);
+  odom_publisher = node_handle_->advertise<nav_msgs::Odometry>("/odometry/perfect", 2);
+  map_publisher = node_handle_->advertise<nav_msgs::Odometry>("/odometry/perfect_map", 2);
 
   last_time = ros::Time::now();
 
@@ -121,7 +121,6 @@ void GazeboExactOdomPlugin::Update()
       common::Time sim_time = world->GetSimTime();
       nav_msgs::Odometry msg;
       msg.header.stamp = ros::Time::now();
-      msg.header.frame_id = "map";
       msg.child_frame_id = "base_link";
 
       #if (GAZEBO_MAJOR_VERSION >= 8)
@@ -160,6 +159,9 @@ void GazeboExactOdomPlugin::Update()
         msg.twist.covariance[i] = 0;
       }
 
+      msg.header.frame_id = "map";
+      map_publisher.publish(msg);
+      msg.header.frame_id = "odom";
       odom_publisher.publish(msg);
     }
 
