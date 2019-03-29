@@ -121,7 +121,8 @@ void GazeboExactOdomPlugin::Update()
       common::Time sim_time = world->GetSimTime();
       nav_msgs::Odometry msg;
       msg.header.stamp = ros::Time::now();
-      msg.child_frame_id = frame_id_;
+      msg.header.frame_id = "map";
+      msg.child_frame_id = "base_link";
 
       #if (GAZEBO_MAJOR_VERSION >= 8)
           ignition::math::Pose3d pose = link->WorldPose();
