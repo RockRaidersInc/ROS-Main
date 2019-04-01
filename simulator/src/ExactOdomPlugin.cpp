@@ -157,7 +157,7 @@ void GazeboExactOdomPlugin::Update()
     msg.pose.pose.position.z = pose_pos.getZ();
     msg.pose.pose.orientation = tf2::toMsg(pose_rot_offset);
 
-    tf2::Vector3 lin_vel_rotated = lin_vel * tf2::Matrix3x3(pose_rot_offset * tf2::Quaternion(0, 0, 3.14159 / 2));
+    tf2::Vector3 lin_vel_rotated = lin_vel * tf2::Matrix3x3(pose_rot_offset);
     msg.twist.twist.linear = tf2::toMsg(lin_vel_rotated);
     msg.twist.twist.angular = tf2::toMsg(ang_vel);
 
