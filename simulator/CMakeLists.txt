@@ -157,6 +157,8 @@ add_library(FixFrictionNode SHARED src/world_fix_friction_plugin.cpp)
 add_library(RockGpsPlugin SHARED src/RockGpsPlugin.cpp)
 add_library(ExactOdomPlugin SHARED src/ExactOdomPlugin.cpp)
 
+add_executable(OdomToTfNode src/OdomToTfNode.cpp)
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -174,6 +176,8 @@ target_link_libraries(SimMotorNode ${catkin_LIBRARIES})
 target_link_libraries(FixFrictionNode ${catkin_LIBRARIES})
 target_link_libraries(RockGpsPlugin ${catkin_LIBRARIES})
 target_link_libraries(ExactOdomPlugin ${catkin_LIBRARIES})
+
+target_link_libraries(OdomToTfNode ${catkin_LIBRARIES})
 
 
 

@@ -168,11 +168,11 @@ void GazeboExactOdomPlugin::Update()
       msg.header.frame_id = "odom";
       odom_publisher.publish(msg);
 
-      tf::Transform transform;
-      transform.setOrigin( tf::Vector3(msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z) );
-      tf::Quaternion q(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
-      transform.setRotation(q);
-      tf_broadcaster->sendTransform(tf::StampedTransform(transform, msg.header.stamp, "odom", "base_link"));
+      // tf::Transform transform;
+      // transform.setOrigin( tf::Vector3(msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z) );
+      // tf::Quaternion q(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
+      // transform.setRotation(q);
+      // tf_broadcaster->sendTransform(tf::StampedTransform(transform, msg.header.stamp, "odom", "base_link"));
     }
 
 }
