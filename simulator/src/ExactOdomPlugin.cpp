@@ -134,7 +134,8 @@ void GazeboExactOdomPlugin::Update()
           math::Pose pose = link->GetWorldPose();
           msg.pose.pose.position.x = pose.pos.x;
           msg.pose.pose.position.y = pose.pos.y;
-          msg.pose.pose.position.z = pose.pos.z;
+          // msg.pose.pose.position.z = pose.pos.z;
+          msg.pose.pose.position.z = 0;
 
           // std::cerr << pose.pos.x << " " << pose.pos.y << " " << pose.pos.z << std::endl;
 
