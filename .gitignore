@@ -8,3 +8,5 @@
 simulator_plugins/build*
 simulator_plugins/devel*
 
+*frames.pdf
+*frames.gv

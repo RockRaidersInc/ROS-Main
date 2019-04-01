@@ -6,6 +6,8 @@
 #include <gazebo/physics/physics.hh>
 #include "std_msgs/Int32.h"
 
+#include <tf/transform_broadcaster.h>
+
 namespace gazebo {
 
 class GazeboExactOdomPlugin : public ModelPlugin
@@ -26,6 +28,7 @@ private:
   physics::LinkPtr link;
 
   std::unique_ptr<ros::NodeHandle> node_handle_;
+  std::unique_ptr<tf::TransformBroadcaster> tf_broadcaster;
   ros::Publisher odom_publisher;
   ros::Publisher map_publisher;
 
@@ -99,6 +102,7 @@ void GazeboExactOdomPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   node_handle_.reset(new ros::NodeHandle("gazebo_perfect_odom_node"));
+  tf_broadcaster.reset(new tf::TransformBroadcaster());
   odom_publisher = node_handle_->advertise<nav_msgs::Odometry>("/odometry/perfect", 2);
   map_publisher = node_handle_->advertise<nav_msgs::Odometry>("/odometry/perfect_map", 2);
 
@@ -163,6 +167,12 @@ void GazeboExactOdomPlugin::Update()
       map_publisher.publish(msg);
       msg.header.frame_id = "odom";
       odom_publisher.publish(msg);
+
+      tf::Transform transform;
+      transform.setOrigin( tf::Vector3(msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z) );
+      tf::Quaternion q(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
+      transform.setRotation(q);
+      tf_broadcaster->sendTransform(tf::StampedTransform(transform, msg.header.stamp, "odom", "base_link"));
     }
 
 }
