@@ -6,7 +6,9 @@
 #include <gazebo/physics/physics.hh>
 #include "std_msgs/Int32.h"
 
-#include <tf/transform_broadcaster.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf/transform_datatypes.h>
 
 namespace gazebo {
 
@@ -28,7 +30,6 @@ private:
   physics::LinkPtr link;
 
   std::unique_ptr<ros::NodeHandle> node_handle_;
-  std::unique_ptr<tf::TransformBroadcaster> tf_broadcaster;
   ros::Publisher odom_publisher;
   ros::Publisher map_publisher;
 
@@ -102,7 +103,6 @@ void GazeboExactOdomPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   node_handle_.reset(new ros::NodeHandle("gazebo_perfect_odom_node"));
-  tf_broadcaster.reset(new tf::TransformBroadcaster());
   odom_publisher = node_handle_->advertise<nav_msgs::Odometry>("/odometry/perfect", 2);
   map_publisher = node_handle_->advertise<nav_msgs::Odometry>("/odometry/perfect_map", 2);
 
@@ -162,6 +162,21 @@ void GazeboExactOdomPlugin::Update()
       for(int i = 0; i < 36; i++) {
         msg.twist.covariance[i] = 0;
       }
+
+      tf::Quaternion q(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
+      double roll, pitch, yaw;
+      tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
+
+      // Offset is added here
+      tf2::Quaternion q2;
+      q2.setRPY(roll, pitch, yaw + 3.14159 / 2);
+
+      // msg.pose.pose.orientation.x = q2.getX();
+      // msg.pose.pose.orientation.y = q2.getY();
+      // msg.pose.pose.orientation.z = q2.getZ();
+      // msg.pose.pose.orientation.w = q2.getW();
+      msg.pose.pose.orientation = tf2::toMsg(q2);
+
 
       msg.header.frame_id = "map";
       map_publisher.publish(msg);

@@ -6,7 +6,7 @@
 #include <sstream>
 
 
-void chatterCallback(const nav_msgs::Odometry::ConstPtr& msg)
+void callback(const nav_msgs::Odometry::ConstPtr& msg)
 {
     static tf::TransformBroadcaster tf_pub;
     
@@ -21,9 +21,9 @@ void chatterCallback(const nav_msgs::Odometry::ConstPtr& msg)
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "talker");
+    ros::init(argc, argv, "odom_to_tf_publisher");
     ros::NodeHandle n;
-    ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);
+    ros::Subscriber sub = n.subscribe("/odometry/perfect", 2, callback);
 
     ros::spin();
 
