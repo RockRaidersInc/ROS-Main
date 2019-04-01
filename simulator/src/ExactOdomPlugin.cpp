@@ -8,7 +8,7 @@
 
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <tf/transform_datatypes.h>
+#include <tf2/transform_datatypes.h>
 
 namespace gazebo {
 
@@ -117,80 +117,55 @@ void GazeboExactOdomPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 // Update the controller
 void GazeboExactOdomPlugin::Update()
 {
-    auto current_time = ros::Time::now();
+  auto current_time = ros::Time::now();
 
-    if ((current_time - last_time).toSec() > update_rate) {
-      last_time = current_time;
+  if ((current_time - last_time).toSec() > update_rate) {
+    last_time = current_time;
 
-      common::Time sim_time = world->GetSimTime();
-      nav_msgs::Odometry msg;
-      msg.header.stamp = ros::Time::now();
-      msg.child_frame_id = "base_link";
+    common::Time sim_time = world->GetSimTime();
+    nav_msgs::Odometry msg;
+    msg.header.stamp = ros::Time::now();
+    msg.child_frame_id = "base_link";
 
-      #if (GAZEBO_MAJOR_VERSION >= 8)
-          ignition::math::Pose3d pose = link->WorldPose();
-          ignition::math::Vector3d velocity = link->WorldLinearVel();
-      #else
-          math::Pose pose = link->GetWorldPose();
-          msg.pose.pose.position.x = pose.pos.x;
-          msg.pose.pose.position.y = pose.pos.y;
-          // msg.pose.pose.position.z = pose.pos.z;
-          msg.pose.pose.position.z = 0;
+    #if (GAZEBO_MAJOR_VERSION >= 8)
+        ignition::math::Pose3d pose = link->WorldPose();
+        ignition::math::Vector3d velocity = link->WorldLinearVel();
+    #else
+        math::Pose pose = link->GetWorldPose();
+        tf2::Vector3 pose_pos(pose.pos.x, pose.pos.y, pose.pos.z - 1.06985);  // the offset makes z zero when the rover is on zero-height terrain
+        tf2::Quaternion pose_rot(pose.rot.x, pose.rot.y, pose.rot.z, pose.rot.w);
 
-          // std::cerr << pose.pos.x << " " << pose.pos.y << " " << pose.pos.z << std::endl;
+        gazebo::math::Vector3 velocity = link->GetWorldLinearVel();
+        tf2::Vector3 lin_vel(velocity.x, velocity.y, velocity.z);
 
-          msg.pose.pose.orientation.x = pose.rot.x;
-          msg.pose.pose.orientation.y = pose.rot.y;
-          msg.pose.pose.orientation.z = pose.rot.z;
-          msg.pose.pose.orientation.w = pose.rot.w;
+        gazebo::math::Vector3 velocityAngular = link->GetWorldAngularVel();
+        tf2::Vector3 ang_vel(velocityAngular.x, velocityAngular.y, velocityAngular.z);
+    #endif
 
-          gazebo::math::Vector3 velocity = link->GetWorldLinearVel();
-
-          msg.twist.twist.linear.x = velocity.x;
-          msg.twist.twist.linear.y = velocity.y;
-          msg.twist.twist.linear.z = velocity.z;
-
-          gazebo::math::Vector3 velocityAngular = link->GetWorldAngularVel();
-          msg.twist.twist.angular.x = velocityAngular.x;
-          msg.twist.twist.angular.y = velocityAngular.y;
-          msg.twist.twist.angular.z = velocityAngular.z;
-
-      #endif
-
-      for(int i = 0; i < 36; i++) {
-        msg.pose.covariance[i] = 0;
-      }
-      for(int i = 0; i < 36; i++) {
-        msg.twist.covariance[i] = 0;
-      }
-
-      tf::Quaternion q(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
-      double roll, pitch, yaw;
-      tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
-
-      // Offset is added here
-      tf2::Quaternion q2;
-      q2.setRPY(roll, pitch, yaw + 3.14159 / 2);
-
-      // msg.pose.pose.orientation.x = q2.getX();
-      // msg.pose.pose.orientation.y = q2.getY();
-      // msg.pose.pose.orientation.z = q2.getZ();
-      // msg.pose.pose.orientation.w = q2.getW();
-      msg.pose.pose.orientation = tf2::toMsg(q2);
-
-
-      msg.header.frame_id = "map";
-      map_publisher.publish(msg);
-      msg.header.frame_id = "odom";
-      odom_publisher.publish(msg);
-
-      // tf::Transform transform;
-      // transform.setOrigin( tf::Vector3(msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z) );
-      // tf::Quaternion q(msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w);
-      // transform.setRotation(q);
-      // tf_broadcaster->sendTransform(tf::StampedTransform(transform, msg.header.stamp, "odom", "base_link"));
+    for(int i = 0; i < 36; i++) {
+      msg.pose.covariance[i] = 0;
+    }
+    for(int i = 0; i < 36; i++) {
+      msg.twist.covariance[i] = 0;
     }
 
+    // Offset is added here
+    tf2::Quaternion pose_rot_offset = tf2::Quaternion(0, 0, 3.14159 / 2) * pose_rot;
+
+    msg.pose.pose.position.x = pose_pos.getX();
+    msg.pose.pose.position.y = pose_pos.getY();
+    msg.pose.pose.position.z = pose_pos.getZ();
+    msg.pose.pose.orientation = tf2::toMsg(pose_rot_offset);
+
+    tf2::Vector3 lin_vel_rotated = lin_vel * tf2::Matrix3x3(pose_rot_offset * tf2::Quaternion(0, 0, 3.14159 / 2));
+    msg.twist.twist.linear = tf2::toMsg(lin_vel_rotated);
+    msg.twist.twist.angular = tf2::toMsg(ang_vel);
+
+    msg.header.frame_id = "map";
+    map_publisher.publish(msg);
+    msg.header.frame_id = "odom";
+    odom_publisher.publish(msg);
+  }
 }
 
 // Register this plugin with the simulator
