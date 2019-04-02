@@ -55,8 +55,12 @@ elif [ ${1} == "straight_pop" ]
 then
     export map="\$(find model_database)/../model_database/igvc_straight_pop.world"
 
+elif [ ${1} == "igvc17" ]
+then
+    export map="\$(find model_database)/../model_database/igvc_pop.world"
+
 else
-    echo -e ${red}The allowed maps are empyt, mdrs, mars, 86_filed, mountain, maze_simple, maze_medium, maze_ramp, straight_pop, or straight_empty ${endColor}
+    echo -e ${red}The allowed maps are empyt, mdrs, mars, 86_filed, mountain, maze_simple, maze_medium, maze_ramp, straight_pop, straight_empty, or igvc17 ${endColor}
     echo -e ${red}example usage: ./launch_simulated.sh maze_simple ${endColor}
     exit
 fi
