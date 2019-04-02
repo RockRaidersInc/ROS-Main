@@ -47,8 +47,16 @@ elif [ ${1} == "mars" ]
 then
     export map="\$(find model_database)/../model_database/mars_terrain_sample.world"
 
+elif [ ${1} == "straight_empty" ]
+then
+    export map="\$(find model_database)/../model_database/igvc_straight_empty.world"
+
+elif [ ${1} == "straight_pop" ]
+then
+    export map="\$(find model_database)/../model_database/igvc_straight_pop.world"
+
 else
-    echo -e ${red}The allowed maps are empyt, mdrs, mars, 86_filed, mountain, maze_simple, maze_medium, or maze_ramp ${endColor}
+    echo -e ${red}The allowed maps are empyt, mdrs, mars, 86_filed, mountain, maze_simple, maze_medium, maze_ramp, straight_pop, or straight_empty ${endColor}
     echo -e ${red}example usage: ./launch_simulated.sh maze_simple ${endColor}
     exit
 fi
