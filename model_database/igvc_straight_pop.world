@@ -74,6 +74,37 @@
       <pose> 0 0 0   0 0 0</pose>
     </include>
     
+
+    <include>
+      <uri>model://construction_barrel_orange</uri>
+      <name>barrel_1</name>
+      <pose> 3 1 0   0 0 0</pose>
+    </include>  
+
+    <include>
+      <uri>model://construction_barrel_brown</uri>
+      <name>barrel_2</name>
+      <pose> 7 -1 0   0 0 0</pose>
+    </include>  
+
+    <include>
+      <uri>model://pothole</uri>
+      <name>pothole_1</name>
+      <pose> 10 0.7 0   0 0 0</pose>
+    </include>  
+
+    <include>
+      <uri>model://construction_barrel_orange</uri>
+      <name>barrel_3</name>
+      <pose> 16 0.7 0   0 0 0</pose>
+    </include>  
+
+    <include>
+      <uri>model://construction_barrel_orange</uri>
+      <name>barrel_4</name>
+      <pose> 19 -0.5 0   0 0 0</pose>
+    </include>  
+    
     <plugin name='FixFrictionNode' filename='libFixFrictionNode.so'/>
 
   </world>

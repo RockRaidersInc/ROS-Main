@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version='1.6'>
-  <world name='maze_medium'>
+  <world name='igvc_straight_empty'>
     <gravity>0 0 -9.8</gravity>
     <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
     <atmosphere type='adiabatic'/>
