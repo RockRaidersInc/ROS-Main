@@ -1,5 +1,5 @@
 ## USB port
-port: /dev/ttyUSB0
+port: /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A505WWCA-if00-port0
 
 
 ##### Calibration ####
