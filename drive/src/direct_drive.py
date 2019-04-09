@@ -82,8 +82,8 @@ class direct_drive:
 
         print("%4i, %4i" % (left_pwm, right_pwm))
 
-        # self.left_pub.publish(left_pwm)
-        # self.right_pub.publish(right_pwm)
+        self.left_pub.publish(left_pwm)
+        self.right_pub.publish(right_pwm)
 
 
 
