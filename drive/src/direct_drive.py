@@ -70,7 +70,7 @@ class direct_drive:
                     pwm = min(pwm, 127)
                     return pwm
                 else:
-                    pwm = map_to(joyval, self.JOYSTICK_DEADBAND, self.JOYSTICK_MAX_READING, 64, 0)
+                    pwm = map_to(joyval, -1 * self.JOYSTICK_DEADBAND, -1 * self.JOYSTICK_MAX_READING, 0, 64)
                     pwm = max(pwm, 0)
                     pwm = min(pwm, 64)
                     return pwm
