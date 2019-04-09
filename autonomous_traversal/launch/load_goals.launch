@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+	<param name="coordinates_file" value="$(arg coordinates)" />
+	
+	<node name="load_goals" pkg="autonomous_traversal" type="load_goals.py" />
+</launch>

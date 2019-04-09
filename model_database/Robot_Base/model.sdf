@@ -5,7 +5,7 @@
     <include>
       <uri> model://kinect_ros </uri>
       <name> depth_camera </name>
-      <pose frame=''> 0.0 0.5 1.12   0.0 0.0 1.57 </pose>
+      <pose frame=''> 0.0 0.5 3.12   0.0 0.5235 1.57 </pose>
     </include>  
 
     <include>
@@ -34,7 +34,7 @@
         <pose frame=''>0 0 0 0 0 0</pose>
         <geometry>
           <box>
-            <size>0.508 0.9144 0.1397</size>
+            <size>0.508 1.2192 0.1397</size>
           </box>
         </geometry>
         <material>
@@ -60,7 +60,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.508 0.9144 0.1397</size>
+            <size>0.508 1.2192 0.1397</size>
           </box>
         </geometry>
         <surface>

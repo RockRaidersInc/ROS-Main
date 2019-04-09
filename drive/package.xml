@@ -2,7 +2,7 @@
 <package>
   <name>drive</name>
   <version>0.0.0</version>
-  <description>The drive package</description>
+  <description>Everything needed to control the rover</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->

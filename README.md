@@ -11,6 +11,7 @@ The following commands should be run to install required packages:
 sudo apt install cmake python-catkin-pkg python-empy python-nose libgtest-dev install python-catkin-tools
 
 sudo apt install ros-kinetic-joy
+sudo apt install ros-kinetic-geographic-msgs
 ```
 
 ##Starting up a simulator
@@ -57,6 +58,7 @@ To run ROS with UI, you must download and install rqt (http://wiki.ros.org/rqt),
 
 ```
 sudo apt install ros-kinetic-joy
+sudo apt install ros-kinetic-geographic-msgs
 ```
 
 ## autonomous traversal stuff

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <!-- load the rover's wheel diameter, distance between wheels, number of encoder ticks per revolution, ect -->
+    <rosparam command="load" file="$(find rover)/params/rover_dimensions.yaml" />
+
+
+	<!--  This launch file is for software-only nodes (eg, no motor driver or sensor nodes) that run on the rover.
+          Base station code should go in base_station.launch  -->
+
+    <!-- <include file="$(find launch_files)/launch/base_station.launch" pass_all_args="true"/> -->
+
+    <node name="joy_to_twist" pkg="drive" type="joycontrol.py" respawn="true"/>
+    <node name="twist_to_motor" pkg="drive" type="joy_to_motor.py" respawn="true">
+        <remap from="left_motor_vel" to="/motors/left_vel"/>
+        <remap from="right_motor_vel" to="/motors/right_vel"/>
+    </node>
+
+    <node name="motor_to_twist" pkg="drive" type="motor_to_twist.py" respawn="true">
+        <remap from="left_motor_in" to="/motors/left_enc"/>
+        <remap from="right_motor_in" to="/motors/right_enc"/>
+        <remap from="twist_publisher" to="/odometry/wheel"/>
+        <param name="linear_covariance_scale_factor" value="0.1"/>
+        <param name="angular_covariance_scale_factor" value="0.5"/>
+    </node>
+  
+</launch>
