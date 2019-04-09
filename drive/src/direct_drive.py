@@ -70,12 +70,12 @@ class direct_drive:
                     pwm = min(pwm, 127)
                     return pwm
                 else:
-                    pwm = map_to(joyval, -1 * self.JOYSTICK_DEADBAND, -1 * self.JOYSTICK_MAX_READING, 0, 64)
+                    pwm = map_to(joyval, -1 * self.JOYSTICK_DEADBAND, -1 * self.JOYSTICK_MAX_READING, 64, 0)
                     pwm = max(pwm, 0)
                     pwm = min(pwm, 64)
                     return pwm
             else:
-                return 0
+                return 64
         
         left_pwm = map_joystick_to_pwm(self.left_y)
         right_pwm = map_joystick_to_pwm(self.right_y)
