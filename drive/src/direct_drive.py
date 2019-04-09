@@ -66,8 +66,10 @@ class direct_drive:
             if abs(joyval) > self.JOYSTICK_DEADBAND:
                 if joyval > 0:
                     pwm = map_to(joyval, self.JOYSTICK_DEADBAND, self.JOYSTICK_MAX_READING, 64, 127)
+                    return pwm
                 else:
                     pwm = map_to(joyval, self.JOYSTICK_DEADBAND, self.JOYSTICK_MAX_READING, 64, 0)
+                    return pwm
             else:
                 return 0
         
