@@ -33,7 +33,7 @@ class direct_drive:
     TURBO_MAX_ANGULAR_SPEED = 1.5
 
     
-    JOYSTICK_MAX_READING = 900  # any values above this wil be mapped to full speed
+    JOYSTICK_MAX_READING = 1.0  # any values above this wil be mapped to full speed
     JOYSTICK_DEADBAND = 0.1
     DRIVE_MAX_SPEED = 127
     DRIVE_MIN_SPEED = 0
@@ -66,9 +66,13 @@ class direct_drive:
             if abs(joyval) > self.JOYSTICK_DEADBAND:
                 if joyval > 0:
                     pwm = map_to(joyval, self.JOYSTICK_DEADBAND, self.JOYSTICK_MAX_READING, 64, 127)
+                    pwm = max(pwm, 64)
+                    pwm = min(pwm, 127)
                     return pwm
                 else:
                     pwm = map_to(joyval, self.JOYSTICK_DEADBAND, self.JOYSTICK_MAX_READING, 64, 0)
+                    pwm = max(pwm, 0)
+                    pwm = min(pwm, 64)
                     return pwm
             else:
                 return 0
@@ -85,8 +89,6 @@ class direct_drive:
 
 def map_to(x, in_low, in_high, out_low, out_high):
     val = (x - in_low) / (in_high - in_low) * (out_high - out_low) + out_low
-    val = max(val, out_low)
-    val = min(val, out_high)
     return val
 
 
