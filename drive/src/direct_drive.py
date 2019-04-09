@@ -33,7 +33,7 @@ class direct_drive:
     TURBO_MAX_ANGULAR_SPEED = 1.5
 
     
-    JOYSTICK_MAX_READING = 1.0  # any values above this wil be mapped to full speed
+    JOYSTICK_MAX_READING = 0.95  # any values above this wil be mapped to full speed
     JOYSTICK_DEADBAND = 0.1
     DRIVE_MAX_SPEED = 127
     DRIVE_MIN_SPEED = 0
