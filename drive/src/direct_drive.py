@@ -36,7 +36,7 @@ class direct_drive:
     JOYSTICK_MAX_READING = 900  # any values above this wil be mapped to full speed
     JOYSTICK_DEADBAND = 0.1
     DRIVE_MAX_SPEED = 127
-    DRIVE_MIN_SPEED = -128
+    DRIVE_MIN_SPEED = 0
 
 
 
@@ -65,9 +65,9 @@ class direct_drive:
         def map_joystick_to_pwm(joyval):
             if abs(joyval) > self.JOYSTICK_DEADBAND:
                 if joyval > 0:
-                    pwm = map_to(joyval, self.JOYSTICK_DEADBAND, self.JOYSTICK_MAX_READING, 0, self.DRIVE_MAX_SPEED)
+                    pwm = map_to(joyval, self.JOYSTICK_DEADBAND, self.JOYSTICK_MAX_READING, 64, 127)
                 else:
-                    pwm = map_to(joyval, self.JOYSTICK_DEADBAND, self.JOYSTICK_MAX_READING, 0, self.DRIVE_MAX_SPEED)
+                    pwm = map_to(joyval, self.JOYSTICK_DEADBAND, self.JOYSTICK_MAX_READING, 64, 0)
             else:
                 return 0
         
@@ -76,7 +76,8 @@ class direct_drive:
 
         print("%4i, %4i" % (left_pwm, right_pwm))
 
-        self.left_pub.publish(left_pwm)
+        # self.left_pub.publish(left_pwm)
+        # self.right_pub.publish(right_pwm)
 
 
 
