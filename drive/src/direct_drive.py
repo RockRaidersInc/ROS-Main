@@ -45,7 +45,7 @@ class direct_drive:
         self.left_pub = rospy.Publisher('/motors/left_pwm', Int8, queue_size=1)
         self.right_pub = rospy.Publisher('/motors/right_pwm', Int8, queue_size=1)
         rospy.Subscriber("joy", Joy, self.callback)
-        # self.publish_timer = rospy.Timer(rospy.Duration(0.05), self.publish_stuff)
+        self.publish_timer = rospy.Timer(rospy.Duration(0.1), self.publish_stuff)
 
 
     def callback(self, data):
@@ -62,6 +62,7 @@ class direct_drive:
         self.button_y = True if data.buttons[self.Y_BUTTON_INDEX] == 1 else False
 
         
+    def publish_stuff(self, asdf):
         def map_joystick_to_pwm(joyval):
             if abs(joyval) > self.JOYSTICK_DEADBAND:
                 if joyval > 0:
@@ -82,7 +83,7 @@ class direct_drive:
 
         print("%4i, %4i" % (left_pwm, right_pwm))
 
-        self.left_pub.publish(left_pwm)
+        self.left_pub.publish(left_pwm) 
         self.right_pub.publish(right_pwm)
 
 
