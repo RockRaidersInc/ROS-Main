@@ -7,9 +7,10 @@ This node converts joystick messages to twist messages
 import rospy
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy
+from std_msgs.msg import Int8
 
 
-class joycontrol:
+class direct_drive:
     left_x = 0
     left_y = 0
     right_x = 0
@@ -27,25 +28,25 @@ class joycontrol:
     Y_BUTTON_INDEX = 3
 
     MAX_LINEAR_SPEED = 0.5
-    MAX_ANGULAR_SPEED = 1.0
+    MAX_ANGULAR_SPEED = 0.5
     TURBO_MAX_LINEAR_SPEED = 1.5
-    TURBO_MAX_ANGULAR_SPEED = 10
+    TURBO_MAX_ANGULAR_SPEED = 1.5
+
+    
+    JOYSTICK_MAX_READING = 900  # any values above this wil be mapped to full speed
+    JOYSTICK_DEADBAND = 0.1
+    DRIVE_MAX_SPEED = 127
+    DRIVE_MIN_SPEED = -128
+
+
 
     def __init__(self):
         rospy.init_node('joy_to_twist')
-        self.twist_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+        self.left_pub = rospy.Publisher('/motors/left_pwm', Int8, queue_size=1)
+        self.right_pub = rospy.Publisher('/motors/right_pwm', Int8, queue_size=1)
         rospy.Subscriber("joy", Joy, self.callback)
         # self.publish_timer = rospy.Timer(rospy.Duration(0.05), self.publish_stuff)
 
-    def publish_stuff(self, event):
-        twist_msg = Twist()
-        if self.button_x:
-            twist_msg.linear.x = self.left_y * self.TURBO_MAX_LINEAR_SPEED
-            twist_msg.angular.z = self.left_x * self.TURBO_MAX_ANGULAR_SPEED
-        else:
-            twist_msg.linear.x = self.left_y * self.MAX_LINEAR_SPEED
-            twist_msg.angular.z = self.left_x * self.MAX_ANGULAR_SPEED
-        self.twist_pub.publish(twist_msg)
 
     def callback(self, data):
         self.left_y = data.axes[self.LEFT_STICK_Y_INDEX]
@@ -60,9 +61,30 @@ class joycontrol:
         self.button_x = True if data.buttons[self.X_BUTTON_INDEX] == 1 else False
         self.button_y = True if data.buttons[self.Y_BUTTON_INDEX] == 1 else False
 
-        self.publish_stuff(None)
+        
+        def map_joystick_to_pwm(joyval):
+            if abs(joyval) > JOYSTICK_DEADBAND:
+                if joyval > 0:
+                    pwm = map_to(joyval, JOYSTICK_DEADBAND, JOYSTICK_MAX_READING, 0, DRIVE_MAX_SPEED)
+                else:
+                    pwm = map_to(joyval, JOYSTICK_DEADBAND, JOYSTICK_MAX_READING, 0, DRIVE_MAX_SPEED)
+            else:
+                return 0
+        
+        left_pwm = map_joystick_to_pwm(self.left_y)
+        right_pwm = map_joystick_to_pwm(self.right_y)
+
+        self.left_pub.publish(left_pwm)
+
+
+
+def map_to(x, in_low, in_high, out_low, out_high):
+    val = (x - in_low) / (in_high - in_low) * (out_high - out_low) + out_low
+    val = max(val, out_low)
+    val = min(val, out_high)
+    return val
 
 
 if __name__ == '__main__':
-    joy = joycontrol()
+    node = direct_drive()
     rospy.spin()
