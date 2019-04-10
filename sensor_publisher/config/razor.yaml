@@ -13,12 +13,12 @@ accel_z_max: 232.0
 
 ### magnetometer
 # standard calibration
-magn_x_min: -392.0
-magn_x_max: 661.0
-magn_y_min: -5590.0
-magn_y_max: 496.0
-magn_z_min: -505.0
-magn_z_max: 474.0
+magn_x_min: -109.00
+magn_x_max: 318.00
+magn_y_min: -510.00
+magn_y_max: 165.00
+magn_z_min: 264.00
+magn_z_max: 822.00
 
 # extended calibration
 calibration_magn_use_extended: false
