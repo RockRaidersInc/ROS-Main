@@ -19,6 +19,7 @@
         <param name="address" value="128"/>
     </node>
 
+<!--
     <node name="motornode_arm_1" pkg="drive" type="motornode.py">
         <param name="controller_name" value="right"/>
         <param name="pub_enc" value="true"/>
@@ -34,5 +35,6 @@
         <param name="m2_name" value="/motors/not_connected"/>
         <param name="address" value="131"/>
     </node>
-    
+-->    
+
 </launch>
