@@ -8,7 +8,7 @@
         <param name="pub_enc" value="true"/>
         <param name="m1_name" value="/motors/left"/>
         <param name="m2_name" value="/motors/left"/>
-        <param name="address" value="129"/>
+        <param name="address" value="128"/>
     </node>
     
     <node name="motornode_right" pkg="drive" type="motornode.py">
@@ -16,7 +16,7 @@
         <param name="pub_enc" value="true"/>
         <param name="m1_name" value="/motors/right"/>
         <param name="m2_name" value="/motors/right"/>
-        <param name="address" value="128"/>
+        <param name="address" value="129"/>
     </node>
 
 <!--
