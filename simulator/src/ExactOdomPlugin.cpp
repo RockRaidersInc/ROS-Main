@@ -132,7 +132,8 @@ void GazeboExactOdomPlugin::Update()
         ignition::math::Vector3d velocity = link->WorldLinearVel();
     #else
         math::Pose pose = link->GetWorldPose();
-        tf2::Vector3 pose_pos(pose.pos.x, pose.pos.y, pose.pos.z - 1.06985);  // the offset makes z zero when the rover is on zero-height terrain
+        // tf2::Vector3 pose_pos(pose.pos.x, pose.pos.y, pose.pos.z - 1.06985);  // the offset makes z zero when the rover is on zero-height terrain
+        tf2::Vector3 pose_pos(pose.pos.x, pose.pos.y, 0);  
         tf2::Quaternion pose_rot(pose.rot.x, pose.rot.y, pose.rot.z, pose.rot.w);
 
         gazebo::math::Vector3 velocity = link->GetWorldLinearVel();
