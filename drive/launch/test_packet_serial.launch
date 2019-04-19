@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+   
+    <rosparam param="/motors/num">4</rosparam>
+    <rosparam param="/motors/0/">
+        {address: 128, motor_num: 1, type: vel, qpps: 64, pub_enc: true, name: left}
+    </rosparam>
+    <rosparam param="/motors/1/">
+        {address: 128, motor_num: 2, type: vel, qpps: 64, pub_enc: false, name: left}
+    </rosparam>
+    <rosparam param="/motors/2/">
+        {address: 129, motor_num: 1, type: vel, qpps: 64, pub_enc: false, name: right}
+    </rosparam>
+    <rosparam param="/motors/3/">
+        {address: 129, motor_num: 2, type: vel, qpps: 64, pub_enc: false, name: right}
+    </rosparam>
+	<node pkg="drive" name ="packet" output="screen" type="packet_motornode2.py">
+        <!--<param name="device" value="usb-FTDI_FT232R_USB_UART_A505WX6A-if00-port0"/>-->
+        <param name="device" value="/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A505WX6A-if00-port0"/>
+
+    </node>
+  
+</launch>

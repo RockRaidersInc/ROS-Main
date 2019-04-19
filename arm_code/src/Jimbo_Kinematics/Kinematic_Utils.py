@@ -78,14 +78,14 @@ def subproblem3(p,q,d):
 
 
 #Length of first linear actuator (attached to base) at zero position
-LA2_ZERO_POSITION = 23.9387
+LA2_ZERO_POSITION = 24.93116
 
 #Length of second linear actuator (attached to second segment) at zero position
 LA3_ZERO_POSITION = 19.5272
 
 #Calculates the zero angle values from the zero positions of the actuators
-q2_zero=np.pi/2-np.arctan(1/40)-np.arctan(14/15)-np.arccos((426.5625-(LA2_ZERO_POSITION)**2)/(2*np.sqrt(10531.57813)))
-q3_zero=np.arctan(1/37) + np.arccos((388.0625-(LA3_ZERO_POSITION)**2)/(13.5*np.sqrt(342.5)))-np.pi/2
+q2_zero=np.pi/2.0-np.arctan(1.0/40.0)-np.arctan(14.0/19.0)-np.arccos((435.0625-(LA2_ZERO_POSITION)**2)/(2*np.sqrt(13933.70313)))
+q3_zero=np.arctan(1.0/37.0) + np.arccos((388.0625-(LA3_ZERO_POSITION)**2)/(13.5*np.sqrt(342.5)))-np.pi/2.0
 
 #ARM DIMENSIONS
 #vector from origin to axis of first horizontal joint
