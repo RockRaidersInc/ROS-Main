@@ -1,0 +1,5 @@
+<library path="lib/liblanes_layer">
+  <class type="lanes_layer::LanesLayer" base_class_type="costmap_2d::Layer">
+    <description>Layer that the responsible for the white lanes</description>
+  </class>
+</library>

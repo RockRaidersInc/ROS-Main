@@ -25,7 +25,7 @@
     </node>
 
     <!-- =========================== Debugging =========================== -->
-<!--     <node name="odom_msg_to_to_xyz_rpy" pkg="utils" type="odom_msg_to_xyz_rpy.py">
+    <node name="odom_msg_to_to_xyz_rpy" pkg="utils" type="odom_msg_to_xyz_rpy.py">
         <remap from="~odom_msg_in" to="/odometry/filtered"/>
         <remap from="~xyz_rpy_msg_out" to="/debug/odom_filtered_xyz_rpy"/>
     </node>
@@ -38,5 +38,5 @@
     <node name="imu_quaternion_to_rpy" pkg="utils" type="imu_msg_to_xyz_rpy.py">
         <remap from="~imu_msg_in" to="/imu/data"/>
         <remap from="~imu_msg_out" to="/debug/imu_rpy"/>
-    </node> -->
+    </node>
 </launch>
