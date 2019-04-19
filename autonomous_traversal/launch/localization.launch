@@ -2,11 +2,11 @@
 <launch>
     <!-- TEMPORARY, DELETE LATER -->
     <node pkg="tf" type="static_transform_publisher" name="base_to_gps" args="0 0 0 0 0 0 base_link gps0_link 100" />
-    <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 0 base_link base_imu_link 100" />
+    <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 0 base_link imu0_link 100" />
 
     <!-- Sensor fusion for IMUs -->
-    <!--<rosparam command="load" file="$(find autonomous_traversal)/params/imu_filter_params.yaml"/>
-    <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node"/>-->
+    <rosparam command="load" file="$(find autonomous_traversal)/params/imu_filter_params.yaml"/>
+    <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node"/>
 
     <!-- Kalman Filter localization - Odom Frame-->
     <rosparam command="load" file="$(find autonomous_traversal)/params/odom_ekf_params.yaml"/>
@@ -35,8 +35,8 @@
         <remap from="~xyz_rpy_msg_out" to="/debug/odom_filtered_map_xyz_rpy"/>
     </node>
 
-    <!--<node name="imu_quaternion_to_rpy" pkg="utils" type="imu_msg_to_xyz_rpy.py">
+    <node name="imu_quaternion_to_rpy" pkg="utils" type="imu_msg_to_xyz_rpy.py">
         <remap from="~imu_msg_in" to="/imu/data"/>
         <remap from="~imu_msg_out" to="/debug/imu_rpy"/>
-    </node> -->
+    </node>
 </launch>

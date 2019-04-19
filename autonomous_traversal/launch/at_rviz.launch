@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find autonomous_traversal)/rviz/at.rviz" />
+	<arg name="rviz_file" default="at.rviz" />
+	
+	<node type="rviz" name="rviz" pkg="rviz" args="-d $(find autonomous_traversal)/rviz/$(arg rviz_file)" />
 </launch>
