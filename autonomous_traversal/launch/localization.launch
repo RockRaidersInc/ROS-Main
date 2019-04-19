@@ -5,8 +5,8 @@
     <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 0 base_link imu0_link 100" />
 
     <!-- Sensor fusion for IMUs -->
-    <rosparam command="load" file="$(find autonomous_traversal)/params/imu_filter_params.yaml"/>
-    <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node"/>
+<!--    <rosparam command="load" file="$(find autonomous_traversal)/params/imu_filter_params.yaml"/>
+    <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node"/> -->
 
     <!-- Kalman Filter localization - Odom Frame-->
     <rosparam command="load" file="$(find autonomous_traversal)/params/odom_ekf_params.yaml"/>
