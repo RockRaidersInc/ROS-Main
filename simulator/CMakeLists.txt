@@ -31,6 +31,12 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 
+find_package(PCL 1.2 REQUIRED)
+
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -228,6 +234,5 @@ target_link_libraries(OdomToTfNode ${catkin_LIBRARIES})
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-
 
 
