@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+<model name="heightmap">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <heightmap>
+              <uri>file://igvc_straight_pop/materials/heightmap.png</uri>
+              <size>51.3 51.3 1</size>
+              <pos>0 0 0</pos>
+            </heightmap>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <heightmap>
+              <texture>
+                <diffuse>file://igvc_straight_pop/materials/visual_diffuse.png</diffuse>
+                <size>51.3</size>
+              </texture>
+              <uri>file://igvc_straight_pop/materials/heightmap.png</uri>
+              <size>51.3 51.3 0.5</size>
+              <pos>0 0 0</pos>
+
+              <use_terrain_paging> false </use_terrain_paging>
+              <sampling> 1 </sampling>
+            </heightmap>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+
+</sdf>

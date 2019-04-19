@@ -8,3 +8,9 @@
 [submodule "yolo-9000"]
 	path = yolo-9000
 	url = https://github.com/philipperemy/yolo-9000.git
+[submodule "razor_imu_9dof"]
+	path = razor_imu_9dof
+	url = https://github.com/KristofRobot/razor_imu_9dof.git
+[submodule "ublox"]
+	path = ublox
+	url = https://github.com/flynneva/ublox.git

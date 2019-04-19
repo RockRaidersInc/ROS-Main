@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+	<node name="input_goals" pkg="autonomous_traversal" type="input_goals.py" output="screen"/>
+</launch>

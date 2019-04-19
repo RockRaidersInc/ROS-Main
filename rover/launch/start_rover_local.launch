@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+     <include file="$(find simulator)/launch/base_station.launch" pass_all_args="true"/>
+</launch>

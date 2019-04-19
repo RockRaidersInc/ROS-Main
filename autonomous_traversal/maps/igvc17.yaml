@@ -1,0 +1,8 @@
+image: igvc17.pgm
+resolution: 0.059414634
+origin: [-30.45, -30.45, 0]
+occupied_thresh: 0.2
+free_thresh: 0.01
+negate: 0
+width: 60.9 
+height: 60.9

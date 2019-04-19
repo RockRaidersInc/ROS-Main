@@ -19,9 +19,6 @@ class ManualArmControl:
     LEFT_BUTTON_INDEX = 4
     RIGHT_BUTTON_INDEX = 5
 
-    A_BUTTON_INDEX = 0
-    B_BUTTON_INDEX = 1
-
     SHOULDER_INITIAL_POS = 512
     ELBOW_INITIAL_POS = 512
     TURRET_STOPPED = 64
@@ -32,21 +29,17 @@ class ManualArmControl:
     # TURRET_LEFT_SPEED = -300
     # TURRET_RIGHT_SPEED = 300
 
-    SHOULDER_MIN = 670
-    SHOULDER_MAX = 1800
+    SHOULDER_MIN = 600
+    SHOULDER_MAX = 1400
 
-    ELBOW_MIN = 200
+    ELBOW_MIN = 400
     ELBOW_MAX = 1400
-
-    END_EFFECTOR_MIN = 0
-    END_EFFECTOR_MAX = 1024
 
     deadzone = 0.1
 
     shoulder_speed = 4
     elbow_speed = 10
     turret_speed = 1
-    end_effector_speed = 1
 
     shoulder_dir = 0
     elbow_dir = 0
@@ -56,16 +49,14 @@ class ManualArmControl:
         self.shoulder_pub = rospy.Publisher('/motors/shoulder_pos', Int32, queue_size=1)
         self.elbow_pub = rospy.Publisher('/motors/elbow_pos', Int32, queue_size=1)
         self.turret_pub = rospy.Publisher('/motors/turret_pwm', Int8, queue_size=1)
-        self.end_effector_pub = rospy.Publisher('/motors/end_effector_pos', Int32, queue_size=1)
 
         rospy.Subscriber('joy', Joy, self.callback_joy)
 
         rospy.loginfo('Waiting for encoder messages')
         self.shoulder_pos = rospy.wait_for_message('/motors/shoulder_enc', Int32)
         self.elbow_pos = rospy.wait_for_message('/motors/elbow_enc', Int32)
-        self.end_effector_pos = rospy.wait_for_message('/motors/end_effector_enc', Int32)
-        rospy.loginfo("self.shoulder_pos: ", self.shoulder_pos.data)
-        rospy.loginfo("self.elbow_pos: ", self.elbow_pos.data)
+        rospy.loginfo("self.shoulder_pos: %f", self.shoulder_pos.data)
+        rospy.loginfo("self.elbow_pos: %f", self.elbow_pos.data)
         self.turret_pwm = self.TURRET_STOPPED
 
         while not rospy.is_shutdown():
@@ -82,15 +73,9 @@ class ManualArmControl:
             elif self.elbow_pos.data < self.ELBOW_MIN:
                 self.elbow_pos.data = self.ELBOW_MIN
 
-            self.end_effector_pos += self.end_effector_dir * self.end_effector_speed
-            if self.end_effector_pos.data > self.END_EFFECTOR_MAX:
-                self.end_effector_pos.data = self.END_EFFECTOR_MAX
-            elif self.end_effector_pos.data < self.END_EFFECTOR_MIN:
-                self.end_effector_pos.data = self.END_EFFECTOR_MIN
-
-            # print("self.shoulder_pos: ", self.shoulder_pos.data)
-            # print("self.elbow_pos: ", self.elbow_pos.data)
-            # print("self.turret_pwm: ", self.turret_pwm)
+            print("self.shoulder_pos: ", self.shoulder_pos.data)
+            print("self.elbow_pos: ", self.elbow_pos.data)
+            print("self.turret_pwm: ", self.turret_pwm)
 
             turret_msg = Int8()
             turret_msg.data = self.turret_pwm
@@ -98,7 +83,6 @@ class ManualArmControl:
             self.shoulder_pub.publish(self.shoulder_pos)
             self.elbow_pub.publish(self.elbow_pos)
             self.turret_pub.publish(turret_msg)
-            self.end_effector_pub.publish(self.end_effector_pos)
 
             rospy.sleep(.05)
 
@@ -116,14 +100,11 @@ class ManualArmControl:
         else:
             self.elbow_dir = right_x / abs(right_x)
 
-        # print("self.shoulder_dir: ", self.shoulder_dir)
-        # print("self.elbow_dir: ", self.elbow_dir)
+        print("self.shoulder_dir: ", self.shoulder_dir)
+        print("self.elbow_dir: ", self.elbow_dir)
         
         l_button = msg.buttons[self.LEFT_BUTTON_INDEX]
         r_button = msg.buttons[self.RIGHT_BUTTON_INDEX]
-
-        a_button = msg.buttons[self.A_BUTTON_INDEX]
-        b_button = msg.buttons[self.B_BUTTON_INDEX]
 
         if l_button:
             self.turret_pwm = self.TURRET_LEFT_SPEED
@@ -131,13 +112,6 @@ class ManualArmControl:
             self.turret_pwm = self.TURRET_RIGHT_SPEED
         else:
             self.turret_pwm = self.TURRET_STOPPED
-
-        if a_button:
-            self.end_effector_dir = 1
-        elif b_button:
-            self.end_effector_dir = -1
-        else:
-            self.end_effector_dir = 0
 
 
 

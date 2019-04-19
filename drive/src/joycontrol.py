@@ -27,9 +27,9 @@ class joycontrol:
     Y_BUTTON_INDEX = 3
 
     MAX_LINEAR_SPEED = 0.5
-    MAX_ANGULAR_SPEED = 0.5
+    MAX_ANGULAR_SPEED = 1.0
     TURBO_MAX_LINEAR_SPEED = 1.5
-    TURBO_MAX_ANGULAR_SPEED = 1.5
+    TURBO_MAX_ANGULAR_SPEED = 10
 
     def __init__(self):
         rospy.init_node('joy_to_twist')

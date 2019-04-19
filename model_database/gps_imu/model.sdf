@@ -30,6 +30,16 @@
           </box>
         </geometry>
       </collision>
+
+      <sensor name='gazebo_gps_sensor' type='gps'>
+        <plugin name="rock_gps_plugin" filename="libRockGpsPlugin.so">
+          <frameId> gps0_link </frameId>
+          <topicName> /gps/fix </topicName>
+        </plugin>
+        <always_on> 1 </always_on>
+        <update_rate> 1 </update_rate>
+      </sensor>
+
     </link>
 
     <plugin name="custom_imu_sim" filename="libhector_gazebo_ros_imu.so">
@@ -40,15 +50,33 @@
         <topicName>imu</topicName>
         <frameId> imu0_link </frameId>
 
-        <accelOffset>0.0 0.0 0.0</accelOffset>
-        <accelDrift>0.0 0.0 0.0</accelDrift>
-        <accelDriftFrequency>0.0 0.0 0.0</accelDriftFrequency>
-        <accelGaussianNoise>0.0 0.0 0.0</accelGaussianNoise>
+<!--         <accelOffset>0.0 0.0 0.0</accelOffset>
+        <accelDrift>0.2 0.2 0.2</accelDrift>
+        <accelDriftFrequency>0.2 0.2 0.2</accelDriftFrequency>
+        <accelGaussianNoise>0.2 0.2 0.2</accelGaussianNoise>
         <xyzOffset> 0 0 0 </xyzOffset>
         <rpyOffset> 0 0 0 </rpyOffset>
 
         <rateOffset>0.0 0.0 0.0</rateOffset>
-        <rateDriftFrequency>0.0 0.0 0.0</rateDriftFrequency>
+        <rateDrift>0.02 0.02 0.02</rateDrift>
+        <rateDriftFrequency>0.1 0.1 0.1</rateDriftFrequency>
+        <rateGaussianNoise>0.0 0.0 0.0</rateGaussianNoise>
+
+        <yawOffset>0.0</yawOffset>
+        <yawDrift>0.0</yawDrift>
+        <yawDriftFrequency>0.0</yawDriftFrequency>
+        <yawGaussianNoise>0.0</yawGaussianNoise> -->
+
+        <accelOffset>0.0 0.0 0.0</accelOffset>
+        <accelDrift>0 0 0</accelDrift>
+        <accelDriftFrequency>0 0 0</accelDriftFrequency>
+        <accelGaussianNoise>0 0 0</accelGaussianNoise>
+        <xyzOffset> 0 0 0 </xyzOffset>
+        <rpyOffset> 0 0 0 </rpyOffset>
+
+        <rateOffset>0.0 0.0 0.0</rateOffset>
+        <rateDrift>0 0 0</rateDrift>
+        <rateDriftFrequency>0 0 0</rateDriftFrequency>
         <rateGaussianNoise>0.0 0.0 0.0</rateGaussianNoise>
 
         <yawOffset>0.0</yawOffset>
@@ -57,21 +85,21 @@
         <yawGaussianNoise>0.0</yawGaussianNoise>
     </plugin>
 
-    <plugin name="custom_gps_sim" filename="libhector_gazebo_ros_gps.so">
+    <!--<plugin name="custom_gps_sim" filename="libhector_gazebo_ros_gps.so">
         <alwaysOn>1</alwaysOn>
         <updateRate>1.0</updateRate>
         <bodyName>gps_imu_link</bodyName>
         <topicName>/gps/fix</topicName>
         <velocityTopicName>/gps/vel</velocityTopicName>
         <frameId> gps0_link </frameId>
-        <drift>0 0 0</drift>
-        <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
-        <velocityDrift>0 0 0</velocityDrift>
+        <drift>0.0 0.0 0.0</drift>
+        <gaussianNoise>0 0 0</gaussianNoise>
+        <velocityDrift>0.0 0.0 0.0</velocityDrift>
         <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
         <referenceLatitude> 42.729957 </referenceLatitude>
         <referenceLongitude> -73.679659 </referenceLongitude>
         <referenceHeading> 90 </referenceHeading>
-    </plugin>
+    </plugin>-->
 
     <plugin name="custom_magnetometer_sim" filename="libhector_gazebo_ros_magnetic.so">
         <alwaysOn>1</alwaysOn>
@@ -79,12 +107,18 @@
         <bodyName>gps_imu_link</bodyName>
         <topicName>/rover/magnetometer</topicName>
         <frameId> imu0_link </frameId>
-        <magnitude> 60 </magnitude>
+        <magnitude> 10 </magnitude>
         <offset>0 0 0</offset>
         <drift>0 0 0</drift>
         <gaussianNoise>0 0 0</gaussianNoise>
         <referenceHeading> 0 </referenceHeading>
-        <!--<declination> 0.226893 </declination>-->
+        <declination> 0.226893 </declination>
+    </plugin>
+      <plugin name="exact_odom_plugin" filename="libExactOdomPlugin.so">
+        <alwaysOn>1</alwaysOn>
+        <bodyName>gps_imu_link</bodyName>
+        <topicName>/odom/odometry_perfect</topicName>
+        <frameId> imu0_link </frameId>
     </plugin>
   </model>
 </sdf>

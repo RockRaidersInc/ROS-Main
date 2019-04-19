@@ -1,0 +1,1 @@
+replace hector plugins with: ros-kinetic-hector-gazebo-plugins

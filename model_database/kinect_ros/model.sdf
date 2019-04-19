@@ -30,7 +30,7 @@
             <format>R8G8B8</format>
           </image>
           <clip>
-            <near>0.5</near>
+            <near>0.01</near>
             <far>100</far>
           </clip>
         </camera>
@@ -41,13 +41,14 @@
             will control the frame rate. -->
           <updateRate>0.0</updateRate>
           <cameraName>camera_ir</cameraName>
-          <imageTopicName>/camera/depth/image_raw</imageTopicName>
-          <cameraInfoTopicName>/camera/depth/camera_info</cameraInfoTopicName>
-          <depthImageTopicName>/camera/depth/image_raw</depthImageTopicName>
-          <depthImageInfoTopicName>/camera/depth/camera_info</depthImageInfoTopicName>
-          <pointCloudTopicName>/camera/depth/points</pointCloudTopicName>
-          <frameName>camera_link</frameName>
-          <pointCloudCutoff>0.05</pointCloudCutoff>
+          <imageTopicName>/zed/depth/image_raw</imageTopicName>
+          <cameraInfoTopicName>/zed/depth/camera_info</cameraInfoTopicName>
+          <depthImageTopicName>/zed/depth/image_raw</depthImageTopicName>
+          <depthImageInfoTopicName>/zed/depth/camera_info</depthImageInfoTopicName>
+          <pointCloudTopicName>/zed/depth/depth_registered</pointCloudTopicName>
+          <frameName>zed_camera_center</frameName>
+          <pointCloudCutoff>0.01</pointCloudCutoff>
+          <pointCloudCutoffMax>100</pointCloudCutoffMax>
           <distortionK1>0</distortionK1>
           <distortionK2>0</distortionK2>
           <distortionK3>0</distortionK3>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="sim_world_file"/>
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(arg sim_world_file)"/>
+  </include>
+
+  <!--<include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(eval sim_world_file == 'empty')">
+    <arg name="world_name" value="$(arg sim_world_file)/../model_database/sim.world"/>
+  </include>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(eval sim_map == 'mdrs')">
+    <arg name="world_name" value="$(find model_database)/mars_desert_research_station_lower.world"/>
+  </include>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(eval sim_map == 'mountain')">
+    <arg name="world_name" value="$(find simulator)/../model_database/mountain_populated.world"/>
+  </include>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(eval sim_map == '86_field')">
+    <arg name="world_name" value="$(find simulator)/../model_database/86_field.world"/>
+  </include>
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(eval sim_map == 'maze_simple')">
+    <arg name="world_name" value="$(find simulator)/../model_database/maze_simple.world"/>
+  </include>-->
+</launch>

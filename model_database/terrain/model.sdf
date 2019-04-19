@@ -1,53 +1,55 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
-  <model name="gps_imu">
+  <model name="terrain">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <heightmap>
+            <uri>file://terrain/media/mtsthelens_129.dem</uri>
+            <size>150 150 50</size>
+            <pos>0 0 -685</pos>
+          </heightmap>
+        </geometry>
+      </collision>
 
-    <model name="heightmap">
-      <static>true</static>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <heightmap>
-              <uri>file://media/dem/mtsthelens_129.dem</uri>
-              <size>150 150 25</size>
-              <pos>0 0 -690.525</pos>
-            </heightmap>
-          </geometry>
-        </collision>
-        <visual name="visual_abcedf">
-          <geometry>
-            <heightmap>
-              <texture>
-                <diffuse>file://media/materials/textures/dirt_diffusespecular.png</diffuse>
-                <normal>file://media/materials/textures/flat_normal.png</normal>
-                <size>1</size>
-              </texture>
-              <texture>
-                <diffuse>file://media/materials/textures/grass_diffusespecular.png</diffuse>
-                <normal>file://media/materials/textures/flat_normal.png</normal>
-                <size>1</size>
-              </texture>
-              <texture>
-                <diffuse>file://media/materials/textures/fungus_diffusespecular.png</diffuse>
-                <normal>file://media/materials/textures/flat_normal.png</normal>
-                <size>1</size>
-              </texture>
-              <blend>
-                <min_height>2</min_height>
-                <fade_dist>5</fade_dist>
-              </blend>
-              <blend>
-                <min_height>4</min_height>
-                <fade_dist>5</fade_dist>
-              </blend>
-              <uri>file://media/dem/mtsthelens_129.dem</uri>
-              <size>150 150 25</size>
-              <pos>0 0 -690.525</pos>
-            </heightmap>
-          </geometry>
-        </visual>
-      </link>
-    </model>
+      <visual name="visual">
+        <geometry>
+          <heightmap>
+            <texture>
+              <diffuse>file://media/materials/textures/dirt_diffusespecular.png</diffuse>
+              <normal>file://media/materials/textures/flat_normal.png</normal>
+              <size>1</size>
+            </texture>
+            <texture>
+              <diffuse>file://media/materials/textures/grass_diffusespecular.png</diffuse>
+              <normal>file://media/materials/textures/flat_normal.png</normal>
+              <size>1</size>
+            </texture>
+            <texture>
+              <diffuse>file://media/materials/textures/fungus_diffusespecular.png</diffuse>
+              <normal>file://media/materials/textures/flat_normal.png</normal>
+              <size>1</size>
+            </texture>
+            <blend>
+              <min_height>2</min_height>
+              <fade_dist>5</fade_dist>
+            </blend>
+            <blend>
+              <min_height>4</min_height>
+              <fade_dist>5</fade_dist>
+            </blend>
 
+            <use_terrain_paging> false </use_terrain_paging>
+            <sampling> 1 </sampling>
+
+            <uri>file://terrain/media/mtsthelens_129.dem</uri>
+            <size>150 150 50</size>
+            <pos>0 0 -685</pos>
+          </heightmap>
+        </geometry>
+      </visual>
+
+    </link>
   </model>
 </sdf>

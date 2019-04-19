@@ -163,6 +163,7 @@ def process_imu_data(line, regex):
         mag_msg.magnetic_field.x = float(match.group('mag_x')) - 150.75
         mag_msg.magnetic_field.y = float(match.group('mag_y')) - 7.205
         mag_msg.magnetic_field.z = float(match.group('mag_z')) - -106.045
+
         set_covariance(mag_msg.magnetic_field_covariance, 1.0)
 
         imu_pub.publish(imu_msg)
