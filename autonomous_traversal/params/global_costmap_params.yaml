@@ -12,5 +12,4 @@ global_costmap:
     - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
     # - {name: obstacle_layer,  type: "costmap_2d::VoxelLayer"}
     - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
-    - {name: explore_boundary, type: "frontier_exploration::BoundedExploreLayer"}
-
+    - {name: lanes_layer,     type: "lanes_layer::LanesLayer"}
