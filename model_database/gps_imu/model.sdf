@@ -106,6 +106,7 @@
         <updateRate>50.0</updateRate>
         <bodyName>gps_imu_link</bodyName>
         <topicName>/rover/magnetometer</topicName>
+        <!-- <topicName>/imu/mag</topicName> -->
         <frameId> imu0_link </frameId>
         <magnitude> 10 </magnitude>
         <offset>0 0 0</offset>
@@ -117,8 +118,8 @@
       <plugin name="exact_odom_plugin" filename="libExactOdomPlugin.so">
         <alwaysOn>1</alwaysOn>
         <bodyName>gps_imu_link</bodyName>
-        <topicName>/odom/odometry_perfect</topicName>
+        <topicName>/odometry/perfect</topicName>
         <frameId> imu0_link </frameId>
-    </plugin>
+      </plugin>
   </model>
 </sdf>

@@ -1,14 +1,16 @@
 local_costmap:
-  global_frame: odom
-  update_frequency: 5.0
-  publish_frequency: 5.0
-  static_map: false
-  rolling_window: true
-  width: 11.0
-  height: 11.0
-  resolution: 0.05
-  transform_tolerance: 0.5
-  
-  plugins:
-    - {name: obstacle_layer,  type: "costmap_2d::VoxelLayer"}
-    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+    global_frame: odom
+    update_frequency: 5.0
+    publish_frequency: 5.0
+    static_map: false
+    rolling_window: true
+    width: 21.0
+    height: 21.0
+    resolution: 0.05
+    transform_tolerance: 0.5
+    
+    plugins:
+        - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
+        # - {name: obstacle_layer,  type: "costmap_2d::VoxelLayer"}
+        - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+        # - {name: lanes_layer,     type: "lanes_layer::LanesLayer"}
