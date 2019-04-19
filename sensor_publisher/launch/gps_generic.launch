@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="gps_publisher" pkg="sensor_publisher" type="gps_publisher.py"/>
+
+  <!-- GPS nmea sentences to coordinates-->
+  <node name="gps_parser" pkg="nmea_navsat_driver" type="nmea_topic_driver" >
+      <remap from="/nmea_sentence" to="/gps/nmea_sentence"/>
+      <remap from="/fix" to="/gps/fix"/>
+      <remap from="/vel" to="/gps/vel"/>
+      <remap from="/time_reference" to="/gps/time_reference"/>
+  </node>
+</launch>
