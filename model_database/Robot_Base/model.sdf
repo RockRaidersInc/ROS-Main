@@ -11,8 +11,9 @@
     <include>
       <uri> model://gps_imu </uri>
       <name> imu </name>
-      <pose frame=''> 0.0 0.0 1.06985 0.0 0.0 0.0 </pose>
+      <pose frame=''> 0.0 0.380992 1.06985 0.0 0.0 0.0 </pose>
     </include>
+
   
     <link name='chassis'>
       <pose frame=''>0 0 1 0 0 0</pose>
@@ -638,7 +639,7 @@
         <cast_shadows>1</cast_shadows>
         <transparency>0</transparency>
       </visual>
-      <collision name='collision_0'>
+      <!--<collision name='collision_0'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
         <pose frame=''>0 0 0 0 -0 0</pose>
@@ -692,7 +693,7 @@
             </bullet>
           </contact>
         </surface>
-      </collision>
+      </collision>-->
     </link>
     
     <link name='left_front_leg'>
@@ -735,7 +736,7 @@
         <cast_shadows>1</cast_shadows>
         <transparency>0</transparency>
       </visual>
-      <collision name='collision_0'>
+      <!--<collision name='collision_0'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
         <pose frame=''>0 0 0 0 -0 0</pose>
@@ -789,7 +790,7 @@
             </bullet>
           </contact>
         </surface>
-      </collision>
+      </collision>-->
     </link>
 
     <link name='right_back_leg'>
@@ -832,7 +833,7 @@
         <cast_shadows>1</cast_shadows>
         <transparency>0</transparency>
       </visual>
-      <collision name='collision_0'>
+      <!--<collision name='collision_0'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
         <pose frame=''>0 0 0 0 -0 0</pose>
@@ -886,7 +887,7 @@
             </bullet>
           </contact>
         </surface>
-      </collision>
+      </collision>-->
     </link>
     
     <link name='right_front_leg'>
@@ -929,7 +930,7 @@
         <cast_shadows>1</cast_shadows>
         <transparency>0</transparency>
       </visual>
-      <collision name='collision_0'>
+      <!--<collision name='collision_0'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
         <pose frame=''>0 0 0 0 -0 0</pose>
@@ -983,7 +984,7 @@
             </bullet>
           </contact>
         </surface>
-      </collision>
+      </collision>-->
     </link>
 
 
@@ -1037,8 +1038,10 @@
         <surface>
           <friction>
             <ode>
-              <mu>20</mu>
-              <mu2>20</mu2>
+              <!--<mu>20</mu>
+              <mu2>20</mu2>-->
+              <mu>0</mu>
+              <mu2>0</mu2>
               <fdir1>0 0 0</fdir1>
               <slip1>0.0</slip1>
               <slip2>0.0</slip2>
@@ -1132,8 +1135,10 @@
         <surface>
           <friction>
             <ode>
-              <mu>20</mu>
-              <mu2>20</mu2>
+              <!--<mu>20</mu>
+              <mu2>20</mu2>-->
+              <mu>0</mu>
+              <mu2>0</mu2>
               <fdir1>0 0 0</fdir1>
               <slip1>0.0</slip1>
               <slip2>0.0</slip2>
@@ -1177,7 +1182,6 @@
       </collision>
     </link>
 
-    <!--<link name='left_back_wheel'>-->
     <link name='right_front_wheel'>
       <pose frame=''>0.45 0.380992 0.758093 2.99584 1.57079 2.99582</pose>
       <inertial>
@@ -2003,6 +2007,30 @@
         </ode>
       </physics>
     </joint>
+
+    <!--<include>
+      <uri> model://caster </uri>
+      <name> caster </name>
+      <pose frame=''> 0.0 -0.6 0.76 0.0 0.0 0.0 </pose>
+    </include>
+
+    <joint name='base_to_caster' type='fixed'>
+      <parent>chassis</parent>
+      <child> caster::wheel </child>
+      <pose frame=''>0 0 0 0 0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>-->
 
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
