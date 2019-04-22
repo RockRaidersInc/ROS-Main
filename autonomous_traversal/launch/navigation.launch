@@ -14,10 +14,10 @@
 		  name="odom_to_base_perfect" 
 		  if="$(arg use_perfect_odom)"/>
 
-	<node name="map_server" 
+<!-- 	<node name="map_server" 
 		  pkg="map_server" 
 		  type="map_server" 
-		  args="$(find autonomous_traversal)/maps/$(arg map_file)"/>
+		  args="$(find autonomous_traversal)/maps/$(arg map_file)"/> -->
 
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 		<!-- Load params -->

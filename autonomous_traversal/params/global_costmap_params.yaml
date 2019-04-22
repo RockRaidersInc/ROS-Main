@@ -1,16 +1,18 @@
 global_costmap:
     global_frame: map
-    update_frequency: 2.0
-    publish_frequency: 2.0
-    static_map: true
-    rolling_window: false
-    width: 100.0
-    height: 100.0
+    robot_base_frame: base_link
+    update_frequency: 1.0
+    publish_frequency: 1.0
+    width: 300.0
+    height: 300.0
+    resolution: 0.1
+    static_map: false 
+    rolling_window: true
 
-    plugins:
-        - {name: static_layer,    type: "costmap_2d::StaticLayer"}
-        - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
-        # - {name: obstacle_layer,  type: "costmap_2d::VoxelLayer"}
-        - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
-        # - {name: explore_boundary, type: "frontier_exploration::BoundedExploreLayer"}
-        - {name: lanes_layer,     type: "lanes_layer::LanesLayer"}
+    # plugins:
+    #     - {name: static_layer,    type: "costmap_2d::StaticLayer"}
+    #     - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
+    #     # - {name: obstacle_layer,  type: "costmap_2d::VoxelLayer"}
+    #     - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+    #     # - {name: explore_boundary, type: "frontier_exploration::BoundedExploreLayer"}
+    #     - {name: lanes_layer,     type: "lanes_layer::LanesLayer"}

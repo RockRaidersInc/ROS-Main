@@ -11,27 +11,27 @@ static_layer:
     use_maximum: true
     subscribe_to_updates: true
 
-obstacle_layer:
-    enabled: true
-    publish_voxel_map: false
+# obstacle_layer:
+#     enabled: true
+#     publish_voxel_map: false
 
-    obstacle_range: 9.5 # The default maximum distance from the robot at which an obstacle will be inserted into the cost map in meters.
-    raytrace_range: 10.0 # The default range in meters at which to raytrace out obstacles from the map using sensor data
+#     obstacle_range: 9.5 # The default maximum distance from the robot at which an obstacle will be inserted into the cost map in meters.
+#     raytrace_range: 10.0 # The default range in meters at which to raytrace out obstacles from the map using sensor data
     
-    observation_sources: zed_camera
-    zed_camera: {sensor_frame: /zed_camera_center, 
-                 data_type: PointCloud2, 
-                 topic: /zed/depth/depth_registered, 
-                 clearing: true,
-                 marking: true, 
-                 max_obstacle_height: 1.0,
-                 min_obstacle_height: .1,
-                 obstacle_range: 9.5,
-                 raytrace_range: 10.0}
+#     observation_sources: zed_camera
+#     zed_camera: {sensor_frame: /zed_camera_center, 
+#                  data_type: PointCloud2, 
+#                  topic: /zed/depth/depth_registered, 
+#                  clearing: true,
+#                  marking: true, 
+#                  max_obstacle_height: 1.0,
+#                  min_obstacle_height: .1,
+#                  obstacle_range: 9.5,
+#                  raytrace_range: 10.0}
 
 
-    track_unknown_space: true
+#     track_unknown_space: true
 
-inflation_layer:
-    inflation_radius: 1.0     # Controls how far away the zero cost point is from the obstacle
-    cost_scaling_factor: 5.0  # Controls how much the cost gets scaled at a distance
+# inflation_layer:
+#     inflation_radius: 1.0     # Controls how far away the zero cost point is from the obstacle
+#     cost_scaling_factor: 5.0  # Controls how much the cost gets scaled at a distance

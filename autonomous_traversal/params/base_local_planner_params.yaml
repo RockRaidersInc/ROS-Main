@@ -9,21 +9,21 @@ TrajectoryPlannerROS:
     min_vel_x: 0.1  # Allowing velocities too low will will stop the 
                     # obstacle avoidance because low velocities won't 
                     # actually be high enough to move the robot
-    max_vel_theta: 3.14
-    min_vel_theta: -3.14
-    min_in_place_vel_theta: 3.14
+    max_vel_theta: 1.57
+    min_vel_theta: -1.57
+    min_in_place_vel_theta: 1.57
     escape_vel: -.1
 
-    acc_lim_theta: 10.0
-    acc_lim_x: 10.0
+    acc_lim_theta: 5.0
+    acc_lim_x: 5.0
     acc_lim_y: 0.0
 
     holonomic_robot: false
 
     # Goal Tolerance Parameters
     yaw_goal_tolerance: 1.633123935319537e+16
-    xy_goal_tolerance: .5  
-    latch_xy_goal_tolerance: false
+    xy_goal_tolerance: 1.0 
+    latch_xy_goal_tolerance: true
 
     ## Forward Simulation Parameters
     # These parameters change how the planner simulates trajectories at each update and therefore changes the optimal trajectory that is chosen.These should be adjusted based on your computer performance
