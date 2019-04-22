@@ -16,7 +16,7 @@ namespace lanes_layer
 		ros::NodeHandle nh("~/" + name_);
 		current_ = true;
 		default_value_ = NO_INFORMATION;
-		// rolling_window_ = layered_costmap_->isRolling();
+		rolling_window_ = layered_costmap_->isRolling();
 		matchSize();
 
 		// Dynamic Reconfig (not fully implemented)
@@ -55,36 +55,48 @@ namespace lanes_layer
 		// Publish U shape on startup
 		// Front left and back right corner in world coodinates
 		if (a){
-			x1 = robot_x + 1.5;	
-			y1 = robot_y + 1.5;
-			x2 = robot_x - 1.5;
-			y2 = robot_y - 1.5;
-			a = false;
+			double u_width = 3.0;
+			double u_height = 3.0;
+
+			calcUCorners(robot_x, robot_y, robot_yaw,
+						 u_width, u_height,
+						 &x1, &y1, &x2, &y2, 
+						 &x3, &y3, &x4, &y4);
+
+			// a = false;
 		}
+
 		// Front left and back right corner in map coordinates
 		ROS_INFO("updateBounds Call");
 		ROS_INFO("Test 1");
-		unsigned int mx1,my1,mx2,my2; 	
+		unsigned int mx1,my1,mx2,my2,mx3,my3,mx4,my4; 	
 		worldToMap(x1,y1,mx1,my1);
 		worldToMap(x2,y2,mx2,my2);
+		worldToMap(x3,y3,mx3,my3);
+		worldToMap(x4,y4,mx4,my4);
 		ROS_INFO("Test 2");
+		// ROS_INFO("MINMAX: (%.2f,%.2f,%.2f,%.2f)", *min_x, *min_y, *max_x, *max_y);
+		// ROS_INFO("XY: (%.2f,%.2f) (%.2f,%.2f)",x1,y1,x2,y2);
+		// ROS_INFO("ROBOT: (%.2f,%.2f,%.2f)",robot_x,robot_y,robot_yaw);
+		// ROS_INFO("ORGN: (%.2f,%.2f)", origin_x_, origin_y_);
+		// ROS_INFO("RES: (%.2f)", resolution_);
+		// ROS_INFO("SIZE: (%d,%d)", size_x_, size_y_);
 		// Start mark cells as obstacles
 		MarkCell marker(costmap_, LETHAL_OBSTACLE); 
-		raytraceLine(marker, mx1, my1, mx1, my2);
-		raytraceLine(marker, mx1, my2, mx2, my2);
-		raytraceLine(marker, mx2, my2, mx2, my1);
+		raytraceLine(marker, mx1, my1, mx2, my2);
+		raytraceLine(marker, mx2, my2, mx3, my3);
+		raytraceLine(marker, mx3, my3, mx4, my4);
+
 		ROS_INFO("Test 3");
 		*min_x = std::min(*min_x, x1); 
 		*min_x = std::min(*min_x, x2);
 		*min_y = std::min(*min_y, y1); 
 		*min_y = std::min(*min_y, y2);
 		*max_x = std::max(*max_x, x1); 
-		*max_x = std::max(*max_x, x1);
+		*max_x = std::max(*max_x, x2);
 		*max_y = std::max(*max_y, y1); 
 		*max_y = std::max(*max_y, y2);
 		ROS_INFO("Test 4");
-		ROS_INFO("(%.2f,%.2f,%.2f,%.2f)", *min_x, *min_y, *max_x, *max_y);
-		ROS_INFO("(%.2f,%.2f) (%.2f,%.2f)",x1,y1,x2,y2);
 
 		// double mark_x = robot_x + cos(robot_yaw);
 		// double mark_y = robot_y + sin(robot_yaw);
@@ -116,6 +128,22 @@ namespace lanes_layer
 			}
 		}
 
+	}
+
+	void LanesLayer::calcUCorners(double robot_x, double robot_y, double robot_yaw,
+								  double width, double height,
+								  double *x1, double *y1, double *x2, double *y2,
+								  double *x3, double *y3, double *x4, double *y4)
+	{
+		ROS_INFO("YAW: %.2f", robot_yaw);
+		*x1 = robot_x + height/2*cos(robot_yaw) - width/2*sin(robot_yaw);
+		*y1 = robot_y - height/2*sin(robot_yaw) - width/2*cos(robot_yaw);
+		*x2 = robot_x - height/2*cos(robot_yaw) - width/2*sin(robot_yaw);
+		*y2 = robot_y + height/2*sin(robot_yaw) - width/2*cos(robot_yaw);
+		*x3 = robot_x - height/2*cos(robot_yaw) + width/2*sin(robot_yaw);
+		*y3 = robot_y + height/2*sin(robot_yaw) + width/2*cos(robot_yaw);
+		*x4 = robot_x + height/2*cos(robot_yaw) + width/2*sin(robot_yaw);
+		*y4 = robot_y - height/2*sin(robot_yaw) + width/2*cos(robot_yaw);
 	}
 
 } // end namespace

@@ -30,11 +30,14 @@ namespace lanes_layer
 	private:
 		void reconfigureCB(costmap_2d::GenericPluginConfig &config, uint32_t level);
 		dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig> *dsrv_;
+		void LanesLayer::calcUCorners(double robot_x, double robot_y, double robot_yaw,
+									  double width, double height,
+									  double *x1, double *y1, double *x2, double *y2,
+									  double *x3, double *y3, double *x4, double *y4);
+
 		bool a;
-		double x1;	
-		double y1;
-		double x2;
-		double y2;
+		bool rolling_window_;
+		double x1, y1, x2, y2, x3, y3, x4, y4;
 	};
 }
 #endif
