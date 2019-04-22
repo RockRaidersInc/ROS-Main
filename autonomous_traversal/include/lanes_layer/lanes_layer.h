@@ -5,6 +5,7 @@
 #include <costmap_2d/layered_costmap.h>
 #include <costmap_2d/observation_buffer.h>
 #include <costmap_2d/GenericPluginConfig.h>
+#include <tf/transform_broadcaster.h>
 #include <dynamic_reconfigure/server.h>
 
 namespace lanes_layer
@@ -30,10 +31,8 @@ namespace lanes_layer
 	private:
 		void reconfigureCB(costmap_2d::GenericPluginConfig &config, uint32_t level);
 		dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig> *dsrv_;
-		void LanesLayer::calcUCorners(double robot_x, double robot_y, double robot_yaw,
-									  double width, double height,
-									  double *x1, double *y1, double *x2, double *y2,
-									  double *x3, double *y3, double *x4, double *y4);
+		void calcUCorners(double robot_x, double robot_y, double robot_yaw,
+						  double U_pts[8], double tf_U_pts[8]);
 
 		bool a;
 		bool rolling_window_;
