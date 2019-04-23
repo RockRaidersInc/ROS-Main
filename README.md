@@ -66,6 +66,7 @@ sudo apt install ros-kinetic-geographic-msgs
 sudo apt install gpsd ros-kinetic-gpsd-client
 sudo apt install ros-kinetic-tf2-geometry-msgs ros-kinetic-move-base sudo apt install ros-kinetic-map-server
 sudo apt install ros-kinetic-nmea-navsat-driver
+sudo apt install ros-kinetic-global-planner
 ```
 
 ## simulation stuff
