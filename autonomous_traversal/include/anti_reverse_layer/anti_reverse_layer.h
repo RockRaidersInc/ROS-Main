@@ -1,5 +1,5 @@
-#ifndef LANES_LAYER_H_
-#define LANES_LAYER_H_
+#ifndef ANTI_REVERSE_LAYER_H_
+#define ANTI_REVERSE_LAYER_H_
 #include <ros/ros.h>
 #include <costmap_2d/layer.h>
 #include <costmap_2d/layered_costmap.h>
@@ -7,13 +7,14 @@
 #include <costmap_2d/GenericPluginConfig.h>
 #include <tf/transform_broadcaster.h>
 #include <dynamic_reconfigure/server.h>
+#include <std_msgs/Float64MultiArray.h>
 
-namespace lanes_layer
+namespace anti_reverse_layer
 {
-	class LanesLayer : public costmap_2d::Layer, public costmap_2d::Costmap2D
+	class AntiReverseLayer : public costmap_2d::Layer, public costmap_2d::Costmap2D
 	{
 	public:
-		LanesLayer();
+		AntiReverseLayer();
 		bool isDiscretized() { return true; }
 
 		virtual void onInitialize();
@@ -25,18 +26,16 @@ namespace lanes_layer
 								 int min_i, int min_j, 
 								 int max_i, int max_j);
 
-		// void warpedLanesImgCallback(const sensor_msgs::ImageConstPtr& msg,
-		// 							const boost::shared_ptr<costmap_2d::ObservationBuffer>& buffer);	
-
 	private:
 		void reconfigureCB(costmap_2d::GenericPluginConfig &config, uint32_t level);
 		dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig> *dsrv_;
-		void calcUCorners(double robot_x, double robot_y, double robot_yaw,
-						  double U_pts[8], double tf_U_pts[8]);
+		void calcUCorners(double robot_x, double robot_y, double robot_yaw, double tf_U_pts[8]);
+		void bufferUPtsMsg(const std_msgs::Float64MultiArray::ConstPtr& pts_msg);
 
-		bool a;
+		ros::Subscriber u_obt_pts_sub;
 		bool rolling_window_;
-		double x1, y1, x2, y2, x3, y3, x4, y4;
+		bool new_U_pts;
+		double U_pts[8]; // {x1,y1,x2,y2,x3,y3,x4,y4}
 	};
 }
 #endif

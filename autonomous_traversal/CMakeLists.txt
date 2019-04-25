@@ -205,5 +205,5 @@ include_directories(
 
 include_directories(${catkin_INCLUDE_DIRS} include)
 
-add_library(lanes_layer plugins/lanes_layer.cpp)
-target_link_libraries(lanes_layer ${catkin_LIBRARIES})
+add_library(anti_reverse_layer plugins/anti_reverse_layer.cpp)
+target_link_libraries(anti_reverse_layer ${catkin_LIBRARIES})
