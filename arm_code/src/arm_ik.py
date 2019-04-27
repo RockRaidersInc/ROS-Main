@@ -13,9 +13,8 @@ from Jimbo_Kinematics import Inverse_Kin_No_EE as ik
 class ArmIK:
 
     def __init__(self):
-        self.arm_angles_pub = rospy.Publisher('arm_angles', Vector3Stamped, queue_size = 1)
-
-        self.target_pos_sub = rospy.Subscriber('wrist_position', Vector3Stamped, self.callback_target)
+        self.arm_angles_pub = rospy.Publisher('target_arm_angles', Vector3Stamped, queue_size = 1)
+        self.target_pos_sub = rospy.Subscriber('desired_wrist_position', Vector3Stamped, self.callback_target)
 
         while not rospy.is_shutdown():
             rospy.sleep(1)
@@ -31,13 +30,13 @@ class ArmIK:
         print(ik.inverse_kin(target_pos))
 
         angles = ik.inverse_kin(target_pos)
+        if not np.isnan(angles).any():
+            vec = Vector3Stamped()
+            vec.vector.x = angles[0][0]
+            vec.vector.y = angles[1][0]
+            vec.vector.z = angles[2][0]
 
-        vec = Vector3Stamped()
-        vec.vector.x = angles[0][0]
-        vec.vector.y = angles[1][0]
-        vec.vector.z = angles[0][0]
-
-        self.arm_angles_pub.publish(vec)
+            self.arm_angles_pub.publish(vec)
 
         
 

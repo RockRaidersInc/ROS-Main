@@ -37,6 +37,7 @@ map_ekf:
                  false, false, false,   #  x_vel   , y_vel    , z_vel,
                  false, false, false,   #  roll_vel, pitch_vel, yaw_vel,
                  false, false, false]   #  x_accel , y_accel  , z_accel]
+
   odom0_queue_size: 10
   odom0_nodelay: true
   odom0_differential: false

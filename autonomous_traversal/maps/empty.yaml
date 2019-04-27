@@ -1,8 +1,8 @@
 image: empty.pgm
-resolution: 0.01
-origin: [-10, -10, 0]
-occupied_thresh: 0.65
-free_thresh: 0.196 # Taken from the Willow Garage map in the turtlebot_navigation package
+resolution: 0.059414634
+origin: [-30.45, -30.45, 0]
+occupied_thresh: 0.2
+free_thresh: 0.01
 negate: 0
-width:  20
-height: 20
+width: 60.9 
+height: 60.9
