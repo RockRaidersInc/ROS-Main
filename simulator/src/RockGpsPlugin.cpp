@@ -113,7 +113,7 @@ void RockGpsPlugin::OnUpdate()
   sensor_msgs::NavSatFix msg;
   msg.header.stamp = ros::Time::now();
   msg.header.frame_id = frameId;
-
+/*
   double longitude = parentSensor->Longitude().Degree();
   double latitude = parentSensor->Latitude().Degree();
   double altitude = parentSensor->Altitude();
@@ -132,4 +132,6 @@ void RockGpsPlugin::OnUpdate()
   msg.position_covariance_type = msg.COVARIANCE_TYPE_DIAGONAL_KNOWN;
 
   gpsPub.publish(msg);
+
+*/
 }

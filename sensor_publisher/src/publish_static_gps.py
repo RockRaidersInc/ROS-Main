@@ -63,7 +63,7 @@ gps_data = ["$GNVTG,,T,,M,0.296,N,0.548,K,A*39",
 
 if __name__ == "__main__":
     rospy.init_node('publish_static_gps')
-    gps_pub = rospy.Publisher('gps/nmea_sentence', NmeaSentence_msg, queue_size = 2)
+    gps_pub = rospy.Publisher('/gps/nmea_sentence', NmeaSentence_msg, queue_size = 2)
     while not rospy.is_shutdown():
         for sentence in gps_data:
             sentence = sentence.strip()

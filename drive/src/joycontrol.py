@@ -31,6 +31,8 @@ class joycontrol:
     TURBO_MAX_LINEAR_SPEED = 1.5
     TURBO_MAX_ANGULAR_SPEED = 0.75
 
+    THRESHOLD = 0.1
+
     def __init__(self):
         rospy.init_node('joy_to_twist')
         self.twist_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
@@ -39,12 +41,16 @@ class joycontrol:
 
     def publish_stuff(self, event):
         twist_msg = Twist()
-        if self.button_x:
-            twist_msg.linear.x = self.left_y * self.TURBO_MAX_LINEAR_SPEED
-            twist_msg.angular.z = self.left_x * self.TURBO_MAX_ANGULAR_SPEED
+        if abs(self.left_y) > self.THRESHOLD or abs(self.left_x) > self.THRESHOLD:
+            if self.button_x:
+                twist_msg.linear.x = self.left_y * self.TURBO_MAX_LINEAR_SPEED
+                twist_msg.angular.z = self.left_x * self.TURBO_MAX_ANGULAR_SPEED
+            else:
+                twist_msg.linear.x = self.left_y * self.MAX_LINEAR_SPEED
+                twist_msg.angular.z = self.left_x * self.MAX_ANGULAR_SPEED
         else:
-            twist_msg.linear.x = self.left_y * self.MAX_LINEAR_SPEED
-            twist_msg.angular.z = self.left_x * self.MAX_ANGULAR_SPEED
+            twist_msg.linear.x = 0.0
+            twist_msg.angular.z = 0.0
         self.twist_pub.publish(twist_msg)
 
     def callback(self, data):
