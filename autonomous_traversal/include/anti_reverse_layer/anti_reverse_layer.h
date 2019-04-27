@@ -34,8 +34,9 @@ namespace anti_reverse_layer
 
 		ros::Subscriber u_obt_pts_sub;
 		bool rolling_window_;
-		bool new_U_pts;
+		bool new_U_pts_flag;
 		double U_pts[8]; // {x1,y1,x2,y2,x3,y3,x4,y4}
+		bool reset_costmap_flag;
 	};
 }
 #endif
