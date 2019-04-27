@@ -21,7 +21,8 @@ namespace anti_reverse_layer
 
 		// Subscribe the topic that publishes U obstacles
 		u_obt_pts_sub = nh.subscribe("/anti_rev_u_pts", 100, &AntiReverseLayer::bufferUPtsMsg, this);
-		new_U_pts = false;
+		new_U_pts_flag = false;
+		reset_costmap_flag = false;
 
 		// Dynamic Reconfig (not fully implemented)
 		dsrv_ = new dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig>(nh);
@@ -57,24 +58,24 @@ namespace anti_reverse_layer
 
 		// Publish virtual U shaped obstacle.
 		// Takes in 4 points and published obstacle line between pt1-pt2, pt2-pt3, pt3-pt4
-		if (new_U_pts){
-
+		if (new_U_pts_flag){
+			ROS_INFO("New U obstacle published with corners at: "
+					  "(%.2f, %.2f), (%.2f, %.2f), (%.2f, %.2f), (%.2f, %.2f)]",
+				      U_pts[0], U_pts[1], U_pts[2], U_pts[3], 
+				      U_pts[4], U_pts[5], U_pts[6], U_pts[7]);
 			// Calculate U corners transformed
 			double U_pts_tf[8];
 			calcUCorners(robot_x, robot_y, robot_yaw, U_pts_tf);
-			
 			// Convert to map coordinates
 			unsigned int U_pts_map[8];
 			for (int i=0;i<8;i+=2)
 				worldToMap(U_pts_tf[i], U_pts_tf[i+1], U_pts_map[i], U_pts_map[i+1]);
-
-			// Mark cells located on the U
+			// Mark cells located on the U using bresenhams line algorithm
 			for (int i=0;i<6;i+=2)
 			{
 				MarkCell marker(costmap_, LETHAL_OBSTACLE); 
 				raytraceLine(marker, U_pts_map[i], U_pts_map[i+1], U_pts_map[i+2], U_pts_map[i+3]);
 			}
-
 			// Update bounds
 			for (int i=0;i<8;i+=2)
 			{
@@ -83,9 +84,25 @@ namespace anti_reverse_layer
 				*max_x = std::max(*max_x, U_pts_tf[i]);
 				*max_y = std::max(*max_y, U_pts_tf[i+1]);
 			}
-			
-			new_U_pts = false;
+			// Reset flag
+			new_U_pts_flag = false;
 		}
+
+		if (reset_costmap_flag)
+		{
+			ROS_INFO("Clearing anti reverse layer");
+			// Clear costmap layer
+			resetMap(0,0,size_x_,size_y_);
+			// Update bounds
+			*min_x = -100000; // Really small value to update full map
+			*min_y = -100000;
+			*max_x = 100000;  // Really large value to update full map
+			*max_y = 100000;
+			// Reset flag
+			reset_costmap_flag = false;
+		}
+		// ROS_INFO("MIN MAX1: (%.2f,%.2f),(%.2f,%.2f)", *min_x, *min_y, *max_x, *max_y); // Debug123
+
 	}
 
 	void AntiReverseLayer::updateCosts(costmap_2d::Costmap2D& master_grid, 
@@ -94,6 +111,8 @@ namespace anti_reverse_layer
 	{
 		if (!enabled_)
 			return;
+
+		// ROS_INFO("MIN MAX2: (%d,%d),(%d,%d)", min_i, min_j, max_i, max_j); // Debug123
 
 		for (int j = min_j; j < max_j; j++)
 		{
@@ -105,6 +124,7 @@ namespace anti_reverse_layer
 				master_grid.setCost(i, j, costmap_[index]); 
 			}
 		}
+
 
 	}
 
@@ -125,15 +145,20 @@ namespace anti_reverse_layer
 
 	void AntiReverseLayer::bufferUPtsMsg(const std_msgs::Float64MultiArray::ConstPtr& pts_msg)
 	{
-		if (pts_msg->data.size() == 8)
-		{
-			std::copy(pts_msg->data.begin(), pts_msg->data.end(), U_pts);
-			new_U_pts = true;
+		std::vector<double> pts_msg_data = pts_msg->data;
 
-			ROS_INFO("New U obstacle published with corners at: "
-					  "(%.2f, %.2f), (%.2f, %.2f), (%.2f, %.2f), (%.2f, %.2f)]",
-				      U_pts[0], U_pts[1], U_pts[2], U_pts[3], 
-				      U_pts[4], U_pts[5], U_pts[6], U_pts[7]);
+		if (pts_msg_data.size() == 8)
+		{
+			// If the data field contains all 0's then reset the layer
+			int num_zeros = 0;
+			for (int i=0;i<pts_msg_data.size();i++)
+				if (pts_msg_data[i] == 0) num_zeros++;
+			if (num_zeros == 8)
+				reset_costmap_flag = true;			
+			
+			// Buffer the U obst pts for publishing
+			std::copy(pts_msg_data.begin(), pts_msg_data.end(), U_pts);
+			new_U_pts_flag = true;
 		}
 		else ROS_WARN("Recieved U_pts message is not of size 8");
 	}

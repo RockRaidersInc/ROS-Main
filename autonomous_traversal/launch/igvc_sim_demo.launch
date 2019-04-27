@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+	<node name="igvc_sim_demo" pkg="autonomous_traversal" type="igvc_sim_demo.py" output="screen"/>
+</launch>
