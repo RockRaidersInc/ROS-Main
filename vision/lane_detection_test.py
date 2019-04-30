@@ -1,73 +1,19 @@
 #! /usr/bin/python
 
 import numpy as np
-from cv_bridge import CvBridge, CvBridgeError
-
 import cv2
-import glob
-import matplotlib.pyplot as plt
-import pickle
-import matplotlib.image as mpimg
-import rospy
-from sensor_msgs.msg import Image
 import time
 import sys
+from debug_utils import *
 
-bridge = CvBridge()
-cv2_img = None
-
-
-# Import everything needed to edit/save/watch video clips
-# from moviepy.editor import VideoFileClip
-# from IPython.display import HTML
-
-
-def imshow(img, title=None, as_float=False, scale=None):
-    # Quick imshow helper function for debugging 
-    if scale is not None:
-        img = cv2.resize(img, (0,0), fx=scale, fy=scale) 
-    if not as_float:
-        img = img.astype(np.uint8)
-    if title is not None:
-        cv2.imshow(title, img)
-    else:
-        cv2.imshow('Quick imshow', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    
-def cs(*args, **kwarg):
-    # Quick checksum for debugging
-    for arg in args:
-        print('Checksum: {}'.format(np.sum(arg)))
-    for key, arg in kwarg.items():
-        print('Checksum ({}): {}'.format(key,np.sum(arg)))
-        
-def s(*arrays,**kw_arrays):
-    # Quick check shape for debugging
-    for array in arrays:
-        print('Shape: {}'.format(array.shape))
-    for key, array in kw_arrays.items():
-        print('Shape ({}): {}'.format(key,array.shape))
-
-# Define all the important functions
 
 def grayscale(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-
 # Or use RGB2GRAY if you read an image with mpimg
-
 def gaussian_blur(img, kernel_size):
     """Applies a Gaussian Noise kernel"""
     return cv2.GaussianBlur(img, (kernel_size, kernel_size), 0)
-
-
-# def undistort(img):
-#   cal_pickle = pickle.load( open( "camera_cal/calibration_pickle.p", "rb" ) )
-#   mtx = cal_pickle["mtx"]
-#   dist = cal_pickle["dist"]
-#   undist = cv2.undistort(img, mtx, dist, None, mtx)
-#   return undist
 
 def x_thresh(img, sobel_kernel=3, thresh=(0, 255)):
     gray = grayscale(img)
@@ -81,7 +27,6 @@ def x_thresh(img, sobel_kernel=3, thresh=(0, 255)):
     sxbinary = np.zeros_like(scaled_sobel)
     sxbinary[(scaled_sobel >= thresh[0]) & (scaled_sobel <= thresh[1])] = 1
     return sxbinary
-
 
 def mag_thresh(img, sobel_kernel=3, thresh=(0, 255)):
     # Convert to grayscale
@@ -101,7 +46,6 @@ def mag_thresh(img, sobel_kernel=3, thresh=(0, 255)):
     # Return the binary image
     return binary_output
 
-
 def dir_threshold(img, sobel_kernel=3, thresh=(0, np.pi / 2)):
     gray = grayscale(img)
     # Take both Sobel x and y gradients
@@ -118,7 +62,6 @@ def dir_threshold(img, sobel_kernel=3, thresh=(0, np.pi / 2)):
 
     return binary_output
 
-
 def hsv_select(img, thresh_low, thresh_high):
     hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
 
@@ -128,7 +71,6 @@ def hsv_select(img, thresh_low, thresh_high):
                  & (hsv[:, :, 2] >= thresh_low[2]) & (hsv[:, :, 2] <= thresh_high[2])] = 1
     return color_binary
 
-
 def hls_select(img, thresh=(0, 255)):
     hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
 
@@ -137,15 +79,8 @@ def hls_select(img, thresh=(0, 255)):
     s_binary[(s > thresh[0]) & (s <= thresh[1])] = 1
     return s_binary
 
-
 def warp(img):
     img_size = (img.shape[1], img.shape[0])
-
-    # src = np.float32([[800, 510], [1150, 700], [270, 700], [510, 510]])
-    # dst = np.float32([[650, 470], [640, 700], [270, 700], [270, 510]])
-
-    # src = np.float32([[440, 200], [430, 830], [250, 650], [260, 490]])
-    # dst = np.float32([[450, 20], [450, 830], [20, 830], [20, 20]])
 
     src = np.float32([[10, 360], [630, 330], [430, 260], [130, 270]])
     dst = np.float32([[20,460], [630, 460], [630, 20], [20,20]])
@@ -161,7 +96,6 @@ def warp(img):
 
     return warped, unpersp, Minv
 
-
 # Function for saving images to an output folder
 def create_pathname(infile, ext):
     temp1 = os.path.split(infile)[-1]
@@ -169,9 +103,8 @@ def create_pathname(infile, ext):
     outfile = os.path.join("output1/", temp2)
     return outfile
 
-
 # Functions for drawing lines
-def fit_lines(img, plot=True):
+def fit_lines(img):
     binary_warped = img.copy()
     # Assuming you have created a warped binary image called "binary_warped"
     # Take a histogram of the bottom half of the image
@@ -252,28 +185,12 @@ def fit_lines(img, plot=True):
     out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
     out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
 
-    if plot == True:
-        plt.figure(figsize=(10, 10))
-        fig = plt.figure()
-
-        # plt.imshow(out_img)
-        plt.plot(left_fitx, ploty, color='yellow')
-        plt.plot(right_fitx, ploty, color='yellow')
-        plt.xlim(0, 1280)
-        plt.ylim(720, 0)
     return left_fit, right_fit, out_img
-
 
 # Define a function for creating lane lines
 def lane_detector(image, video_mode=False):
-    # read image
-    # if video_mode == False:
-    #   image = cv2.imread(image)
-
     # Undistort image
-    # undist = undistort(image)
     undist = image
-    # print(undist.shape)
 
     # Define a kernel size and apply Gaussian smoothing
     apply_blur = True
@@ -288,6 +205,7 @@ def lane_detector(image, video_mode=False):
 
     # Define parameters for color thresholding
     s_binary = hls_select(undist, thresh=(90, 255))
+    s_binary = s_binary == 0
 
     # You can combine various thresholding operations
 
@@ -372,138 +290,35 @@ def draw_lines(undist, warped, left_fit, right_fit, left_cur, right_cur, center,
     newwarp = cv2.warpPerspective(color_warp, Minv, (color_warp.shape[1], color_warp.shape[0]))
     # Combine the result with the original image
     result = cv2.addWeighted(undist, 1, newwarp, 0.3, 0)
-    # add_text_to_image(result, left_cur, right_cur, center)
-    if show_img == True:
-        plt.figure(figsize=(10, 10))
-        fig = plt.figure()
-        plt.imshow(result)
 
     return result
 
 
 def process_img(image):
-    # On test image 3 first
-    # image= 'test_images/test3.jpg'
-    # orig_img = cv2.imread(image)
-    infile = "test_image"
     undist, sxbinary, s_binary, combined_binary1, warped_im, Minv = lane_detector(image)
-    imshow(undist, 'undist')
-    imshow(sxbinary*255, 'sxbinary')
-    imshow(s_binary*255, 's_binary')
-    imshow(combined_binary1*255, 'combined_binary1')
-    imshow(warped_im*255, 'warped_im')
-
-    # Save undist image
-    # outfile = create_pathname(infile, "_undist.jpg")
-    # cv2.imwrite("_undist.jpg", undist)
-
-    # #Save gradient thresholding
-    # sxbinary_disp = sxbinary*255
-    # outfile = create_pathname(infile, "_sxbinary.jpg")
-    # cv2.imwrite("_sxbinary.jpg", sxbinary_disp)
-
-    # Save color thresholding
-    # s_binary_disp = s_binary*255
-    # outfile = create_pathname(infile, "_sbinary.jpg")
-    # cv2.imwrite("_sbinary.jpg", s_binary_disp)
-
-    # Save gradient and color thresholding
-    # combined_binary1_disp = combined_binary1*255
-    # outfile = create_pathname(infile, "_combined_binary1.jpg")
-    # cv2.imwrite("_combined_binary1.jpg", combined_binary1_disp)
-
-    # # Save gradient thresholding
-    # warped_im_disp = warped_im*255
-    # # outfile = create_pathname(infile, "_warped.jpg")
-    # cv2.imwrite("_warped.jpg", warped_im_disp)
-
-    # print("the size of warp is {}, the size of combined_binary1 is {}".format(warped_im.shape, combined_binary1.shape))
+    # imshow(undist, 'undist')
+    # imshow(sxbinary*255, 'sxbinary')
+    # imshow(s_binary*255, 's_binary')
+    # imshow(combined_binary1*255, 'combined_binary1')
+    # imshow(warped_im*255, 'warped_im')
 
     left_fit, right_fit, out_img = fit_lines(warped_im)
     print(left_fit, right_fit)
     # imshow(out_img, 'out_img')
-    # cv2.imwrite("out_img.jpg", out_img)
 
-    # print(left_fit, right_fit)
     left_cur, right_cur, center = curvature(left_fit, right_fit, warped_im, print_data=True)
     result = draw_lines(undist, warped_im, left_fit, right_fit, left_cur, right_cur, center, Minv, show_img=False)
-    # cv2.imwrite("foo.jpg", result)
-
-
-    # Plots test images
-    # plt.figure(figsize=(10,10))
-    # fig = plt.figure()
-    # a=fig.add_subplot(2,2,1)
-    # plt.imshow(undist)
-    # a.set_title('Undistorted')
-
-    # a=fig.add_subplot(2,2,2)
-    # plt.imshow(sxbinary, cmap = 'Greys_r')
-    # a.set_title('X-thresholding')
-
-    # a=fig.add_subplot(2,2,3)
-    # plt.imshow(s_binary, cmap = 'Greys_r')
-    # a.set_title('Color Thresholding')
-
-    # a=fig.add_subplot(2,2,4)
-    # plt.imshow(combined_binary1, cmap = 'Greys_r')
-
-    # a.set_title('Gradient and Color Thresholding')
-    # cv2.waitKey(0)
-
-    # return result
-    # return warped_im
-
-
-def image_callback(msg):
-    print("Received an image!")
-    global cv2_img
-    try:
-        # Convert your ROS Image message to OpenCV2
-        cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
-
-    except CvBridgeError as e:
-        pass
-    else:
-        # Save your OpenCV2 image as a jpeg
-        # cv2.imwrite('camera_image.jpeg', cv2_img)
-        # process_img(cv2_img)
-        pass
+    # imshow(result, 'result')
+    return result
 
 
 def main():
-    rospy.init_node('image_listener')
-    # Define your image topic
-    # image_topic = "/zed/left/image_raw_color"
-    image_topic = "/zed/depth/image_raw"
-    # Set up your subscriber and define its callback
-    print(1)
-    rospy.Subscriber(image_topic, Image, image_callback)
-    # time.sleep(3)
-    # Spin until ctrl + c
-    while 1:
-        if cv2_img is not None:
-            # process_img(cv2_img)
-            cv2.imshow('img', cv2_img)
+    for i in range(1,16):
+        img = cv2.imread('igvc_sim_testset/{}.png'.format(i), cv2.IMREAD_COLOR)
+        process_img(img)
+        cv2.imwrite("foo.jpg", result)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-        time.sleep(.2)
-    cv2.destroyAllWindows()
-    # rospy.spin()
-
-    # img = cv2.imread('test3.jpeg',cv2.IMREAD_COLOR)
-    # process_img(img)
 
 
 if __name__ == '__main__':
-    # get image from ros topic
     main()
-
-    # get test image from local.
-    '''
-    image = cv2.imread("test.png")
-    process_img(image)
-    '''
-
