@@ -14,7 +14,7 @@
 		  name="odom_to_base_perfect" 
 		  if="$(arg simulation)"/>
 
-	<node name="map_server" 
+ 	<node name="map_server" 
 		  pkg="map_server" 
 		  type="map_server" 
 		  args="$(find autonomous_traversal)/maps/$(arg map).yaml"/>

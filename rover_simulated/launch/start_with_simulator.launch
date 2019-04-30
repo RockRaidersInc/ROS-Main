@@ -3,6 +3,10 @@
     <include file="$(find drive)/launch/kinematics.launch"/> 
 
     <include file="$(find rover_simulated)/launch/hardware_simulated.launch" pass_all_args="true"/> 
+    <node name="imu_quaternion_to_rpy" pkg="utils" type="imu_msg_to_xyz_rpy.py">
+        <remap from="~imu_msg_in" to="/imu/data"/>
+        <remap from="~imu_msg_out" to="/debug/imu_rpy"/>
+    </node>
     
     <node name="joy_0" pkg="joy" type="joy_node"/>
 </launch>

@@ -123,9 +123,11 @@ class motornode:
             else:
                 if self.m1_pwm is not None:
                     roboclaw.ForwardBackwardM1(self.address, self.m1_pwm)
+                    # roboclaw.DutyM1(self.address, (self.m1_pwm - 64) * int(32767 / 64))
                     self.m1_pwm = None
                 if self.m2_pwm is not None:
                     roboclaw.ForwardBackwardM2(self.address, self.m2_pwm)
+                    roboclaw.DutyM2(self.address, (self.m2_pwm - 64) * int(32768 / 64))
                     self.m2_pwm = None
 
                 if self.m1_vel is not None:

@@ -1,18 +1,24 @@
 <?xml version="1.0"?>
 <launch>
     <!-- Sensor Publisher -->
+<!--
     <node name="localization_sensors" pkg="sensor_publisher" type="sensor_publisher.py"/>
 
+-->
     <!-- Transforms, not sure if this is done right -->
-    <node pkg="tf" type="static_transform_publisher" name="base_to_gps" args="0 0 0 0 0 0 base_link gps0_link 100" />
-    <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 0 base_link imu0_link 100" />
+<!--     <node pkg="tf" type="static_transform_publisher" name="base_to_gps" args="0 0 0 0 0 0 base_link gps0_link 100" /> -->
+<!--     <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 0 base_link imu0_link 100" /> -->
 
     <!-- GPS nmea sentences to coordinates-->
+<!--
     <node name="gps_parser" pkg="nmea_navsat_driver" type="nmea_topic_driver" >
         <remap from="/nmea_sentence" to="/gps/nmea_sentence"/>
         <remap from="/fix" to="/gps/fix"/>
         <remap from="/vel" to="/gps/vel"/>
         <remap from="/time_reference" to="/gps/time_reference"/>
     </node>
+-->
 
+    <include file="$(find sensor_publisher)/launch/razor_imu.launch"/>
+    <include file="$(find sensor_publisher)/launch/gps_generic.launch"/>
 </launch>

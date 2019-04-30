@@ -1,10 +1,10 @@
 debug: 1                    # Range 0-4 (0 means no debug statements will print)
 
-device: /dev/ttyUSB0
+device: /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A702U4HV-if00-port0
 frame_id: gps
 dynamic_model: portable
 fix_mode: auto              # Switches between 2D/3D automatically
-dr_limit: 0                 # Dead reckoning limit
+dr_limit: 1                 # Dead reckoning limit
 enable_ppp: false           # Advanced setting not supported by all devices
 
 rate: 10                     # Measurement rate in Hz
@@ -16,17 +16,17 @@ uart1:
   out: 4                    # RTCM
 
 # RTCM out config
-rtcm:
-  ids: [5, 87, 77, 230]     # RTCM Messages to configure
-  rates: [1, 1, 1, 10]      # Rates of RTCM messages above,
+# rtcm:
+#   ids: [5, 87, 77, 230]     # RTCM Messages to configure
+#   rates: [1, 1, 1, 10]      # Rates of RTCM messages above,
                             # in number of navigation solutions
-dat:
-  set: false                # Do not set the user configured datum
+# dat:
+#   set: false                # Do not set the user configured datum
 
 # GNSS Config, verify which GNSS are supported by your device
 gnss:
   gps: true                 # (not required since it defaults to true)
-  glonass: true
+  glonass: false
   beidou: false
   qzss: false
   sbas: false
@@ -35,7 +35,7 @@ inf:
   all: true                   # Whether to display INF messages
 
 # Message subscriptions
-subscribe:
-  all: true                 # Subscribe to all messages
-  aid:
-    all: false                # ... except AID messages
+# subscribe:
+#   all: true                 # Subscribe to all messages
+#   aid:
+#     all: false                # ... except AID messages

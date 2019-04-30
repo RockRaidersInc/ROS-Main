@@ -11,6 +11,7 @@ static_layer:
     use_maximum: true
     subscribe_to_updates: true
 
+
 obstacle_layer:
     enabled: true
     track_unknown_space: true
