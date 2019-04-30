@@ -315,9 +315,8 @@ def process_img(image):
 def main():
     for i in range(1,16):
         img = cv2.imread('igvc_sim_testset/{}.png'.format(i), cv2.IMREAD_COLOR)
-        process_img(img)
-        cv2.imwrite("foo.jpg", result)
-
+        result = process_img(img)
+        cv2.imwrite("igvc_sim_testset_result/{}.png".format(i), result)
 
 
 if __name__ == '__main__':
