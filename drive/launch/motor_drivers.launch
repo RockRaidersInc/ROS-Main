@@ -6,17 +6,17 @@
     <node name="motornode_left" pkg="drive" type="motornode.py">
         <param name="controller_name" value="left"/>
         <param name="pub_enc" value="true"/>
-        <param name="m1_name" value="/motors/left"/>
+        <param name="m1_name" value="/motors/left_unused"/>
         <param name="m2_name" value="/motors/left"/>
-        <param name="address" value="129"/>
+        <param name="address" value="128"/>
     </node>
     
     <node name="motornode_right" pkg="drive" type="motornode.py">
         <param name="controller_name" value="right"/>
         <param name="pub_enc" value="true"/>
-        <param name="m1_name" value="/motors/right"/>
+        <param name="m1_name" value="/motors/right_unused"/>
         <param name="m2_name" value="/motors/right"/>
-        <param name="address" value="128"/>
+        <param name="address" value="129"/>
     </node>
 
 <!--
@@ -35,6 +35,6 @@
         <param name="m2_name" value="/motors/not_connected"/>
         <param name="address" value="131"/>
     </node>
--->
-    
+-->    
+
 </launch>

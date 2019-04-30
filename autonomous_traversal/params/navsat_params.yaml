@@ -2,7 +2,7 @@ navsat_tf:
   frequency: 30
   delay: 3.0
   # Need to tune. Refer to https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml
-  magnetic_declination_radians: 0.0 #0.226893
+  magnetic_declination_radians: 0.226893
   yaw_offset: 0
   zero_altitude: true
   broadcast_utm_transform: true

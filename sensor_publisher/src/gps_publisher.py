@@ -12,7 +12,7 @@ from sensor_msgs.msg import MagneticField as MagneticField_msg
 from nmea_msgs.msg import Sentence as NmeaSentence_msg
 
 
-arduino_serial_id = "usb-Arduino__www.arduino.cc__0043_75335313437351E01021-if00"
+arduino_serial_id = "usb-FTDI_FT232R_USB_UART_A702U4HV-if00-port0"
 
 
 def signal_handler(sig, frame):
@@ -52,7 +52,7 @@ def main(imu_pub, mag_pub):
     else:
         no_print = False
 
-    ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+    ser = serial.Serial('/dev/serial/by-id/' + arduino_serial_id, 9600, timeout=1)
     # ser = serial.Serial('/dev/serial/by-id/' + arduino_serial_id, 115200, timeout=1)
 
     # this is an easy way to parse the data coming out of the IMU. The Arduino prints the data
@@ -64,6 +64,18 @@ def main(imu_pub, mag_pub):
     imu_buffer = list()
     gps_buffer = list()
     input_buffer = list()   # for non-sorted data
+
+
+    input_str = ""
+
+    while True:
+        input_str += ser.read(1)
+#        print "got nmea sentence: ", input_str
+        if input_str[-1] == "\n":
+            input_str = input_str.strip()
+            send_gps_nmea_sentence(input_str)
+            print "sent nmea sentence ", input_str
+            input_str = ""
 
     while True:
         # pdb.set_trace()  # for debugging
@@ -81,10 +93,6 @@ def main(imu_pub, mag_pub):
             continue
 
         while len(input_buffer) > 0:
-            gps_buffer.append(input_buffer.pop(0))
-            continue
-            print("error")
-            return
             if input_buffer[0] != "!":
                 imu_buffer.append(input_buffer.pop(0))
             elif input_buffer[0] == "!" and len(input_buffer) == 1:
@@ -181,9 +189,9 @@ def map_to(x, in_min, in_max, out_min, out_max):
 
 
 if __name__ == "__main__":
-    imu_pub = rospy.Publisher('imu/data_raw', Imu_msg, queue_size = 2)
-    mag_pub = rospy.Publisher('imu/mag', MagneticField_msg, queue_size = 2)
-    gps_pub = rospy.Publisher('gps/nmea_sentence', NmeaSentence_msg, queue_size = 2)
+    imu_pub = rospy.Publisher('imu/data_raw/asdf', Imu_msg, queue_size = 2)
+    mag_pub = rospy.Publisher('imu/mag/asdf', MagneticField_msg, queue_size = 2)
+    gps_pub = rospy.Publisher('/gps/nmea_sentence', NmeaSentence_msg, queue_size = 2)
 
-    rospy.init_node('IMU_reader_node')
+    rospy.init_node('GPS_reader_node')
     main(imu_pub, mag_pub)

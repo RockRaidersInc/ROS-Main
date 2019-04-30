@@ -89,7 +89,7 @@ Visualization Manager:
         Shaft Length: 0.5
         Shaft Radius: 0.0250000004
         Value: Arrow
-      Topic: /odometry/perfect_map
+      Topic: /odometry/filtered_map
       Unreliable: false
       Value: true
     - Angle Tolerance: 0.100000001
@@ -109,7 +109,7 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: false
-      Enabled: false
+      Enabled: true
       Keep: 100
       Name: Odometry Pose
       Position Tolerance: 0.100000001
@@ -123,9 +123,9 @@ Visualization Manager:
         Shaft Length: 1
         Shaft Radius: 0.0500000007
         Value: Arrow
-      Topic: /odometry/perfect
+      Topic: /odometry/filtered
       Unreliable: false
-      Value: false
+      Value: true
     - Alpha: 1
       Axes Length: 1
       Axes Radius: 0.100000001
@@ -294,7 +294,11 @@ Visualization Manager:
   Value: true
   Views:
     Current:
+<<<<<<< HEAD
+      Angle: 0.0249998756
+=======
       Angle: 3.17499971
+>>>>>>> ae4917e1a821662c69be756e9bae70b0d5af947f
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987

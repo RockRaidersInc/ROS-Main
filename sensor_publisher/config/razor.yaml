@@ -13,20 +13,21 @@ accel_z_max: 232.0
 
 ### magnetometer
 # standard calibration
-magn_x_min: -392.0
-magn_x_max: 661.0
-magn_y_min: -5590.0
-magn_y_max: 496.0
-magn_z_min: -505.0
-magn_z_max: 474.0
+magn_x_min: -132.00
+magn_x_max: 365.00
+magn_y_min: -288.00
+magn_y_max: 214.00
+magn_z_min: 264.00
+magn_z_max: 822.00
 
 # extended calibration
-calibration_magn_use_extended: false
-magn_ellipsoid_center: [0, 0, 0]
-magn_ellipsoid_transform: [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+calibration_magn_use_extended: true
+magn_ellipsoid_center: [112.173, -18.2393, -70.5913]
+# magn_ellipsoid_center: [149.760, 16.2692, 513.530]
+magn_ellipsoid_transform: [[0.941823, 0.00544372, -0.0246595], [0.00544372, 0.957537, 0.0176324], [-0.0246595, 0.0176324, 0.983950]]
 
 # AHRS to robot calibration
-imu_yaw_calibration: 0.0
+imu_yaw_calibration: 90
 
 ### gyroscope
 gyro_average_offset_x: -26.46
