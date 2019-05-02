@@ -82,8 +82,14 @@ def hls_select(img, thresh=(0, 255)):
 def warp(img):
     img_size = (img.shape[1], img.shape[0])
 
-    src = np.float32([[10, 360], [630, 330], [430, 260], [130, 270]])
-    dst = np.float32([[20,460], [630, 460], [630, 20], [20,20]])
+    src = np.float32([[230, 321], [258, 292], [371, 292], [400, 321]])
+    square_size = 50
+    img_x_half = 320
+    img_y_half = 240
+    dst = np.float32([[-square_size/2 + img_x_half, square_size/2 + img_y_half], 
+                      [-square_size/2 + img_x_half, -square_size/2 + img_y_half], 
+                      [square_size/2 + img_x_half, -square_size/2 + img_y_half], 
+                      [square_size/2 + img_x_half, square_size/2 + img_y_half]])
     M = cv2.getPerspectiveTransform(src, dst)
 
     # inverse
@@ -92,9 +98,10 @@ def warp(img):
     # create a warped image
     warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
 
-    unpersp = cv2.warpPerspective(warped, Minv, img_size, flags=cv2.INTER_LINEAR)
+    # unpersp = cv2.warpPerspective(warped, Minv, img_size, flags=cv2.INTER_LINEAR)
+    unpersp = img
 
-    return warped, unpersp, Minv
+    return warped, unpersp, M
 
 # Function for saving images to an output folder
 def create_pathname(infile, ext):
@@ -105,6 +112,9 @@ def create_pathname(infile, ext):
 
 # Functions for drawing lines
 def fit_lines(img):
+    # import matplotlib.pyplot as plt
+    # plt.imshow(img)
+    # plt.show()
     binary_warped = img.copy()
     # Assuming you have created a warped binary image called "binary_warped"
     # Take a histogram of the bottom half of the image
@@ -295,12 +305,15 @@ def draw_lines(undist, warped, left_fit, right_fit, left_cur, right_cur, center,
 
 
 def process_img(image):
+    warped_im_raw, _, _ = warp(image)
+    imshow(warped_im_raw)
+
     undist, sxbinary, s_binary, combined_binary1, warped_im, Minv = lane_detector(image)
-    # imshow(undist, 'undist')
-    # imshow(sxbinary*255, 'sxbinary')
-    # imshow(s_binary*255, 's_binary')
-    # imshow(combined_binary1*255, 'combined_binary1')
-    # imshow(warped_im*255, 'warped_im')
+    imshow(undist, 'undist')
+    imshow(sxbinary*255, 'sxbinary')
+    imshow(s_binary*255, 's_binary')
+    imshow(combined_binary1*255, 'combined_binary1')
+    imshow(warped_im*255, 'warped_im')
 
     left_fit, right_fit, out_img = fit_lines(warped_im)
     print(left_fit, right_fit)

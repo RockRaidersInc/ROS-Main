@@ -1,8 +1,9 @@
 #! /usr/bin/python
-
+from __future__ import print_function
 import cv2
 import numpy as np
 import logging
+import sys
 
 
 def imshow(img, title=None, as_float=False, scale=None):
@@ -16,7 +17,11 @@ def imshow(img, title=None, as_float=False, scale=None):
     cv2.namedWindow(title)
     cv2.moveWindow(title, 40,30)
     cv2.imshow(title, img)
-    cv2.waitKey(0)
+    key = cv2.waitKey(0)
+    if key == ord('q'):
+        print("exiting (q was pressed)", file=sys.stderr)
+        sys.exit()
+
     cv2.destroyAllWindows()
     
 def cs(*args, **kwarg):
