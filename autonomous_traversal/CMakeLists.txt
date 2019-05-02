@@ -8,6 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
   costmap_2d
   pluginlib
   dynamic_reconfigure
+  geometry_msgs
+  message_generation
 )
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -52,11 +54,10 @@ find_package(catkin REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  Lane.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -72,11 +73,11 @@ find_package(catkin REQUIRED)
 #   Action2.action
 # )
 
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+# Generate added messages and services with any dependencies listed here
+generate_messages(
+  DEPENDENCIES
+  geometry_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -112,6 +113,7 @@ catkin_package(
 #  LIBRARIES autonomous_traversal
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
+CATKIN_DEPENDS message_runtime
 )
 
 ###########
@@ -207,3 +209,5 @@ include_directories(${catkin_INCLUDE_DIRS} include)
 
 add_library(anti_reverse_layer plugins/anti_reverse_layer.cpp)
 target_link_libraries(anti_reverse_layer ${catkin_LIBRARIES})
+
+

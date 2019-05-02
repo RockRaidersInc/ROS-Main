@@ -54,7 +54,9 @@
   <depend>pluginlib</depend>
   <depend>roscpp</depend>
   <depend>rospy</depend>
-  
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <costmap_2d plugin="${prefix}/costmap_plugins.xml"/>
