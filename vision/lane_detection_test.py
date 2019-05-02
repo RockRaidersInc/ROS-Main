@@ -82,14 +82,15 @@ def hls_select(img, thresh=(0, 255)):
 def warp(img):
     img_size = (img.shape[1], img.shape[0])
 
-    src = np.float32([[230, 321], [258, 292], [371, 292], [400, 321]])
-    square_size = 50
+    src = np.float32([[130, 310], [231, 172], [431, 173], [563, 309]])
+    square_size = 100
     img_x_half = 320
     img_y_half = 240
-    dst = np.float32([[-square_size/2 + img_x_half, square_size/2 + img_y_half], 
-                      [-square_size/2 + img_x_half, -square_size/2 + img_y_half], 
-                      [square_size/2 + img_x_half, -square_size/2 + img_y_half], 
-                      [square_size/2 + img_x_half, square_size/2 + img_y_half]])
+    y_offset = 150
+    dst = np.float32([[-square_size/2 + img_x_half, square_size/2 + img_y_half + y_offset], 
+                      [-square_size/2 + img_x_half, -square_size/2 + img_y_half + y_offset], 
+                      [square_size/2 + img_x_half, -square_size/2 + img_y_half + y_offset], 
+                      [square_size/2 + img_x_half, square_size/2 + img_y_half + y_offset]])
     M = cv2.getPerspectiveTransform(src, dst)
 
     # inverse
@@ -305,9 +306,6 @@ def draw_lines(undist, warped, left_fit, right_fit, left_cur, right_cur, center,
 
 
 def process_img(image):
-    warped_im_raw, _, _ = warp(image)
-    imshow(warped_im_raw)
-
     undist, sxbinary, s_binary, combined_binary1, warped_im, Minv = lane_detector(image)
     imshow(undist, 'undist')
     imshow(sxbinary*255, 'sxbinary')
@@ -327,7 +325,7 @@ def process_img(image):
 
 def main():
     for i in range(1,16):
-        img = cv2.imread('igvc_sim_testset1/{}.png'.format(i), cv2.IMREAD_COLOR)
+        img = cv2.imread('igvc_sim_testset2/{}.png'.format(i), cv2.IMREAD_COLOR)
         result = process_img(img)
         cv2.imwrite("igvc_sim_testset_result/{}.png".format(i), result)
 
