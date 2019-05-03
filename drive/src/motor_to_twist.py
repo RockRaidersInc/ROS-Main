@@ -41,13 +41,16 @@ class motor_to_twist:
         self.right_positions.append((new_pos, rospy.Time.now()))
     
     def publish_data(self, time_obj):
-	if len(self.left_positions) < 3 or len(self.right_positions) < 3:
-		return
+        if len(self.left_positions) <= 10 or len(self.right_positions) <= 10:
+            return
 
-        while self.left_positions[-1][1].to_sec() - self.left_positions[0][1].to_sec() > 0.5:
+        while self.left_positions[-1][1].to_sec() - self.left_positions[0][1].to_sec() > 1:
             self.left_positions.pop(0)
-        while self.right_positions[-1][1].to_sec() - self.right_positions[0][1].to_sec() > 0.5:
+        while self.right_positions[-1][1].to_sec() - self.right_positions[0][1].to_sec() > 1:
             self.right_positions.pop(0)
+
+        if len(self.left_positions) <= 10 or len(self.right_positions) <= 10:
+            return
 
         out_msg = Odometry()
         out_msg.header.stamp = rospy.Time.now()
@@ -60,10 +63,12 @@ class motor_to_twist:
 
                 left_vel = self.linear_reg_slope(self.left_positions)
                 right_vel = self.linear_reg_slope(self.right_positions)
+                #print(str(left_vel) + ',' + str(right_vel))
 
                 v, omega = kinematics.forward_kinematics(left_vel, right_vel, track=self.track, diameter=self.wheel_diameter)
                 out_msg.twist.twist.linear.x = v
                 out_msg.twist.twist.angular.z = omega
+                #print(str(v) + ',' + str(omega))
 
                 # don't use old data
                 self.left_positions.pop(0)

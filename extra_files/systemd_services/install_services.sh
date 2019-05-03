@@ -4,3 +4,6 @@
 cp xboxdrv.service /etc/systemd/system/xboxdrv.service
 systemctl enable xboxdrv.service
 systemctl restart xboxdrv.service
+
+cp drive_at_startup.service /etc/systemd/system/drive_at_startup.service
+systemctl enable drive_at_startup.service

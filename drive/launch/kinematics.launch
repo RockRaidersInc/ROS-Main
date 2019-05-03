@@ -16,7 +16,7 @@
         <remap from="right_motor_vel" to="/motors/right_vel"/>
     </node>
 
-    <node name="motor_to_twist" pkg="drive" type="motor_to_twist.py" respawn="true">
+    <node name="motor_to_twist" pkg="drive" type="motor_to_twist.py" respawn="true" output="screen">
         <remap from="left_motor_in" to="/motors/left_enc"/>
         <remap from="right_motor_in" to="/motors/right_enc"/>
         <remap from="twist_publisher" to="/odometry/wheel"/>
