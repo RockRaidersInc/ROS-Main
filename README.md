@@ -1,22 +1,42 @@
 # ROS-Main
 
-This respository should be your src file in your ROS workspace.  So when cloning, call this from your workspace
+First install Gazebo. Use these commands:
 ```
+sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-latest.list'
+wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+sudo apt update
+sudo apt install -y gazebo7
+```
+
+First install ROS Kinetic. Instructions are here:
+```
+http://wiki.ros.org/kinetic/Installation/Ubuntu
+```
+
+Install some more tools:
+```
+sudo apt install -y cmake python-catkin-pkg python-empy python-nose libgtest-dev python-catkin-tools
+sudo apt install -y ros-kinetic-joy ros-kinetic-geographic-msgs ros-kinetic-tf2-geometry-msgs ros-kinetic-move-base ros-kinetic-map-server ros-kinetic-global-planner
+sudo apt install -y ros-kinetic-desktop
+sudo apt install -y ros-kinetic-gazebo-ros
+sudo apt install -y ros-kinetic-pcl-ros
+sudo apt install -y ros-kinetic-usb-cam
+```
+
+Create a catkin workspace and clone our repository:
+```
+mkdir ~\URC
+cd ~\URC
 git clone https://github.com/RockRaidersInc/ROS-Main.git src
+catkin build
 ```
 
-The following commands should be run to install required packages:
+If catkin build succeeded then test the install by running 
 ```
-# installing catkin (the newer version with `catkin build`)
-sudo apt install cmake python-catkin-pkg python-empy python-nose libgtest-dev install python-catkin-tools
-
-sudo apt install ros-kinetic-joy
-sudo apt install ros-kinetic-geographic-msgs
+./src/launchscripts/simulator.sh igvc17
 ```
+The simulator should start. If it crases don't fear, press control-c in the terminal and try it again. Gazebo often crashes on startup for unknonw reasons.
 
-##Starting up a simulator
-The easiest way is to simply call the bash script `launch_simulated.sh` from the folder launchscripts
-Then, in a new terminal, source devel/setup.bash and run `roslaunch launch_files base_station.launch` to get joystick support.
 
 ##Starting up the actual rover
 On the rover run `roslaunch launch_files launch_with_hardware.launch`. 
@@ -30,12 +50,7 @@ Once you have cloned your repository, if you intend on working with the USB came
 git submodule init
 git submodule update
 ```
-Also install the usb_cam package
-```
-sudo apt install usb_cam
-```
 
-This will clone the usb_cam pakage into the correct directory.  You will then need to run `catkin build` to build the new package and it should be ready to go
 
 To start getting your images from the camera, you need to run the usb_cam_node as follows:
 ```
@@ -64,9 +79,7 @@ sudo apt install ros-kinetic-geographic-msgs
 ## autonomous traversal stuff
 ```
 sudo apt install gpsd ros-kinetic-gpsd-client
-sudo apt install ros-kinetic-tf2-geometry-msgs ros-kinetic-move-base sudo apt install ros-kinetic-map-server
 sudo apt install ros-kinetic-nmea-navsat-driver
-sudo apt install ros-kinetic-global-planner
 ```
 
 ## simulation stuff
