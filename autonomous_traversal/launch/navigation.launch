@@ -17,7 +17,7 @@
  	<node name="map_server" 
 		  pkg="map_server" 
 		  type="map_server" 
-		  args="$(find autonomous_traversal)/maps/$(arg map_file).yaml"/>
+		  args="$(find autonomous_traversal)/maps/$(arg map).yaml"/>
 
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 		<!-- Load params -->
