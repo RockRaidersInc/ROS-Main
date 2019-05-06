@@ -31,6 +31,11 @@ git clone https://github.com/RockRaidersInc/ROS-Main.git src
 catkin build
 ```
 
+While we're here, give yourself permission to open serial ports
+```
+sudo adduser $(whoami) dialout
+```
+
 If catkin build succeeded then test the install by running 
 ```
 ./src/launchscripts/simulator.sh igvc17
@@ -72,32 +77,30 @@ To run ROS with UI, you must download and install rqt (http://wiki.ros.org/rqt),
 # Other stuff that needs to be installed
 
 ```
-sudo apt install ros-kinetic-joy
-sudo apt install ros-kinetic-geographic-msgs
+sudo apt install -y ros-kinetic-joy  ros-kinetic-geographic-msgs
 ```
 
 ## autonomous traversal stuff
 ```
-sudo apt install gpsd ros-kinetic-gpsd-client
-sudo apt install ros-kinetic-nmea-navsat-driver
+sudo apt install -y gpsd ros-kinetic-gpsd-client ros-kinetic-nmea-navsat-driver ros-kinetic-gps-common ros-kinetic-mapviz ros-kinetic-mapviz-plugins ros-kinetic-swri-transform-util
 ```
 
 ## simulation stuff
 ```
-sudo apt install libignition-math2-dev ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control
+sudo apt install -y libignition-math2-dev ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control
 ```
 
 
 ## xbox controller setup
 A driver needs to be running to handle xbox controllers. It can be installed with
 ```
-sudo apt install xboxdrv
+sudo apt install -y xboxdrv
 ```
 To use an Xbox controller, run this in a separate terminal:
 
 ```sudo xboxdrv --detach-kernel-driver```
 
-The previous command can be auto-started on boot like so:
+Having to run this every time is annoying. Use these commands to have it run automatically on startup:
 ```
 # navigate to the source directory and run 
 cd extra_files/systemd_services && sudo ./install_services.sh
