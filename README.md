@@ -100,13 +100,22 @@ To use an Xbox controller, run this in a separate terminal:
 
 ```sudo xboxdrv --detach-kernel-driver```
 
-Having to run this every time is annoying. Use these commands to have it run automatically on startup:
+## Rover specific setup
+This section is about setting up the rover to run drive code on startup.
 ```
 # navigate to the source directory and run 
 cd extra_files/systemd_services && sudo ./install_services.sh
 
 # make sure the service is running with
 sudo systemctl status xboxdrv.service
+```
+
+Add the following lines to .bashrc
+```
+sudo systemctl kill drive_at_startup.service
+source /opt/ros/kinetic/setup.bash
+source ~/URC/devel/setup.bash
+source ~/URC/src/launchscripts/export_remote_ros_vars.sh
 ```
 
 To remove the xbox controller service 
