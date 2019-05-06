@@ -1,0 +1,1 @@
+rock	ALL=NOPASSWD:	/sbin/modprobe pcspkr
