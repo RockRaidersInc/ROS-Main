@@ -25,8 +25,8 @@ sudo apt install -y ros-kinetic-usb-cam
 
 Create a catkin workspace and clone our repository:
 ```
-mkdir ~\URC
-cd ~\URC
+mkdir ~/URC
+cd ~/URC
 git clone https://github.com/RockRaidersInc/ROS-Main.git src
 catkin build
 ```
