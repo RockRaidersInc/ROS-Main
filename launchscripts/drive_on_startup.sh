@@ -28,7 +28,7 @@ fi
 
 # roslaunch base_station base_station.launch &
 
-sleep 3
+# sleep 3
 
 sudo modprobe pcspkr
 beep -f 1000 -r 2 -l 250

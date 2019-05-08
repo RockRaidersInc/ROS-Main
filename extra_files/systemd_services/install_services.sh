@@ -14,3 +14,5 @@ systemctl enable drive_at_startup.service
 
 # let the rock user run ```sudo /sbin/modprobe pcspkr``` without a password. This is required to make beeps with the industrial motherboard's built in speaker (we love legacy hardware)
 cp spkr_sudoers /etc/sudoers.d/.
+
+sudo apt install -y beep

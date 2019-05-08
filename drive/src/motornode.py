@@ -159,6 +159,9 @@ class motornode:
         random.shuffle(ports)
         for usb in ports:
             try:
+                rospy.logerr('about to open ' + str(usb.device))
+                if usb.product != 'USB Roboclaw 2x60A':
+                    continue
                 # Open up the serial port and see if data is available at the desired address
                 roboclaw.Open(usb.device, 38400)
                 c1, c2 = roboclaw.GetConfig(self.address)
@@ -173,6 +176,7 @@ class motornode:
                 else:
                     roboclaw.port.close()
             except IOError:
+                rospy.logerr('IOError')
                 continue
             # time.sleep(0.1)
         return False
@@ -183,7 +187,7 @@ class motornode:
             self.timeout = int(round(time.time() * 1000))
             self.m1_pwm = msg.data
         else:
-            #rospy.loginfo('%s recieved M1_pwm, not connected', self.address)
+            rospy.loginfo('%s recieved M1_pwm, not connected', self.address)
             pass
             
     def callbackM2_pwm(self, msg):
@@ -191,7 +195,7 @@ class motornode:
             self.timeout = int(round(time.time() * 1000))
             self.m2_pwm = msg.data
         else:
-            #rospy.loginfo('%s recieved M2_pwm, not connected', self.address)
+            rospy.loginfo('%s recieved M2_pwm, not connected', self.address)
             pass
 
 
