@@ -142,7 +142,7 @@ def process_imu_data(line, regex):
         imu_msg.header.stamp = rospy.get_rostime()
         imu_msg.header.stamp.secs = int(data_collection_time)
         imu_msg.header.stamp.nsecs = int((data_collection_time - imu_msg.header.stamp.secs) * 1000000000)
-        imu_msg.header.frame_id = "imu0_link"
+        imu_msg.header.frame_id = "base_imu_link"
 
         accel_x, accel_y, accel_z = float(match.group('accel_x')), float(match.group('accel_y')), float(match.group('accel_z'))
         imu_msg.linear_acceleration.x = map_to(accel_x, -0.4, 10.3, 0, 9.81)

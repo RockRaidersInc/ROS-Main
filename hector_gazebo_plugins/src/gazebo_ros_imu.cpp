@@ -391,18 +391,18 @@ void GazeboRosIMU::Update()
   imuMsg.header.stamp.sec = cur_time.sec;
   imuMsg.header.stamp.nsec = cur_time.nsec;
 
-//   // orientation quaternion
-// #if (GAZEBO_MAJOR_VERSION >= 8)
-//   imuMsg.orientation.x = rot.X();
-//   imuMsg.orientation.y = rot.Y();
-//   imuMsg.orientation.z = rot.Z();
-//   imuMsg.orientation.w = rot.W();
-// #else
-//   imuMsg.orientation.x = rot.x;
-//   imuMsg.orientation.y = rot.y;
-//   imuMsg.orientation.z = rot.z;
-//   imuMsg.orientation.w = rot.w;
-// #endif
+  // orientation quaternion
+#if (GAZEBO_MAJOR_VERSION >= 8)
+  imuMsg.orientation.x = rot.X();
+  imuMsg.orientation.y = rot.Y();
+  imuMsg.orientation.z = rot.Z();
+  imuMsg.orientation.w = rot.W();
+#else
+  imuMsg.orientation.x = rot.x;
+  imuMsg.orientation.y = rot.y;
+  imuMsg.orientation.z = rot.z;
+  imuMsg.orientation.w = rot.w;
+#endif
 
   // pass angular rates
 #if (GAZEBO_MAJOR_VERSION >= 8)
