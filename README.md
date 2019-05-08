@@ -40,7 +40,7 @@ If catkin build succeeded then test the install by running
 ```
 ./src/launchscripts/simulator.sh igvc17
 ```
-The simulator should start. If it crases don't fear, press control-c in the terminal and try it again. Gazebo often crashes on startup for unknonw reasons.
+The simulator should start. If it crashes press control-c in the terminal and try it again. Gazebo often crashes on startup for unknonw reasons.
 
 
 ##Starting up the actual rover
@@ -82,7 +82,7 @@ sudo apt install -y ros-kinetic-joy  ros-kinetic-geographic-msgs
 
 ## autonomous traversal stuff
 ```
-sudo apt install -y gpsd ros-kinetic-gpsd-client ros-kinetic-nmea-navsat-driver ros-kinetic-gps-common ros-kinetic-mapviz ros-kinetic-mapviz-plugins ros-kinetic-swri-transform-util
+sudo apt install -y gpsd ros-kinetic-gpsd-client ros-kinetic-nmea-navsat-driver ros-kinetic-gps-common ros-kinetic-mapviz ros-kinetic-mapviz-plugins ros-kinetic-swri-transform-util ros-kinetic-robot-localization
 ```
 
 ## simulation stuff
