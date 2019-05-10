@@ -27,7 +27,7 @@ Create a catkin workspace and clone our repository:
 ```
 mkdir ~/URC
 cd ~/URC
-git clone https://github.com/RockRaidersInc/ROS-Main.git src
+git clone --recurse-submodules https://github.com/RockRaidersInc/ROS-Main.git src
 catkin build
 ```
 
