@@ -1,8 +1,8 @@
 image: empty.pgm
-resolution: 0.59414634
-origin: [-30.45, -30.45, 0]
+resolution: 0.148536585
+origin: [-76.125, -76.125, 0]
 occupied_thresh: 0.2
 free_thresh: 0.01
 negate: 0
-width: 609 
-height: 609
+width: 152.25
+height: 152.25

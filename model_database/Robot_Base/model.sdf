@@ -2,11 +2,11 @@
 <sdf version='1.6'>
   <model name='Robot_Base'>
 
-    <!--<include>
+    <include>
       <uri> model://kinect_ros </uri>
       <name> depth_camera </name>
         <pose frame=''> 0.0 0.6 1.62   0.0 0.5236 1.57 </pose> 
-    </include>  -->
+    </include>  
 
     <include>
       <uri> model://gps_imu </uri>
