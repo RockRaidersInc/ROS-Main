@@ -35,7 +35,7 @@ class joycontrol:
 
     def __init__(self):
         rospy.init_node('joy_to_twist')
-        self.twist_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+        self.twist_pub = rospy.Publisher('~cmd_vel', Twist, queue_size=1)
         rospy.Subscriber("joy", Joy, self.callback)
         # self.publish_timer = rospy.Timer(rospy.Duration(0.05), self.publish_stuff)
 
