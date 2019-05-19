@@ -147,8 +147,19 @@ def warp(img):
     # src = np.float32([[440, 200], [430, 830], [250, 650], [260, 490]])
     # dst = np.float32([[450, 20], [450, 830], [20, 830], [20, 20]])
 
-    src = np.float32([[10, 360], [630, 330], [430, 260], [130, 270]])
-    dst = np.float32([[20,460], [630, 460], [630, 20], [20,20]])
+    # src = np.float32([[10, 360], [630, 330], [430, 260], [130, 270]])
+    # dst = np.float32([[20,460], [630, 460], [630, 20], [20,20]])
+
+        src = np.float32([[130, 310], [231, 172], [431, 173], [563, 309]])
+    square_size = 100
+    img_x_half = 320
+    img_y_half = 240
+    y_offset = 150
+    dst = np.float32([[-square_size/2 + img_x_half, square_size/2 + img_y_half + y_offset], 
+                      [-square_size/2 + img_x_half, -square_size/2 + img_y_half + y_offset], 
+                      [square_size/2 + img_x_half, -square_size/2 + img_y_half + y_offset], 
+                      [square_size/2 + img_x_half, square_size/2 + img_y_half + y_offset]])
+    
     M = cv2.getPerspectiveTransform(src, dst)
 
     # inverse

@@ -51,7 +51,7 @@ odom_ekf:
                  false, false, false]   #  x_accel , y_accel  , z_accel]
   odom1_queue_size: 10
   odom1_nodelay: true
-  odom1_differential: true
+  odom1_differential: false
   odom1_relative: false
 
   # IMU Settings
@@ -62,7 +62,7 @@ odom_ekf:
                 false,  false,  false,
                 false,  false,  false]
   imu0_nodelay: false
-  imu0_differential: false
+  imu0_differential: true
   imu0_relative: false
   imu0_queue_size: 10
   imu0_remove_gravitational_acceleration: true
