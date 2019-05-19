@@ -85,8 +85,15 @@ def hls_select(img, thresh=(0, 255)):
 def warp(img):
     img_size = (img.shape[1], img.shape[0])
 
-    src = np.float32([[0, 200], [630, 240], [480, 100], [290, 100]])
-    dst = np.float32([[0,480], [640, 480], [640, 0], [0, 0]])
+    src = np.float32([[130, 310], [231, 172], [431, 173], [563, 309]])
+    square_size = 100
+    img_x_half = 320
+    img_y_half = 240
+    y_offset = 150
+    dst = np.float32([[-square_size/2 + img_x_half, square_size/2 + img_y_half + y_offset], 
+                      [-square_size/2 + img_x_half, -square_size/2 + img_y_half + y_offset], 
+                      [square_size/2 + img_x_half, -square_size/2 + img_y_half + y_offset], 
+                      [square_size/2 + img_x_half, square_size/2 + img_y_half + y_offset]])
     M = cv2.getPerspectiveTransform(src, dst)
 
     # inverse
@@ -95,9 +102,10 @@ def warp(img):
     # create a warped image
     warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
 
-    unpersp = cv2.warpPerspective(warped, Minv, img_size, flags=cv2.INTER_LINEAR)
+    # unpersp = cv2.warpPerspective(warped, Minv, img_size, flags=cv2.INTER_LINEAR)
+    unpersp = img
 
-    return warped, unpersp, Minv
+    return warped, unpersp, M
 
 # Function for saving images to an output folder
 def create_pathname(infile, ext):
@@ -108,6 +116,9 @@ def create_pathname(infile, ext):
 
 # Functions for drawing lines
 def fit_lines(img):
+    # import matplotlib.pyplot as plt
+    # plt.imshow(img)
+    # plt.show()
     binary_warped = img.copy()
     # Assuming you have created a warped binary image called "binary_warped"
     # Take a histogram of the bottom half of the image
@@ -300,6 +311,11 @@ def draw_lines(undist, warped, left_fit, right_fit, left_cur, right_cur, center,
 
 def process_img(image):
     undist, sxbinary, s_binary, combined_binary1, warped_im, Minv = lane_detector(image)
+    imshow(undist, 'undist')
+    imshow(sxbinary*255, 'sxbinary')
+    imshow(s_binary*255, 's_binary')
+    imshow(combined_binary1*255, 'combined_binary1')
+    imshow(warped_im*255, 'warped_im')
 
     left_fit, right_fit, out_img = fit_lines(warped_im)
     print(left_fit, right_fit)
@@ -318,6 +334,11 @@ def process_img(image):
 
     return out_img
 
+def main():
+    for i in range(1,16):
+        img = cv2.imread('igvc_sim_testset2/{}.png'.format(i), cv2.IMREAD_COLOR)
+        result = process_img(img)
+        cv2.imwrite("igvc_sim_testset_result/{}.png".format(i), result)
 
 def main():
     for i in range(68):

@@ -35,7 +35,7 @@
 		<!-- Use perfect odometry from simulator (for debugging) -->
 		<remap from="odom" to="/odometry/perfect" if="$(arg simulation)"/>
 		<remap from="odom" to="/odometry/filtered" unless="$(arg simulation)"/>
-		<remap from="/cmd_vel" to="/cmd_vel" />
+		<remap from="/cmd_vel" to="/cmd_vel_autonomy" />
 		<remap from="/map" to="/map" /> 
 	</node>
 	

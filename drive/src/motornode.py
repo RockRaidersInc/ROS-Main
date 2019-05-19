@@ -131,10 +131,16 @@ class motornode:
                     self.m2_pwm = None
 
                 if self.m1_vel is not None:
-                    roboclaw.SpeedM1(self.address, self.m1_vel)
+                    if self.m1_vel == 0:
+                        roboclaw.DutyM1(self.address, 0)
+                    else:
+                        roboclaw.SpeedM1(self.address, self.m1_vel)
                     self.m1_vel = None
                 if self.m2_vel is not None:
-                    roboclaw.SpeedM2(self.address, self.m2_vel)
+                    if self.m2_vel == 0:
+                        roboclaw.DutyM2(self.address, 0)
+                    else:
+                        roboclaw.SpeedM2(self.address, self.m2_vel)
                     self.m2_vel = None
 
                 # TODO: Move QPPS to configuration file per motor
@@ -153,6 +159,9 @@ class motornode:
         random.shuffle(ports)
         for usb in ports:
             try:
+                rospy.logerr('about to open ' + str(usb.device))
+                if usb.product != 'USB Roboclaw 2x60A':
+                    continue
                 # Open up the serial port and see if data is available at the desired address
                 roboclaw.Open(usb.device, 38400)
                 c1, c2 = roboclaw.GetConfig(self.address)
@@ -167,6 +176,7 @@ class motornode:
                 else:
                     roboclaw.port.close()
             except IOError:
+                rospy.logerr('IOError')
                 continue
             # time.sleep(0.1)
         return False
@@ -177,7 +187,7 @@ class motornode:
             self.timeout = int(round(time.time() * 1000))
             self.m1_pwm = msg.data
         else:
-            #rospy.loginfo('%s recieved M1_pwm, not connected', self.address)
+            rospy.loginfo('%s recieved M1_pwm, not connected', self.address)
             pass
             
     def callbackM2_pwm(self, msg):
@@ -185,7 +195,7 @@ class motornode:
             self.timeout = int(round(time.time() * 1000))
             self.m2_pwm = msg.data
         else:
-            #rospy.loginfo('%s recieved M2_pwm, not connected', self.address)
+            rospy.loginfo('%s recieved M2_pwm, not connected', self.address)
             pass
 
 
@@ -194,7 +204,7 @@ class motornode:
             self.timeout = int(round(time.time() * 1000))
             self.m1_vel = msg.data
         else:
-            rospy.logerr('%s recieved M1_vel, not connected', self.address)
+            # rospy.logerr('%s recieved M1_vel, not connected', self.address)
             pass
 
     def callbackM2_vel(self, msg):
@@ -202,7 +212,7 @@ class motornode:
             self.timeout = int(round(time.time() * 1000))
             self.m2_vel = msg.data
         else:
-            rospy.logerr('%s recieved M2_vel, not connected', self.address)
+            # rospy.logerr('%s recieved M2_vel, not connected', self.address)
             pass
 
     def callbackM1_pos(self, msg):

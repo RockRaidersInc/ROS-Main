@@ -18,10 +18,10 @@ odom_ekf:
   frequency: 30
   sensor_timeout: 0.1
   two_d_mode: true
-  transform_time_offset: 0.0
+  transform_time_offset: 0.01
   transform_timeout: 0.0
   print_diagnostics: true
-  debug: true
+  debug: false
   debug_out_file: odom_ekf.log
 
   # Frame Transforms
@@ -42,10 +42,22 @@ odom_ekf:
   odom0_differential: false
   odom0_relative: false
 
+  # Visual Odometry Settings
+  odom1: /odometry/visual
+  odom1_config: [true,  true,  true,    # [x_pos   , y_pos    , z_pos,
+                 true,  true,  true,    #  roll    , pitch    , yaw,
+                 false, false, false,   #  x_vel   , y_vel    , z_vel,
+                 false, false, false,   #  roll_vel, pitch_vel, yaw_vel,
+                 false, false, false]   #  x_accel , y_accel  , z_accel]
+  odom1_queue_size: 10
+  odom1_nodelay: true
+  odom1_differential: true
+  odom1_relative: false
+
   # IMU Settings
   imu0: /imu/data
   imu0_config: [false, false, false,
-                true, true, false,
+                true, true, true,
                 false, false, false,
                 false,  false,  false,
                 false,  false,  false]

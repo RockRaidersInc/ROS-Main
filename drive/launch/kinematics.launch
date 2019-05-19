@@ -10,13 +10,16 @@
 
     <!-- <include file="$(find launch_files)/launch/base_station.launch" pass_all_args="true"/> -->
 
-    <node name="joy_to_twist" pkg="drive" type="joycontrol.py" respawn="true"/>
-    <node name="twist_to_motor" pkg="drive" type="joy_to_motor.py" respawn="true">
+    <node name="joy_to_twist" pkg="drive" type="joycontrol.py" respawn="true">
+        <remap from="~cmd_vel" to="/cmd_vel_user"/>
+    </node>
+    <node name="twist_to_motor" pkg="drive" type="joy_to_motor.py" respawn="true" output="screen">
         <remap from="left_motor_vel" to="/motors/left_vel"/>
         <remap from="right_motor_vel" to="/motors/right_vel"/>
+        <remap from="~cmd_vel" to="/cmd_vel_final"/>
     </node>
 
-    <node name="motor_to_twist" pkg="drive" type="motor_to_twist.py" respawn="true">
+    <node name="motor_to_twist" pkg="drive" type="motor_to_twist.py" respawn="true" output="screen">
         <remap from="left_motor_in" to="/motors/left_enc"/>
         <remap from="right_motor_in" to="/motors/right_enc"/>
         <remap from="twist_publisher" to="/odometry/wheel"/>
@@ -24,4 +27,11 @@
         <param name="angular_covariance_scale_factor" value="0.5"/>
     </node>
   
+    <node name="cmd_vel_multiplexer" pkg="drive" type="cmd_vel_multiplexer.py" respawn="true" output="screen">
+        <remap from="~cmd_vel_user" to="/cmd_vel_user"/>
+        <remap from="~cmd_vel_autonomy" to="/cmd_vel_autonomy"/>
+        <remap from="~cmd_vel_out" to="/cmd_vel_final"/>
+        <remap from="~joy" to="/joy"/>
+    </node>
+
 </launch>

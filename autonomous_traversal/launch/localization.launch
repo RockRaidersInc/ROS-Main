@@ -5,7 +5,7 @@
     <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 3.14159 base_link base_imu_link 100" />
 
     <!-- Simulator only, TODO: Re name simulator imu link to base_imu_link -->
-    <!--<node pkg="tf" type="static_transform_publisher" name="base_to_imu_sim" args="0 0 0 0 0 0 base_link imu0_link 100" />-->
+    <!--<node pkg="tf" type="static_transform_publisher" name="base_to_imu_sim" args="0 0 0 0 0 0 base_link base_imu_link 100" />-->
 
     <!-- Sensor fusion for IMUs -->
     <!--

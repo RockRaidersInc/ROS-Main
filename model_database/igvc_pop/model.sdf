@@ -7,7 +7,7 @@
           <geometry>
             <heightmap>
               <uri>file://igvc_pop/materials/heightmap.png</uri>
-              <!-- <size>60.9 60.9 0.90.0</size> -->
+              <!--<size>60.9 60.9 0.90</size> -->
               <size>60.9 60.9 0.0</size>
               <pos>0 0 0</pos>
             </heightmap>
@@ -22,7 +22,7 @@
                 <size>60.9</size>
               </texture>
               <uri>file://igvc_pop/materials/heightmap.png</uri>
-              <!-- <size>60.9 60.9 0.90.0</size> -->
+              <!--<size>60.9 60.9 0.90</size> -->
               <size>60.9 60.9 0.0</size>
               <pos>0 0 0</pos>
 

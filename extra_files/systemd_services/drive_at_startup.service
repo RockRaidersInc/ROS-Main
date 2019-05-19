@@ -1,0 +1,13 @@
+[Unit]
+Description=Run the drive code at startup
+After=local-fs.target
+
+[Service]
+Restart=no
+User=rock
+ExecStart=/bin/bash /home/rock/URC/src/launchscripts/drive_on_startup.sh
+# Type=forking
+KillSignal=SIGKILL
+
+[Install]
+WantedBy=multi-user.target

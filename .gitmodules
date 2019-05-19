@@ -14,3 +14,6 @@
 [submodule "ublox"]
 	path = ublox
 	url = https://github.com/flynneva/ublox.git
+[submodule "zed-ros-wrapper"]
+        path = zed-ros-wrapper
+        url = https://github.com/stereolabs/zed-ros-wrapper.git

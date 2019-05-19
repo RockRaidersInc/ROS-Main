@@ -1,0 +1,2 @@
+rock	ALL=NOPASSWD:	/sbin/modprobe pcspkr
+rock	ALL=NOPASSWD:	/bin/systemctl kill drive_at_startup.service

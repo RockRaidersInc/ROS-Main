@@ -7,7 +7,7 @@
 -->
     <!-- Transforms, not sure if this is done right -->
 <!--     <node pkg="tf" type="static_transform_publisher" name="base_to_gps" args="0 0 0 0 0 0 base_link gps0_link 100" /> -->
-<!--     <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 0 base_link imu0_link 100" /> -->
+<!--     <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 0 base_link base_imu_link 100" /> -->
 
     <!-- GPS nmea sentences to coordinates-->
 <!--

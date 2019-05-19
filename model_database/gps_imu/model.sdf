@@ -48,7 +48,7 @@
         <bodyName>gps_imu_link</bodyName>
         <robotNamespace> /rover </robotNamespace>
         <topicName>imu</topicName>
-        <frameId> imu0_link </frameId>
+        <frameId> base_imu_link </frameId>
 
 <!--         <accelOffset>0.0 0.0 0.0</accelOffset>
         <accelDrift>0.2 0.2 0.2</accelDrift>
@@ -107,7 +107,7 @@
         <bodyName>gps_imu_link</bodyName>
         <topicName>/rover/magnetometer</topicName>
         <!-- <topicName>/imu/mag</topicName> -->
-        <frameId> imu0_link </frameId>
+        <frameId> base_imu_link </frameId>
         <magnitude> 10 </magnitude>
         <offset>0 0 0</offset>
         <drift>0 0 0</drift>
@@ -119,7 +119,7 @@
         <alwaysOn>1</alwaysOn>
         <bodyName>gps_imu_link</bodyName>
         <topicName>/odometry/perfect</topicName>
-        <frameId> imu0_link </frameId>
+        <frameId> base_imu_link </frameId>
       </plugin>
   </model>
 </sdf>
