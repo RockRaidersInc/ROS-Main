@@ -5,6 +5,7 @@ import roboclaw
 from std_msgs.msg import Int8
 from std_msgs.msg import Int16
 from std_msgs.msg import Int32
+from std_msgs.msg import Float32
 
 import serial.tools.list_ports
 import time
@@ -63,7 +64,7 @@ class motornode:
     m2_pos = None
 
 
-    def __init__(self, name, m1_name='M1', m2_name='M2', publish_enc=False, address=0x80):
+    def __init__(self, name, m1_name='M1', m2_name='M2', publish_enc=False, publish_amps=True, address=0x80):
         self.name = name
         self.address = address
         self.timeout = int(round(time.time() * 1000))
@@ -82,6 +83,11 @@ class motornode:
         if publish_enc:
             self.m1_enc_pub = rospy.Publisher(m1_name + '_enc', Int32, queue_size = 1)
             self.m2_enc_pub = rospy.Publisher(m2_name + ("_enc2" if m1_name == m2_name else "_enc"), Int32, queue_size = 1)
+        
+        if publish_amps:
+            self.m1_amp_pub = rospy.Publisher(m1_name + '_amps', Float32, queue_size = 1)
+            self.m2_amp_pub = rospy.Publisher(m2_name + ("_amps2" if m1_name == m2_name else "_amps"), Float32, queue_size = 1)
+            self.battery_voltage_pub = rospy.Publisher(m2_name + '_battery_voltage', Float32, queue_size = 1)
 
         while not rospy.is_shutdown():
             # Try to connect every second
@@ -115,6 +121,27 @@ class motornode:
                     m2_msg.data = int(response_2[1])
                     self.m1_enc_pub.publish(m1_msg)
                     self.m2_enc_pub.publish(m2_msg)
+
+            # Publish current readings
+            if self.m1_enc_pub is not None:
+                currents = roboclaw.ReadCurrents(self.address)
+                if currents[0] == 0:
+                    rospy.logerr(str((self.name, os.getpid())) + ": error returned from current reading: " + str(currents))
+                else:
+                    m1_amp_msg = Float32()
+                    m1_amp_msg.data = currents[1] / 100.0
+                    m2_amp_msg = Float32()
+                    m2_amp_msg.data = currents[2] / 100.0
+                    self.m1_amp_pub.publish(m1_amp_msg)
+                    self.m2_amp_pub.publish(m2_amp_msg)
+
+                bat_voltage = roboclaw.ReadMainBatteryVoltage(self.address)
+                if bat_voltage[0] == 0:
+                    rospy.logerr(str((self.name, os.getpid())) + ": error returned from battery voltage reading: " + str(bat_voltage))
+                else:
+                    bat_volt_msg = Float32()
+                    bat_volt_msg.data = bat_voltage[1] / 10.0
+                    self.battery_voltage_pub.publish(bat_volt_msg)
 
             # Timeout if no command recieved for more than TIMEOUT_TIME
             if int(round(time.time() * 1000)) - self.timeout > self.TIMEOUT_TIME:
@@ -239,7 +266,8 @@ if __name__ == '__main__':
     m1Name = rospy.get_param('~m1_name', 'M1')
     m2Name = rospy.get_param('~m2_name', 'M2')
     pub_enc = rospy.get_param('~pub_enc', False)
+    pub_amps = rospy.get_param('~pub_amps', False)
     address = int(rospy.get_param('~address', 0x80))
-    controller = motornode(name, m1Name, m2Name, pub_enc, address)
+    controller = motornode(name, m1Name, m2Name, pub_enc, pub_amps, address)
     
     rospy.spin()
