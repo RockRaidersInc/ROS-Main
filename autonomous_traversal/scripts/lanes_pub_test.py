@@ -9,10 +9,13 @@ def u_pts_pub_test():
 
 	while not rospy.is_shutdown():
 		keystroke = raw_input()
-
+		print('Publishing lane pts')
 		lane = Lane()
 		for i in range(10):
-			lane_pt = Vector3(i,i,0)	
+			lane_pt = Vector3(i/10.0,1,0)	
+			lane.lane_points.append(lane_pt)
+		for i in range(10):
+			lane_pt = Vector3(i/10.0,-1,0)	
 			lane.lane_points.append(lane_pt)
 		pub.publish(lane)
 
