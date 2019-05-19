@@ -7,6 +7,9 @@ import sys
 from debug_utils import *
 
 
+show_imgs = False
+
+
 def grayscale(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -226,7 +229,8 @@ def lane_detector(image, video_mode=False):
 
     # Combine the two binary thresholds
     combined_binary1 = np.zeros_like(sxbinary)
-    combined_binary1[(s_binary == 1) | (sxbinary == 1)] = 1
+    # combined_binary1[(s_binary == 1) | (sxbinary == 1)] = 1
+    combined_binary1[(s_binary == 1)] = 1
 
     combined_binary2 = np.zeros_like(sxbinary)
     combined_binary2[(s_binary == 1) | (sxbinary == 1) | (mag_binary == 1)] = 1
@@ -315,13 +319,20 @@ def process_img(image):
 
     left_fit, right_fit, out_img = fit_lines(warped_im)
     print(left_fit, right_fit)
-    # imshow(out_img, 'out_img')
 
     left_cur, right_cur, center = curvature(left_fit, right_fit, warped_im, print_data=True)
     result = draw_lines(undist, warped_im, left_fit, right_fit, left_cur, right_cur, center, Minv, show_img=False)
-    # imshow(result, 'result')
-    return result
 
+    if show_imgs:
+        imshow(undist, 'undist')
+        imshow(sxbinary*255, 'sxbinary')
+        imshow(s_binary*255, 's_binary')
+        imshow(combined_binary1*255, 'combined_binary1')
+        imshow(warped_im*255, 'warped_im')
+        imshow(out_img, 'out_img')
+        imshow(result, 'result')
+
+    return out_img
 
 def main():
     for i in range(1,16):
@@ -329,6 +340,15 @@ def main():
         result = process_img(img)
         cv2.imwrite("igvc_sim_testset_result/{}.png".format(i), result)
 
+def main():
+    for i in range(68):
+        img = cv2.imread('igvc_sim_testset2/{}.png'.format(i), cv2.IMREAD_COLOR)
+        try:
+            result = process_img(img)
+            cv2.imwrite("igvc_sim_testset_result/{}.png".format(i), result)
+        except Exception as e:
+            print(e)
+        # break
 
 if __name__ == '__main__':
     main()

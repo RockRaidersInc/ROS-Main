@@ -1,5 +1,12 @@
-<library path="lib/libanti_reverse_layer">
-  <class type="anti_reverse_layer::AntiReverseLayer" base_class_type="costmap_2d::Layer">
-    <description>Layer that the responsible publishing virtual U shaped obstacles to prevent the robot from planning a path going backwards along the track</description>
-  </class>
-</library>
+<class_libraries>
+  	<library path="lib/libanti_reverse_layer">
+		<class type="anti_reverse_layer::AntiReverseLayer" base_class_type="costmap_2d::Layer">
+			<description>Layer that the responsible publishing virtual U shaped obstacles to prevent the robot from planning a path going backwards along the track</description>
+		</class>
+  	</library>
+	<library path="lib/liblanes_layer">
+		<class type="lanes_layer::LanesLayer" base_class_type="costmap_2d::Layer">
+			<description>Layer that the responsible publishing lane points (x,y in meters from the robot's frame)</description>
+		</class>
+	</library>
+</class_libraries>

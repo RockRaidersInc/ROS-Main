@@ -12,6 +12,7 @@ from sensor_msgs.msg import MagneticField as MagneticField_msg
 from nmea_msgs.msg import Sentence as NmeaSentence_msg
 
 
+# arduino_serial_id = "usb-FTDI_FT232R_USB_UART_A702U4HV-if00-port0"
 arduino_serial_id = "usb-FTDI_FT232R_USB_UART_A702U4HV-if00-port0"
 
 
@@ -70,12 +71,15 @@ def main(imu_pub, mag_pub):
 
     while True:
         input_str += ser.read(1)
-#        print "got nmea sentence: ", input_str
-        if input_str[-1] == "\n":
-            input_str = input_str.strip()
-            send_gps_nmea_sentence(input_str)
-            print "sent nmea sentence ", input_str
-            input_str = ""
+        if len(input_str) > 0:
+    #        print "got nmea sentence: ", input_str
+            if input_str[-1] == "\n":
+                input_str = input_str.strip()
+                send_gps_nmea_sentence(input_str)
+                print "sent nmea sentence ", input_str
+                input_str = ""
+        else:
+            time.sleep(0.01)
 
     while True:
         # pdb.set_trace()  # for debugging

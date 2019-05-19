@@ -14,13 +14,14 @@ namespace anti_reverse_layer
 	{
 		// Initialize
 		ros::NodeHandle nh("~/" + name_);
+		matchSize();
+		u_obt_pts_sub = nh.subscribe("/anti_rev_u_pts", 100, &AntiReverseLayer::bufferUPtsMsg, this);
+      	ROS_INFO("AntiReverseLayer: subscribed to topic %s", "/anti_rev_u_pts");
+
+      	// Configurations
 		current_ = true;
 		default_value_ = NO_INFORMATION;
 		rolling_window_ = layered_costmap_->isRolling();
-		matchSize();
-
-		// Subscribe the topic that publishes U obstacles
-		u_obt_pts_sub = nh.subscribe("/anti_rev_u_pts", 100, &AntiReverseLayer::bufferUPtsMsg, this);
 		new_U_pts_flag = false;
 		reset_costmap_flag = false;
 
@@ -55,6 +56,12 @@ namespace anti_reverse_layer
 	{
 		if (!enabled_)
 			return;
+
+		if (layered_costmap_->isRolling())
+		{
+			// TODO: Make this compatible with rolling costmaps (local costmaps)
+			// Offset the origin by 1/2 of the width and height of the costmap layer
+		}
 
 		// Publish virtual U shaped obstacle.
 		// Takes in 4 points and published obstacle line between pt1-pt2, pt2-pt3, pt3-pt4
@@ -94,10 +101,10 @@ namespace anti_reverse_layer
 			// Clear costmap layer
 			resetMap(0,0,size_x_,size_y_);
 			// Update bounds
-			*min_x = -100000; // Really small value to update full map
-			*min_y = -100000;
-			*max_x = 100000;  // Really large value to update full map
-			*max_y = 100000;
+			*min_x = -std::numeric_limits<double>::max();  // Really small value to update full map
+			*min_y = -std::numeric_limits<double>::max();
+			*max_x =  std::numeric_limits<double>::max();  // Really large value to update full map
+			*max_y =  std::numeric_limits<double>::max();
 			// Reset flag
 			reset_costmap_flag = false;
 		}
