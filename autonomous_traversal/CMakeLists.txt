@@ -4,12 +4,12 @@ project(autonomous_traversal)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
+  message_generation
   std_msgs
+  geometry_msgs
   costmap_2d
   pluginlib
   dynamic_reconfigure
-  geometry_msgs
-  message_generation
 )
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -53,7 +53,7 @@ find_package(catkin REQUIRED)
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-## Generate messages in the 'msg' folder
+# Generate messages in the 'msg' folder
 add_message_files(
   FILES
   Lane.msg
@@ -208,6 +208,6 @@ include_directories(
 include_directories(${catkin_INCLUDE_DIRS} include)
 
 add_library(anti_reverse_layer plugins/anti_reverse_layer.cpp)
+add_library(lanes_layer plugins/lanes_layer.cpp)
 target_link_libraries(anti_reverse_layer ${catkin_LIBRARIES})
-
-
+target_link_libraries(lanes_layer ${catkin_LIBRARIES})
