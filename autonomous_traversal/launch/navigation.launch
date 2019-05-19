@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="map" default="maze_simple" />
+	<arg name="map"/>
+	<arg name="simulation"/>
 
 	<!-- ONLY FOR SIMULATION - Perfect odometry for debuging -->
-	<arg name="simulation" default="false" />
 	<node pkg="tf" 
 		  type="static_transform_publisher" 
 		  name="map_to_odom_perfect" 
@@ -35,7 +35,7 @@
 		<!-- Use perfect odometry from simulator (for debugging) -->
 		<remap from="odom" to="/odometry/perfect" if="$(arg simulation)"/>
 		<remap from="odom" to="/odometry/filtered" unless="$(arg simulation)"/>
-		<remap from="cmd_vel" to="/cmd_vel" />
+		<remap from="/cmd_vel" to="/cmd_vel" />
 		<remap from="/map" to="/map" /> 
 	</node>
 	
