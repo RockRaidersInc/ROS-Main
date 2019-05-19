@@ -9,6 +9,7 @@
         <param name="m1_name" value="/motors/left_unused"/>
         <param name="m2_name" value="/motors/left"/>
         <param name="address" value="128"/>
+        <param name="pub_amps" value="true"/>
     </node>
     
     <node name="motornode_right" pkg="drive" type="motornode.py">
@@ -17,6 +18,7 @@
         <param name="m1_name" value="/motors/right_unused"/>
         <param name="m2_name" value="/motors/right"/>
         <param name="address" value="129"/>
+        <param name="pub_amps" value="true"/>
     </node>
 
 <!--
