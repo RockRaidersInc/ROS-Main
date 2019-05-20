@@ -5,6 +5,7 @@ PLUGINLIB_EXPORT_CLASS(lanes_layer::LanesLayer, costmap_2d::Layer)
 
 using costmap_2d::LETHAL_OBSTACLE;
 using costmap_2d::NO_INFORMATION;
+using costmap_2d::FREE_SPACE;
 
 namespace lanes_layer
 {
@@ -61,7 +62,7 @@ namespace lanes_layer
 		if (reset_costmap_flag)
 			resetCostmapLayer();
 
-		addLanesToCostmap(robot_x, robot_y, robot_yaw);
+		processLanesMsgs(robot_x, robot_y, robot_yaw);
 
 		*min_x = std::min(*min_x, min_x_);
 		*min_y = std::min(*min_y, min_y_);
@@ -101,7 +102,7 @@ namespace lanes_layer
   		lanes_msgs_buffer_.push_back(*lane_pts_msg);
 	}
 
-	void LanesLayer::addLanesToCostmap(double robot_x, double robot_y, double robot_yaw)
+	void LanesLayer::processLanesMsgs(double robot_x, double robot_y, double robot_yaw)
 	{
 		// Load the lanes message data from the buffer
 		std::list<autonomous_traversal::Lane> lanes_msgs_buffer_copy;
@@ -115,10 +116,40 @@ namespace lanes_layer
 		robot_tf.setOrigin(tf::Vector3(robot_x, robot_y, 0));
 		robot_tf.setRotation(tf::createQuaternionFromYaw(robot_yaw));
 
-		// Iterate through the buffered Lanes messages and add to costmap
+		// Iterate through the buffered Lanes messages
 		for (std::list<autonomous_traversal::Lane>::iterator lane_msgs_itr = lanes_msgs_buffer_copy.begin();
        		 lane_msgs_itr != lanes_msgs_buffer_copy.end(); lane_msgs_itr++)
 		{
+			// ----- Clear non lane points on the costmap layer -----
+			// Transform corner coordinates into robot frame
+			boost::array<geometry_msgs::Vector3, 2> bound_corner_pts = lane_msgs_itr->bound_corners;
+			tf::Vector3 tl_bound_corner(bound_corner_pts[0].x, bound_corner_pts[0].y, 0);
+			tf::Vector3 tr_bound_corner(bound_corner_pts[0].x, bound_corner_pts[1].y, 0);
+			tf::Vector3 br_bound_corner(bound_corner_pts[1].x, bound_corner_pts[1].y, 0);
+			tf::Vector3 bl_bound_corner(bound_corner_pts[1].x, bound_corner_pts[0].y, 0);
+			tl_bound_corner = robot_tf(tl_bound_corner); // Top left bound corner
+			tr_bound_corner = robot_tf(tr_bound_corner);
+			br_bound_corner = robot_tf(br_bound_corner);
+			bl_bound_corner = robot_tf(bl_bound_corner);
+			// Use the function setConvexPolygonCost to fill in the bounded area with free space
+			std::vector<tf::Vector3> polygon_tf{tl_bound_corner, 
+											    tr_bound_corner, 
+											    br_bound_corner, 
+											    bl_bound_corner};
+			std::vector<geometry_msgs::Point> polygon_gm;
+			pointsTFToMsgs(polygon_tf, polygon_gm);
+			setConvexPolygonCost(polygon_gm, FREE_SPACE);
+			// Touch all points
+			for (int i = 0; i < polygon_tf.size(); i++)
+			{
+				min_x_ = std::min(polygon_tf[i].getX(), min_x_);
+				min_y_ = std::min(polygon_tf[i].getY(), min_y_);
+				max_x_ = std::max(polygon_tf[i].getX(), max_x_);
+				max_y_ = std::max(polygon_tf[i].getY(), max_y_);				
+			}
+
+			// ------------- Add lane points to costmap -------------
+			// Step through lane points
 			std::vector<geometry_msgs::Vector3> lane_pts = lane_msgs_itr->lane_points;
 			for (std::vector<geometry_msgs::Vector3>::iterator lane_pt_itr = lane_pts.begin();
 				lane_pt_itr != lane_pts.end(); lane_pt_itr++)

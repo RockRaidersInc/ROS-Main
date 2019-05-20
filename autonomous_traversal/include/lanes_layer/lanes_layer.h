@@ -30,19 +30,29 @@ namespace lanes_layer
 		void reconfigureCB(costmap_2d::GenericPluginConfig &config, uint32_t level);
 		dynamic_reconfigure::Server<costmap_2d::GenericPluginConfig> *dsrv_;
 		void bufferLanePtsMsg(const autonomous_traversal::Lane::ConstPtr& lanes_msg);
-		void addLanesToCostmap(double robot_x, double robot_y, double robot_yaw);
+		void processLanesMsgs(double robot_x, double robot_y, double robot_yaw);
 		void resetCostmapLayer();
 
 		ros::Subscriber lanes_sub;
 		boost::mutex lanes_msg_mutex_;
   		std::list<autonomous_traversal::Lane> lanes_msgs_buffer_;
-
   		ros::Time last_reading_time_;	
   		double min_x_, min_y_, max_x_, max_y_;
 		unsigned int buffered_readings_;
 		bool rolling_window_;
 		bool reset_costmap_flag;
 
+		static inline void pointsTFToMsgs(std::vector<tf::Vector3>& tf_vect, 
+										  std::vector<geometry_msgs::Point>& gm_vect)
+		{
+			for (std::vector<tf::Vector3>::iterator tf_pt_iter = tf_vect.begin();
+				 tf_pt_iter != tf_vect.end(); tf_pt_iter++)
+			{
+				geometry_msgs::Point gm_pt;
+				tf::pointTFToMsg(*tf_pt_iter, gm_pt);
+				gm_vect.push_back(gm_pt);
+			}
+		}
 	};
 }
 #endif

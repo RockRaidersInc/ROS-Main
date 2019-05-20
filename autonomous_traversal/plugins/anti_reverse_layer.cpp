@@ -56,12 +56,8 @@ namespace anti_reverse_layer
 	{
 		if (!enabled_)
 			return;
-
-		if (layered_costmap_->isRolling())
-		{
-			// TODO: Make this compatible with rolling costmaps (local costmaps)
-			// Offset the origin by 1/2 of the width and height of the costmap layer
-		}
+  		if (layered_costmap_->isRolling())
+    		updateOrigin(robot_x - getSizeInMetersX() / 2, robot_y - getSizeInMetersY() / 2);
 
 		// Publish virtual U shaped obstacle.
 		// Takes in 4 points and published obstacle line between pt1-pt2, pt2-pt3, pt3-pt4
@@ -131,8 +127,6 @@ namespace anti_reverse_layer
 				master_grid.setCost(i, j, costmap_[index]); 
 			}
 		}
-
-
 	}
 
 	void AntiReverseLayer::calcUCorners(double robot_x, double robot_y, double robot_yaw, double U_pts_tf[8])
@@ -147,13 +141,11 @@ namespace anti_reverse_layer
 			U_pts_tf[i] = pt_tf.getX();
 			U_pts_tf[i+1] = pt_tf.getY();
 		}
-
 	}
 
 	void AntiReverseLayer::bufferUPtsMsg(const std_msgs::Float64MultiArray::ConstPtr& pts_msg)
 	{
 		std::vector<double> pts_msg_data = pts_msg->data;
-
 		if (pts_msg_data.size() == 8)
 		{
 			// If the data field contains all 0's then reset the layer
