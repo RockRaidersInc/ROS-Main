@@ -15,17 +15,17 @@ def u_pts_pub_test():
 		
 		lane = Lane()
 		
-		tl_bound_pt = Vector3(1.1,1.1,0.0)
-		br_bound_pt = Vector3(-.1,-1.1,0.0)
-		lane.bound_corners[0] = tl_bound_pt
-		lane.bound_corners[1] = br_bound_pt
+		lane.bound_polygon.append(Vector3(1.1,1.1,0.0))
+		lane.bound_polygon.append(Vector3(1.1,-1.1,0.0))
+		lane.bound_polygon.append(Vector3(-1.1,-1.1,0.0))
+		lane.bound_polygon.append(Vector3(-1.1,1.1,0.0))
 
 		for i in range(10):
 			lane_pt = Vector3(i/10.0,1.0,0.0)	
 			lane.lane_points.append(lane_pt)
-		# for i in range(10):
-		# 	lane_pt = Vector3(i/10.0,-1.0,0.0)	
-		# 	lane.lane_points.append(lane_pt)
+		for i in range(10):
+			lane_pt = Vector3(i/10.0,-1.0,0.0)	
+			lane.lane_points.append(lane_pt)
 
 		pub.publish(lane)
 

@@ -120,27 +120,27 @@ namespace lanes_layer
 		for (std::list<autonomous_traversal::Lane>::iterator lane_msgs_itr = lanes_msgs_buffer_copy.begin();
        		 lane_msgs_itr != lanes_msgs_buffer_copy.end(); lane_msgs_itr++)
 		{
-			// // ----- Clear non lane points on the costmap layer -----
-			// // Transform polygon coordinates into robot frame abd clear polygon
-			// std::vector<geometry_msgs::Vector3> bound_polygon = lane_msgs_itr->bound_polygon;
-			// std::vector<geometry_msgs::Point> bound_polygon_tf;
-			// for (int i = 0; i < bound_polygon.size(); i++)
-			// {
-			// 	tf::Vector3 polygon_v3(bound_polygon[i].x, bound_polygon[i].y, 0);
-			// 	polygon_v3 = robot_tf(polygon_v3); // Transform into robot frame
-			// 	geometry_msgs::Point polygon_pt;
-			// 	pointTFToMsg(polygon_v3, polygon_pt);
-			// 	bound_polygon_tf.push_back(polygon_pt);
-			// }
-			// setConvexPolygonCost(bound_polygon_tf, FREE_SPACE);
-			// // Touch all points
-			// for (int i = 0; i < bound_polygon_tf.size(); i++)
-			// {
-			// 	min_x_ = std::min(bound_polygon_tf[i].x, min_x_);
-			// 	min_y_ = std::min(bound_polygon_tf[i].y, min_y_);
-			// 	max_x_ = std::max(bound_polygon_tf[i].x, max_x_);
-			// 	max_y_ = std::max(bound_polygon_tf[i].y, max_y_);				
-			// }
+			// ----- Clear non lane points on the costmap layer -----
+			// Transform polygon coordinates into robot frame abd clear polygon
+			std::vector<geometry_msgs::Vector3> bound_polygon = lane_msgs_itr->bound_polygon;
+			std::vector<geometry_msgs::Point> bound_polygon_tf;
+			for (int i = 0; i < bound_polygon.size(); i++)
+			{
+				tf::Vector3 polygon_v3(bound_polygon[i].x, bound_polygon[i].y, 0);
+				polygon_v3 = robot_tf(polygon_v3); // Transform into robot frame
+				geometry_msgs::Point polygon_pt;
+				pointTFToMsg(polygon_v3, polygon_pt);
+				bound_polygon_tf.push_back(polygon_pt);
+			}
+			setConvexPolygonCost(bound_polygon_tf, FREE_SPACE);
+			// Touch all points
+			for (int i = 0; i < bound_polygon_tf.size(); i++)
+			{
+				min_x_ = std::min(bound_polygon_tf[i].x, min_x_);
+				min_y_ = std::min(bound_polygon_tf[i].y, min_y_);
+				max_x_ = std::max(bound_polygon_tf[i].x, max_x_);
+				max_y_ = std::max(bound_polygon_tf[i].y, max_y_);				
+			}
 
 			// ------------- Add lane points to costmap -------------
 			// Step through lane points
