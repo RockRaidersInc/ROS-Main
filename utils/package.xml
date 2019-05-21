@@ -54,6 +54,7 @@
   <depend>nav_msgs</depend>
   <build_depend>libpcl-all-dev</build_depend>
   <exec_depend>libpcl-all</exec_depend>
+  <build_depend>image_transport</build_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

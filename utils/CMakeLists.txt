@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -203,8 +204,12 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
+
+
+
 include_directories(${catkin_INCLUDE_DIRS} include)
 
-# add_executable(pointcloud_filter src/pointcloud_filter.cpp)
-# target_link_libraries(pointcloud_filter ${catkin_LIBRARIES})
+# include_directories(${OpenCV_INCLUDE_DIRS})
 
+add_executable(pointcloud_filter src/pointcloud_filter.cpp)
+target_link_libraries(pointcloud_filter ${catkin_LIBRARIES})

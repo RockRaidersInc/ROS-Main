@@ -7,6 +7,7 @@ def u_pts_pub_test():
 	pub = rospy.Publisher('/lanes', Lane, queue_size=10)
 	rospy.init_node('lanes_pub_test')
 	rate = rospy.Rate(30)
+	print("alive")
 
 	while not rospy.is_shutdown():
 		keystroke = raw_input()
@@ -22,9 +23,9 @@ def u_pts_pub_test():
 		for i in range(10):
 			lane_pt = Vector3(i/10.0,1.0,0.0)	
 			lane.lane_points.append(lane_pt)
-		for i in range(10):
-			lane_pt = Vector3(i/10.0,-1.0,0.0)	
-			lane.lane_points.append(lane_pt)
+		# for i in range(10):
+		# 	lane_pt = Vector3(i/10.0,-1.0,0.0)	
+		# 	lane.lane_points.append(lane_pt)
 
 		pub.publish(lane)
 
