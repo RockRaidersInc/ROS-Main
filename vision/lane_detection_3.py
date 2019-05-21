@@ -174,18 +174,17 @@ class LaneDetector:
             left: 471, 456 - -2ft, 5ft
             right: 920, 457 - 2ft, 5ft
         """
-        y_offset = 720 / 2 - 80
+        y_offset = 720 / 2 - 150
         scale_factor = 50
-        src = np.float32([[701, 653], 
-                        #  [691, 457], 
-                         [658, 327], 
-                         [471, 456], 
-                         [920, 457]])
-        dst = np.float32([[0 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset],  # bottom
-                        # [0 * scale_factor + img_x_half, 0 * scale_factor + img_y_half + y_offset],    # center
-                        [0 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],   # top
-                        [-2 * scale_factor + img_x_half, 0 * scale_factor + img_y_half + y_offset],   # left
-                        [2 * scale_factor + img_x_half, 0 * scale_factor + img_y_half + y_offset]])   # right
+
+        src = np.float32([[1280 - 387, 720 - 81],  # bottom left
+                         [1280 - 515, 720 - 370],  # top left
+                         [1280 - 865, 720 - 371],  # top right
+                         [1280 - 1020, 720 - 65]]) # bottom right
+        dst = np.float32([[2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset],   # bottom left
+                          [2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],   # top left
+                          [-2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],    # top right
+                          [-2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset]])  # bottom right
 
 
         # print "src:", src
@@ -199,7 +198,7 @@ class LaneDetector:
         # create a warped image
         warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
 
-        roi_unwarped = np.array([[[0, 0]], [[0, img_y_half * 2]], [[img_x_half * 2, img_y_half * 2]], [[img_x_half * 2, 0]]], dtype="float32")
+        roi_unwarped = np.array([[[0, 0]], [[0, img_size[0]]], [[img_size[1], img_size[0]]], [[img_size[1], 0]]], dtype=np.float32)
         roi_warped = cv2.perspectiveTransform(roi_unwarped, M)
 
         # unpersp = cv2.warpPerspective(warped, Minv, img_size, flags=cv2.INTER_LINEAR)
@@ -209,37 +208,40 @@ class LaneDetector:
 
 
     def warp_points(self, point_array, img_shape):
-        img_size = img_shape
+        img_size = [720, 1280]
 
         """
-        good calibration: (0ft, 0ft right inbetween wheels, points in x,y format where rover drives in y direction)
+        cross calibration: (0ft, 0ft right inbetween wheels, points in x,y format where rover drives in y direction)
             bottom: 701, 653 - 0ft, 3ft
             center: 691, 457 - 0ft, 5ft
             top: 658, 327 - 0ft, 7ft
             left: 471, 456 - -2ft, 5ft
             right: 920, 457 - 2ft, 5ft
+
+        square calibration
+            bottom left:  387, 81  - 
+            top left:     515, 370
+            top right:    865, 371
+            bottom right: 1020, 65
         """
 
         img_x_half = img_shape[1] / 2
         img_y_half = img_shape[0] / 2
         y_offset = 720 / 2 - 80
-
-        y_offset = 720 / 2 - 80
         scale_factor = 50
-        src = np.float32([[701, 653], 
-                        #  [691, 457], 
-                         [658, 327], 
-                         [471, 456], 
-                         [920, 457]])
-        dst = np.float32([[0.9144, 0],  # bottom
-                        # [0 * scale_factor + img_x_half, 0 * scale_factor + img_y_half + y_offset],    # center
-                        [2.1336, 0],   # top
-                        [1.524, -0.6096],   # left
-                        [1.524, 0.6096]])   # right
+
+        src = np.float32([[1280 - 387, 720 - 81],  # bottom left
+                         [1280 - 515, 720 - 370],  # top left
+                         [1280 - 865, 720 - 371],  # top right
+                         [1280 - 1020, 720 - 65]]) # bottom right
+        dst = np.float32([[0.9144, -0.6096],     # bottom left
+                        [2.1336, -0.6096],       # top left
+                        [2.1336, 0.6096],  # top right
+                        [0.9144, 0.6096]])  # bottom right
 
         M = cv2.getPerspectiveTransform(src, dst)
 
-        roi_unwarped = np.array([[[0, 0]], [[0, img_y_half * 2]], [[img_x_half * 2, img_y_half * 2]], [[img_x_half * 2, 0]]], dtype=np.float32)
+        roi_unwarped = np.array([[[0, 0]], [[0, img_size[0]]], [[img_size[1], img_size[0]]], [[img_size[1], 0]]], dtype=np.float32)
         roi_warped = cv2.perspectiveTransform(roi_unwarped, M)
 
         point_array = point_array.transpose()
@@ -247,6 +249,7 @@ class LaneDetector:
         warped_points = cv2.perspectiveTransform(reshaped_point_array, M)
 
         return warped_points, roi_warped
+        # return warped_points, roi_warped
 
     # Function for saving images to an output folder
     def create_pathname(self, infile, ext):
@@ -260,26 +263,44 @@ class LaneDetector:
         try:
             roi = np.array(roi).squeeze()
             points = np.array(points).squeeze()
-            print points.shape
+            # print points.shape
             lane = Lane()
             
-            tl_bound_pt = Vector3(np.max(roi[:, 1]), np.max(roi[:, 0]), 0.0)
-            br_bound_pt = Vector3(np.min(roi[:, 1]), np.min(roi[:, 0]), 0.0)
-            # tl_bound_pt = Vector3(1.1,1.1,0.0)
-            # br_bound_pt = Vector3(-.1,-1.1,0.0)
+            lower_x_bound = 1.9144
+            upper_x_bound = 5.
+            lower_y_bound = -2.
+            upper_y_bound = 2.
+
+            # tl_bound_pt = Vector3(np.max(roi[:, 1]), np.max(roi[:, 0]), 0.0)
+            # br_bound_pt = Vector3(np.min(roi[:, 1]), np.min(roi[:, 0]), 0.0)
+            tl_bound_pt = Vector3(upper_x_bound, upper_y_bound, 0.0)
+            br_bound_pt = Vector3(lower_x_bound, lower_y_bound, 0.0)
             lane.bound_corners[0] = tl_bound_pt
             lane.bound_corners[1] = br_bound_pt
-
-            # import matplotlib.pyplot as plt
-            # plt.scatter(points[:, 0], points[:, 1])
-            # plt.show()
-            # plt.clear()
 
             # for i in range(10):
             #     lane_pt = Vector3(i/10.0,1.0,0.0)	
             #     lane.lane_points.append(lane_pt)
+            points_filtered_x = []
+            points_filtered_y = []
             for i in range(points.shape[0]):
-                lane_pt = Vector3(points[i, 0], points[i, 1], 0.0)	
+                point_x = points[i, 0]
+                point_y = points[i, 1]
+                if lower_x_bound < point_x and point_x < upper_x_bound and lower_y_bound < point_y and point_y < upper_y_bound:
+                    # if True:
+                    # print(point_x, point_y)
+                    points_filtered_x.append(point_x)
+                    points_filtered_y.append(point_y)
+
+            # import matplotlib.pyplot as plt
+            # plt.scatter(points_filtered_x, points_filtered_y)
+            # plt.show()
+            # plt.clear()
+
+            for i in range(len(points_filtered_y)):
+                point_x = points_filtered_x[i]
+                point_y = points_filtered_y[i]
+                lane_pt = Vector3(point_x, point_y, 0.0)	
                 lane.lane_points.append(lane_pt)
 
             self.lane_pub.publish(lane)
@@ -326,47 +347,10 @@ class LaneDetector:
         warped, _, _ = self.warp(undist)
         self.undist_pub.publish(bridge.cv2_to_imgmsg(warped))
 
-        # # Define parameters for gradient thresholding
-        # sxybinary = self.edge_thresh(undist, thresh=(22, 100))
-        # self.sxybinary_pub.publish(bridge.cv2_to_imgmsg((sxybinary*255).astype(np.uint8)))
-
-        # mag_binary = self.mag_thresh(undist, sobel_kernel=3, thresh=(40, 100))
-        # self.mag_binary_pub.publish(bridge.cv2_to_imgmsg((mag_binary*255).astype(np.uint8)))
-        # # dir_binary = self.dir_threshold(undist, sobel_kernel=15, thresh=(0.7, 1.3))
-
         # Define parameters for color thresholding
         # s_binary = self.hls_select(undist, thresh=(90, 255))
         s_binary = self.hsv_select(undist)
         self.s_binary_pub.publish(bridge.cv2_to_imgmsg(s_binary.astype(np.uint8)))
-
-        # You can combine various thresholding operations
-
-        # Stack each channel to view their individual contributions in green and blue respectively
-        # This returns a stack of the two binary images, whose components you can see as different colors
-        # color_binary = np.dstack((np.zeros_like(sxybinary), sxybinary, s_binary))
-
-        # Combine the two binary thresholds
-        # combined_binary1 = np.zeros_like(sxybinary)
-        # combined_binary1[(s_binary == 1) | (sxybinary == 1)] = 1
-        # self.combined_binary1_pub.publish(bridge.cv2_to_imgmsg(combined_binary1*255))
-
-        # do a skeleton 
-        # bool done;
-        # do
-        # {
-        # cv::morphologyEx(img, temp, cv::MORPH_OPEN, element);
-        # cv::bitwise_not(temp, temp);
-        # cv::bitwise_and(img, temp, temp);
-        # cv::bitwise_or(skel, temp, skel);
-        # cv::erode(img, img, element);
-        
-        # double max;
-        # cv::minMaxLoc(img, 0, &max);
-        # done = (max == 0);
-        # } while (!done);
-
-        # combined_binary2 = np.zeros_like(sxybinary)
-        # combined_binary2[(s_binary == 1) | (sxybinary == 1) | (mag_binary == 1)] = 1
 
         # close the image to get rid of noise
         kernel = np.ones((5,5), np.uint8) 
@@ -376,22 +360,23 @@ class LaneDetector:
 
         self.denoised_pub.publish(bridge.cv2_to_imgmsg(denoised))
 
+        # publish points
+        lane_points_image_frame_yx = np.array(np.where(denoised != 0))
+        lane_points_image_frame = np.array([lane_points_image_frame_yx[1,:], lane_points_image_frame_yx[0,:]])
+
+        # lane_points_image_frame = np.array([[485, 199], [326, 438], [1171, 442]]).transpose()
+        lane_points_map_frame, roi = self.warp_points(lane_points_image_frame, denoised.shape)
+        self.u_pts_pub_test(roi, lane_points_map_frame)
+
+
         # Apply perspective transform
         warped_im, roi, Minv = self.warp(np.dstack([denoised, denoised, denoised]))
-
-        # publish points
-        # lane_points_image_frame = np.array(np.where(denoised != 0))
-        lane_points_image_frame = np.array([[485, 199], [326, 438], [1171, 442]]).transpose()
-        lane_points_map_frame, roi = self.warp_points(lane_points_image_frame, denoised.shape)
-        print lane_points_map_frame
-        self.u_pts_pub_test(roi, lane_points_map_frame)
 
         # publish the warped image for debugging purposes
         for i in range(len(roi) - 1):
             cv2.line(warped_im, tuple(roi[i, 0]), tuple(roi[i+1, 0]), (0, 255, 0), 4)
 
         self.warped_im_pub.publish(bridge.cv2_to_imgmsg(warped_im))
-
         # return s_binary, combined_binary1, warped_im, Minv
 
 
@@ -399,7 +384,8 @@ class LaneDetector:
         print("Received an image!")
         try:
             # Convert your ROS Image message to OpenCV2
-            self.cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
+            image_raw = bridge.imgmsg_to_cv2(msg, "bgr8")
+            self.cv2_img = cv2.resize(image_raw, (1280, 720))
 
         except CvBridgeError as e:
             print("error recieving image")
@@ -409,8 +395,8 @@ class LaneDetector:
     def main(self):
         rospy.init_node('image_listener')
         # Define your image topic
-        image_topic = "/zed_node/left/image_rect_color"
-        # image_topic = "/zed/depth/image_raw"
+        # image_topic = "/zed_node/left/image_rect_color"
+        image_topic = "/zed/depth/image_raw"
         # Set up your subscriber and define its callback
         rospy.Subscriber(image_topic, Image, self.image_callback)
         self.raw_pub = rospy.Publisher("raw_image", Image, queue_size=10)
