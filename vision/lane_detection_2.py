@@ -102,15 +102,30 @@ class LaneDetector:
     def warp(self, img):
         img_size = (img.shape[1], img.shape[0])
 
-        src = np.float32([[130, 310], [231, 172], [431, 173], [563, 309]])
-        square_size = 100
-        img_x_half = 320
-        img_y_half = 240
-        y_offset = 150
-        dst = np.float32([[-square_size/2 + img_x_half, square_size/2 + img_y_half + y_offset], 
-                        [-square_size/2 + img_x_half, -square_size/2 + img_y_half + y_offset], 
-                        [square_size/2 + img_x_half, -square_size/2 + img_y_half + y_offset], 
-                        [square_size/2 + img_x_half, square_size/2 + img_y_half + y_offset]])
+        # src = np.float32([[130, 310], [231, 172], [431, 173], [563, 309]])
+        img_x_half = 1280 / 2
+        img_y_half = 720 / 2
+        y_offset = 720 / 2 - 150
+        square_size_y = 0.508 * 100
+        square_size_x = 0.762 * 100
+        # dst = np.float32([[-square_size/2 + img_x_half, square_size/2 + img_y_half + y_offset], 
+        #                 [-square_size/2 + img_x_half, -square_size/2 + img_y_half + y_offset], 
+        #                 [square_size/2 + img_x_half, -square_size/2 + img_y_half + y_offset], 
+        #                 [square_size/2 + img_x_half, square_size/2 + img_y_half + y_offset]])
+
+        src = np.float32([[523, 491], [555, 383], [779, 395], [786, 501]])
+        # dst = np.float32([[1.32, -0.381], 
+        #                 [1.83, -0.381], 
+        #                 [1.83, 0.381], 
+        #                 [1.32, 0.381]])
+        dst = np.float32([[-square_size_x/2 + img_x_half, square_size_y/2 + img_y_half + y_offset], 
+                        [-square_size_x/2 + img_x_half, -square_size_y/2 + img_y_half + y_offset],
+                        [square_size_x/2 + img_x_half, -square_size_y/2 + img_y_half + y_offset],
+                        [square_size_x/2 + img_x_half, square_size_y/2 + img_y_half + y_offset]])
+
+        print "src:", src
+        print "dst:", dst
+
         M = cv2.getPerspectiveTransform(src, dst)
 
         # inverse
@@ -385,8 +400,8 @@ class LaneDetector:
     def main(self):
         rospy.init_node('image_listener')
         # Define your image topic
-        # image_topic = "/zed/left/image_raw_color"
-        image_topic = "/zed/depth/image_raw"
+        image_topic = "/zed_node/left/image_rect_color"
+        # image_topic = "/zed/depth/image_raw"
         # Set up your subscriber and define its callback
         rospy.Subscriber(image_topic, Image, self.image_callback)
         self.raw_pub = rospy.Publisher("raw_image", Image, queue_size=10)
