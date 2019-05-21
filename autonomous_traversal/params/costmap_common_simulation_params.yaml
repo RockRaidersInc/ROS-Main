@@ -38,4 +38,4 @@ obstacle_layer:
 
 inflation_layer:
     inflation_radius: 2.5     # Controls how far away the zero cost point is from the obstacle
-    cost_scaling_factor: 4.5 # Controls how much the cost gets scaled at a distance
+    cost_scaling_factor: 4.5  # Controls how much the cost gets scaled at a distance

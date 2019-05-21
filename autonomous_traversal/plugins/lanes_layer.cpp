@@ -120,33 +120,27 @@ namespace lanes_layer
 		for (std::list<autonomous_traversal::Lane>::iterator lane_msgs_itr = lanes_msgs_buffer_copy.begin();
        		 lane_msgs_itr != lanes_msgs_buffer_copy.end(); lane_msgs_itr++)
 		{
-			// ----- Clear non lane points on the costmap layer -----
-			// Transform corner coordinates into robot frame
-			boost::array<geometry_msgs::Vector3, 2> bound_corner_pts = lane_msgs_itr->bound_corners;
-			tf::Vector3 tl_bound_corner(bound_corner_pts[0].x, bound_corner_pts[0].y, 0);
-			tf::Vector3 tr_bound_corner(bound_corner_pts[0].x, bound_corner_pts[1].y, 0);
-			tf::Vector3 br_bound_corner(bound_corner_pts[1].x, bound_corner_pts[1].y, 0);
-			tf::Vector3 bl_bound_corner(bound_corner_pts[1].x, bound_corner_pts[0].y, 0);
-			tl_bound_corner = robot_tf(tl_bound_corner); // Top left bound corner
-			tr_bound_corner = robot_tf(tr_bound_corner);
-			br_bound_corner = robot_tf(br_bound_corner);
-			bl_bound_corner = robot_tf(bl_bound_corner);
-			// Use the function setConvexPolygonCost to fill in the bounded area with free space
-			std::vector<tf::Vector3> polygon_tf{tl_bound_corner, 
-											    tr_bound_corner, 
-											    br_bound_corner, 
-											    bl_bound_corner};
-			std::vector<geometry_msgs::Point> polygon_gm;
-			pointsTFToMsgs(polygon_tf, polygon_gm);
-			setConvexPolygonCost(polygon_gm, FREE_SPACE);
-			// Touch all points
-			for (int i = 0; i < polygon_tf.size(); i++)
-			{
-				min_x_ = std::min(polygon_tf[i].getX(), min_x_);
-				min_y_ = std::min(polygon_tf[i].getY(), min_y_);
-				max_x_ = std::max(polygon_tf[i].getX(), max_x_);
-				max_y_ = std::max(polygon_tf[i].getY(), max_y_);				
-			}
+			// // ----- Clear non lane points on the costmap layer -----
+			// // Transform polygon coordinates into robot frame abd clear polygon
+			// std::vector<geometry_msgs::Vector3> bound_polygon = lane_msgs_itr->bound_polygon;
+			// std::vector<geometry_msgs::Point> bound_polygon_tf;
+			// for (int i = 0; i < bound_polygon.size(); i++)
+			// {
+			// 	tf::Vector3 polygon_v3(bound_polygon[i].x, bound_polygon[i].y, 0);
+			// 	polygon_v3 = robot_tf(polygon_v3); // Transform into robot frame
+			// 	geometry_msgs::Point polygon_pt;
+			// 	pointTFToMsg(polygon_v3, polygon_pt);
+			// 	bound_polygon_tf.push_back(polygon_pt);
+			// }
+			// setConvexPolygonCost(bound_polygon_tf, FREE_SPACE);
+			// // Touch all points
+			// for (int i = 0; i < bound_polygon_tf.size(); i++)
+			// {
+			// 	min_x_ = std::min(bound_polygon_tf[i].x, min_x_);
+			// 	min_y_ = std::min(bound_polygon_tf[i].y, min_y_);
+			// 	max_x_ = std::max(bound_polygon_tf[i].x, max_x_);
+			// 	max_y_ = std::max(bound_polygon_tf[i].y, max_y_);				
+			// }
 
 			// ------------- Add lane points to costmap -------------
 			// Step through lane points

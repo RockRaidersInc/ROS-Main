@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <launch>
 	<arg name="map"/>
- 	<node name="map_server" 
-		  pkg="map_server" 
-		  type="map_server" 
-		  args="$(find autonomous_traversal)/maps/$(arg map).yaml"/>
+ 	<node name="map_server" pkg="map_server" type="map_server" 
+ 		  args="$(find autonomous_traversal)/maps/$(arg map).yaml">
+		<rosparam param="map_name" subst_value="true">$(arg map)</rosparam>
+		<rosparam file="$(find autonomous_traversal)/maps/gps_map_origins.yaml" 
+				  command="load" 
+				  ns="gps_map_origins"/> 
+	</node>
 
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 		<!-- Load params -->

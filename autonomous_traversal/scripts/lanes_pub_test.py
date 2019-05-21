@@ -2,6 +2,7 @@ import rospy
 from autonomous_traversal.msg import Lane
 from geometry_msgs.msg import Vector3
 
+
 def u_pts_pub_test():
 	pub = rospy.Publisher('/lanes', Lane, queue_size=10)
 	rospy.init_node('lanes_pub_test')

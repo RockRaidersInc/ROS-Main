@@ -21,12 +21,6 @@ bridge = CvBridge()
 class LaneDetector:
     cv2_img = None
 
-
-    # Import everything needed to edit/save/watch video clips
-    # from moviepy.editor import VideoFileClip
-    # from IPython.display import HTML
-
-
     def grayscale(self, img):
         return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 

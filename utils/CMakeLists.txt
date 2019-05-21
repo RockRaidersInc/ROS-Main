@@ -205,6 +205,6 @@ include_directories(
 
 include_directories(${catkin_INCLUDE_DIRS} include)
 
-add_executable(pointcloud_filter src/pointcloud_filter.cpp)
-target_link_libraries(pointcloud_filter ${catkin_LIBRARIES})
+# add_executable(pointcloud_filter src/pointcloud_filter.cpp)
+# target_link_libraries(pointcloud_filter ${catkin_LIBRARIES})
 
