@@ -9,9 +9,11 @@ def u_pts_pub_test():
 		keystroke = raw_input()
 
 		u_pts = Float64MultiArray()
-		if keystroke == "r":
+		if keystroke == 'r':
+			print('Clearing u obstacles')
 			u_pts.data = [0,0,0,0,0,0,0,0]
 		else:
+			print('Adding u obstacle')
 			u_pts.data = [3.5,1.5,-1.5,1.5,-1.5,-1.5,3.5,-1.5]
 		
 		pub.publish(u_pts)

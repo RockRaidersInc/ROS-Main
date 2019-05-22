@@ -1,23 +1,13 @@
 <?xml version="1.0"?>
 <launch>
 	<arg name="map"/>
-	<arg name="simulation"/>
-
-	<!-- ONLY FOR SIMULATION - Perfect odometry for debuging -->
-	<node pkg="tf" 
-		  type="static_transform_publisher" 
-		  name="map_to_odom_perfect" 
-		  args="0 0 0 0 0 0 map odom 100"
-		  if="$(arg simulation)"/>
-	<node pkg="simulator" 
-		  type="OdomToTfNode" 
-		  name="odom_to_base_perfect" 
-		  if="$(arg simulation)"/>
-
- 	<node name="map_server" 
-		  pkg="map_server" 
-		  type="map_server" 
-		  args="$(find autonomous_traversal)/maps/$(arg map).yaml"/>
+ 	<node name="map_server" pkg="map_server" type="map_server" 
+ 		  args="$(find autonomous_traversal)/maps/$(arg map).yaml">
+		<rosparam param="map_name" subst_value="true">$(arg map)</rosparam>
+		<rosparam file="$(find autonomous_traversal)/maps/gps_map_origins.yaml" 
+				  command="load" 
+				  ns="gps_map_origins"/> 
+	</node>
 
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 		<!-- Load params -->
@@ -27,14 +17,17 @@
 		<rosparam file="$(find autonomous_traversal)/params/costmap_common_params.yaml" 
 				  command="load"
 				  ns="local_costmap"/>
-		<rosparam file="$(find autonomous_traversal)/params/local_costmap_params.yaml" command="load" />
-		<rosparam file="$(find autonomous_traversal)/params/global_costmap_params.yaml" command="load" /> 
-		<rosparam file="$(find autonomous_traversal)/params/base_local_planner_params.yaml" command="load" />
-		<rosparam file="$(find autonomous_traversal)/params/move_base_params.yaml" command="load" />
+		<rosparam file="$(find autonomous_traversal)/params/local_costmap_params.yaml" 
+				  command="load"/>
+		<rosparam file="$(find autonomous_traversal)/params/global_costmap_params.yaml" 
+				  command="load"/> 
+		<rosparam file="$(find autonomous_traversal)/params/base_local_planner_params.yaml" 
+				  command="load"/>
+		<rosparam file="$(find autonomous_traversal)/params/move_base_params.yaml" 
+				  command="load"/>
 		
 		<!-- Use perfect odometry from simulator (for debugging) -->
-		<remap from="odom" to="/odometry/perfect" if="$(arg simulation)"/>
-		<remap from="odom" to="/odometry/filtered" unless="$(arg simulation)"/>
+		<remap from="odom" to="/odometry/filtered"/>
 		<remap from="/cmd_vel" to="/cmd_vel_autonomy" />
 		<remap from="/map" to="/map" /> 
 	</node>

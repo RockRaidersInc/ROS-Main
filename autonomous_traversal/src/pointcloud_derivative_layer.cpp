@@ -44,34 +44,39 @@ float apply_1x1_kernel(std::vector<float> array, std::vector<float> kernel, int 
 }
 
 
+bool is_finite(float num) {
+    return (num != std::numeric_limits<float>::infinity()) && (num != -std::numeric_limits<float>::infinity()) && (! std::isnan(num));
+}
+
+
 // void timerCallback(const ros::TimerEvent&) {
 void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input_cloud_msg) {
     float resolution = 0.1;
 
-    // // Container for original & filtered data
-    // //TODO: make a shared pointer, this is a memory leak?
-    // pcl::PCLPointCloud2* cloud = new pcl::PCLPointCloud2;  
-    // pcl::PCLPointCloud2ConstPtr cloudPtr(cloud);
-    // pcl::PCLPointCloud2 cloud_filtered_2;
+    // Container for original & filtered data
+    //TODO: make a shared pointer, this is a memory leak?
+    pcl::PCLPointCloud2* cloud = new pcl::PCLPointCloud2;  
+    pcl::PCLPointCloud2ConstPtr cloudPtr(cloud);
+    pcl::PCLPointCloud2 cloud_filtered_2;
 
-    // // Convert to PCL data type
-    // pcl_conversions::toPCL(*input_cloud_msg, *cloud);
+    // Convert to PCL data type
+    pcl_conversions::toPCL(*input_cloud_msg, *cloud);
 
-    // // Perform the actual filtering
-    // pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
-    // sor.setInputCloud (cloudPtr);
-    // sor.setLeafSize (resolution, resolution, resolution);
-    // sor.filter (cloud_filtered_2);
+    // Perform the actual filtering
+    pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
+    sor.setInputCloud (cloudPtr);
+    sor.setLeafSize (resolution/1.2, resolution/1.2, resolution/1.2);
+    sor.filter (cloud_filtered_2);
 
-    // // Convert back to ROS data type
-    // sensor_msgs::PointCloud2 intermediate_cloud;
-    // pcl_conversions::fromPCL(cloud_filtered_2, intermediate_cloud);
+    // Convert back to ROS data type
+    sensor_msgs::PointCloud2 intermediate_cloud;
+    pcl_conversions::fromPCL(cloud_filtered_2, intermediate_cloud);
 
     // now convert to the normal pointcloud datatype
     pcl::PointCloud<pcl::PointXYZRGB> cloud_filtered_unrotated;
     pcl::PointCloud<pcl::PointXYZRGB> cloud_filtered;
-    // pcl::fromROSMsg (intermediate_cloud, cloud_filtered_unrotated);
-    pcl::fromROSMsg (*input_cloud_msg, cloud_filtered_unrotated);
+    pcl::fromROSMsg (intermediate_cloud, cloud_filtered_unrotated);
+    // pcl::fromROSMsg (*input_cloud_msg, cloud_filtered_unrotated);
 
     pcl_ros::transformPointCloud(cloud_filtered_unrotated, cloud_filtered, base_link_to_camera_tf.inverse());
 
@@ -115,14 +120,16 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input_cloud_msg) {
     float max_z = -std::numeric_limits<float>::infinity();
 
     for (auto b1 = cloud_filtered.points.begin(); b1 < cloud_filtered.points.end(); b1++) {
-        if (b1->x < min_x) min_x = b1->x;
-        if (b1->x > max_x) max_x = b1->x;
+        if (is_finite(b1->x) && is_finite(b1->y) && is_finite(b1->z)) {
+            if (b1->x < min_x) min_x = b1->x;
+            if (b1->x > max_x) max_x = b1->x;
 
-        if (b1->y < min_y) min_y = b1->y;
-        if (b1->y > max_y) max_y = b1->y;
+            if (b1->y < min_y) min_y = b1->y;
+            if (b1->y > max_y) max_y = b1->y;
 
-        if (b1->z < min_z) min_z = b1->z;
-        if (b1->z > max_z) max_z = b1->z;
+            if (b1->z < min_z) min_z = b1->z;
+            if (b1->z > max_z) max_z = b1->z;
+        }
     }
     
     int x_len = ceil((max_x - min_x) / resolution);
@@ -193,15 +200,14 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input_cloud_msg) {
             float x_deriv = (xp1 - base) / (resolution);
             float y_deriv = (yp1 - base) / (resolution);
             
-            float deriv_mag = sqrt(x_deriv * x_deriv + y_deriv * y_deriv);
-            // float height_diff = max_heights.at((y) * x_len + (x)) - min_heights.at((y) * x_len + (x));
+            float deriv_mag = std::min(sqrt(x_deriv * x_deriv + y_deriv * y_deriv) / 2.0, (double) 3);
+            float height_diff = max_heights.at((y) * x_len + (x)) - min_heights.at((y) * x_len + (x));
 
-            // derivatives.at(y * (x_len - 1) + x) = std::max(deriv_mag, height_diff);
-            derivatives.at(y * (x_len - 1) + x) = deriv_mag;
+            derivatives.at(y * (x_len - 1) + x) = std::max(deriv_mag, height_diff);
+            // derivatives.at(y * (x_len - 1) + x) = deriv_mag;
             // derivatives.at(y * (x_len - 1) + x) = base;
         }
     }
-
 
 
     // make the z valued in the filtered point cloud equal to the derivatives 

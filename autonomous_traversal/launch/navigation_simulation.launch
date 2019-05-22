@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- ONLY FOR SIMULATION - Perfect odometry for debuging -->
+	<node pkg="tf" 
+		  type="static_transform_publisher" 
+		  name="map_to_odom_perfect" 
+		  args="0 0 0 0 0 0 map odom 100"/>
+	<node pkg="simulator" 
+		  type="OdomToTfNode" 
+		  name="odom_to_base_perfect"/>
+
+	<arg name="map"/>
+ 	<node name="map_server" 
+		  pkg="map_server" 
+		  type="map_server" 
+		  args="$(find autonomous_traversal)/maps/$(arg map).yaml"/>
+
+	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+		<!-- Load params - physical rover -->
+		<rosparam file="$(find autonomous_traversal)/params/costmap_common_simulation_params.yaml" 
+				  command="load" 
+				  ns="global_costmap"/> 
+		<rosparam file="$(find autonomous_traversal)/params/costmap_common_simulation_params.yaml" 
+				  command="load"
+				  ns="local_costmap"/>
+		<rosparam file="$(find autonomous_traversal)/params/local_costmap_simulation_params.yaml" 
+				  command="load"/>
+		<rosparam file="$(find autonomous_traversal)/params/global_costmap_simulation_params.yaml" 
+				  command="load"/> 
+		<rosparam file="$(find autonomous_traversal)/params/base_local_planner_simulation_params.yaml" 
+				  command="load"/>
+		<rosparam file="$(find autonomous_traversal)/params/move_base_simulation_params.yaml" 
+				  command="load"/>
+
+		<!-- Use perfect odometry from simulator (for debugging) -->
+		<remap from="odom" to="/odometry/perfect"/>
+		<remap from="/cmd_vel" to="/cmd_vel_autonomy" />
+		<remap from="/map" to="/map" /> 
+	</node>
+	
+
+
+</launch>

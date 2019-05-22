@@ -1,4 +1,4 @@
-1) Rewrite at_rviz.launch to accept the name of the rviz file as a parameter
 2) Use PCL filter to filter out depth cloud data
 3) CPU + RAM + GPU Consumption node for debugging
-4) 
+4) Magnetic declination doesn't work in simulator, needs fixing
+5) Kalman gain calculation and visualization for debugging
