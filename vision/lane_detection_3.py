@@ -271,31 +271,22 @@ class LaneDetector:
             lower_y_bound = -2.
             upper_y_bound = 2.
 
-            # tl_bound_pt = Vector3(np.max(roi[:, 1]), np.max(roi[:, 0]), 0.0)
-            # br_bound_pt = Vector3(np.min(roi[:, 1]), np.min(roi[:, 0]), 0.0)
-            tl_bound_pt = Vector3(upper_x_bound, upper_y_bound, 0.0)
-            br_bound_pt = Vector3(lower_x_bound, lower_y_bound, 0.0)
-            lane.bound_corners[0] = tl_bound_pt
-            lane.bound_corners[1] = br_bound_pt
+            lane.bound_polygon.append(Vector3(lower_x_bound,lower_y_bound,0))
+            lane.bound_polygon.append(Vector3(lower_x_bound,upper_y_bound,0))
+            lane.bound_polygon.append(Vector3(upper_x_bound,upper_y_bound,0))
+            lane.bound_polygon.append(Vector3(upper_x_bound,lower_y_bound,0))
 
-            # for i in range(10):
-            #     lane_pt = Vector3(i/10.0,1.0,0.0)	
-            #     lane.lane_points.append(lane_pt)
             points_filtered_x = []
             points_filtered_y = []
             for i in range(points.shape[0]):
                 point_x = points[i, 0]
                 point_y = points[i, 1]
-                if lower_x_bound < point_x and point_x < upper_x_bound and lower_y_bound < point_y and point_y < upper_y_bound:
+                if lower_x_bound < point_x and point_x < upper_x_bound and 
+                   lower_y_bound < point_y and point_y < upper_y_bound:
                     # if True:
                     # print(point_x, point_y)
                     points_filtered_x.append(point_x)
                     points_filtered_y.append(point_y)
-
-            # import matplotlib.pyplot as plt
-            # plt.scatter(points_filtered_x, points_filtered_y)
-            # plt.show()
-            # plt.clear()
 
             for i in range(len(points_filtered_y)):
                 point_x = points_filtered_x[i]
@@ -412,7 +403,6 @@ class LaneDetector:
 
         self.lane_pub = rospy.Publisher('/lanes', Lane, queue_size=10)
         
-
         self.debug = rospy.Publisher("detector_debug", Image, queue_size=10)
 
         # time.sleep(3)
