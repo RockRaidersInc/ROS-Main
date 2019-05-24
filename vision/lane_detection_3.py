@@ -281,8 +281,7 @@ class LaneDetector:
             for i in range(points.shape[0]):
                 point_x = points[i, 0]
                 point_y = points[i, 1]
-                if lower_x_bound < point_x and point_x < upper_x_bound and 
-                   lower_y_bound < point_y and point_y < upper_y_bound:
+                if lower_x_bound < point_x and point_x < upper_x_bound and lower_y_bound < point_y and point_y < upper_y_bound:
                     # if True:
                     # print(point_x, point_y)
                     points_filtered_x.append(point_x)

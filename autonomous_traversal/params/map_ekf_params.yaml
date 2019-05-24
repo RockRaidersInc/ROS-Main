@@ -55,17 +55,17 @@ map_ekf:
   odom1_relative: false
 
 
-  # Visual Odometry Settings
-  odom2: /odometry/visual
-  odom2_config: [true,  true,  true,    # [x_pos   , y_pos    , z_pos,
-                 false, false, true,    #  roll    , pitch    , yaw,
-                 false, false, false,   #  x_vel   , y_vel    , z_vel,
-                 false, false, false,   #  roll_vel, pitch_vel, yaw_vel,
-                 false, false, false]   #  x_accel , y_accel  , z_accel]
-  odom2_queue_size: 10
-  odom2_nodelay: true
-  odom2_differential: true
-  odom2_relative: false
+#  # Visual Odometry Settings
+#  odom2: /odometry/visual
+#  odom2_config: [true,  true,  true,    # [x_pos   , y_pos    , z_pos,
+#                 false, false, true,    #  roll    , pitch    , yaw,
+#                 false, false, false,   #  x_vel   , y_vel    , z_vel,
+#                 false, false, false,   #  roll_vel, pitch_vel, yaw_vel,
+#                 false, false, false]   #  x_accel , y_accel  , z_accel]
+#  odom2_queue_size: 10
+#  odom2_nodelay: true
+#  odom2_differential: true
+#  odom2_relative: false
   
 
   # IMU Settings
