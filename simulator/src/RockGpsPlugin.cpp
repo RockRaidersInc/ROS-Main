@@ -125,6 +125,9 @@ void RockGpsPlugin::OnUpdate()
   for (int i = 0; i < 9; i++) {
       msg.position_covariance[i] = 0;
   }
+  msg.position_covariance[0] = 0.5;
+  msg.position_covariance[4] = 0.5;
+  msg.position_covariance[8] = 0.5;
 
   msg.position_covariance_type = msg.COVARIANCE_TYPE_DIAGONAL_KNOWN;
 

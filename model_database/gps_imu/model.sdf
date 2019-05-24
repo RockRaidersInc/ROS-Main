@@ -34,7 +34,7 @@
       <sensor name='gazebo_gps_sensor' type='gps'>
         <plugin name="rock_gps_plugin" filename="libRockGpsPlugin.so">
           <frameId> gps0_link </frameId>
-          <topicName> /gps/fix </topicName>
+          <topicName> /gps/fix_unadjusted </topicName>
         </plugin>
         <always_on> 1 </always_on>
         <update_rate> 1 </update_rate>
