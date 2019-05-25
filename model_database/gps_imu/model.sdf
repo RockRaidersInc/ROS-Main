@@ -38,6 +38,16 @@
         </plugin>
         <always_on> 1 </always_on>
         <update_rate> 1 </update_rate>
+
+        <gps>
+          <position_sensing>
+            <horizontal>
+              <noise type="gaussian">
+                <stddev> 1.5 </stddev>
+              </noise>
+            </horizontal>
+          </position_sensing>
+        </gps>
       </sensor>
 
     </link>
