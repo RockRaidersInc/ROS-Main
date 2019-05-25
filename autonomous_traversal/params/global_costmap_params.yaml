@@ -8,9 +8,9 @@ global_costmap:
   height: 100.0
 
   plugins:
+    - {name: lanes_layer,        type: "lanes_layer::LanesLayer"}
     - {name: static_layer,       type: "costmap_2d::StaticLayer"}
-    - {name: obstacle_layer,     type: "costmap_2d::ObstacleLayer"}
+    # - {name: obstacle_layer,     type: "costmap_2d::ObstacleLayer"}
     # - {name: obstacle_layer,   type: "costmap_2d::VoxelLayer"}
-    # - {name: lanes_layer,        type: "lanes_layer::LanesLayer"}
     # - {name: anti_reverse_layer, type: "anti_reverse_layer::AntiReverseLayer"}
     - {name: inflation_layer,    type: "costmap_2d::InflationLayer"}
