@@ -281,7 +281,7 @@ class LaneDetector:
             for i in range(points.shape[0]):
                 point_x = points[i, 0]
                 point_y = points[i, 1]
-                if lower_x_bound < point_x and point_x < upper_x_bound and 
+                if lower_x_bound < point_x and point_x < upper_x_bound and \
                    lower_y_bound < point_y and point_y < upper_y_bound:
                     # if True:
                     # print(point_x, point_y)
@@ -329,27 +329,28 @@ class LaneDetector:
         undist = image
 
         # Define a kernel size and apply Gaussian smoothing
-        apply_blur = True
+        apply_blur = False
         if apply_blur:
             undist = self.gaussian_blur(undist, 5)
             extra_blurred = self.gaussian_blur(undist, 21)
-        self.blurred_pub.publish(bridge.cv2_to_imgmsg((undist).astype(np.uint8)))
+        # self.blurred_pub.publish(bridge.cv2_to_imgmsg((undist).astype(np.uint8)))
 
         warped, _, _ = self.warp(undist)
-        self.undist_pub.publish(bridge.cv2_to_imgmsg(warped))
+        # self.undist_pub.publish(bridge.cv2_to_imgmsg(warped))
 
         # Define parameters for color thresholding
         # s_binary = self.hls_select(undist, thresh=(90, 255))
         s_binary = self.hsv_select(undist)
-        self.s_binary_pub.publish(bridge.cv2_to_imgmsg(s_binary.astype(np.uint8)))
+        # self.s_binary_pub.publish(bridge.cv2_to_imgmsg(s_binary.astype(np.uint8)))
 
         # close the image to get rid of noise
         kernel = np.ones((5,5), np.uint8) 
         # eroded = cv2.erode(warped_im, kernel, iterations=1)
-        denoised = cv2.morphologyEx(s_binary.astype(np.uint8), cv2.MORPH_ERODE, kernel)
-        denoised = self.skeleton(denoised)
+        # denoised = cv2.morphologyEx(s_binary.astype(np.uint8), cv2.MORPH_ERODE, kernel)
+        # denoised = self.skeleton(denoised)
+        denoised = self.skeleton(s_binary.astype(np.uint8))
 
-        self.denoised_pub.publish(bridge.cv2_to_imgmsg(denoised))
+        # self.denoised_pub.publish(bridge.cv2_to_imgmsg(denoised))
 
         # publish points
         lane_points_image_frame_yx = np.array(np.where(denoised != 0))
@@ -364,8 +365,8 @@ class LaneDetector:
         warped_im, roi, Minv = self.warp(np.dstack([denoised, denoised, denoised]))
 
         # publish the warped image for debugging purposes
-        for i in range(len(roi) - 1):
-            cv2.line(warped_im, tuple(roi[i, 0]), tuple(roi[i+1, 0]), (0, 255, 0), 4)
+        # for i in range(len(roi) - 1):
+        #     cv2.line(warped_im, tuple(roi[i, 0]), tuple(roi[i+1, 0]), (0, 255, 0), 4)
 
         self.warped_im_pub.publish(bridge.cv2_to_imgmsg(warped_im))
         # return s_binary, combined_binary1, warped_im, Minv
@@ -390,16 +391,16 @@ class LaneDetector:
         image_topic = "/zed/depth/image_raw"
         # Set up your subscriber and define its callback
         rospy.Subscriber(image_topic, Image, self.image_callback)
-        self.raw_pub = rospy.Publisher("raw_image", Image, queue_size=10)
-        self.blurred_pub = rospy.Publisher("blurred", Image, queue_size=10)
-        self.undist_pub = rospy.Publisher("undist", Image, queue_size=10)
-        self.sxybinary_pub = rospy.Publisher("sxybinary", Image, queue_size=10)
-        self.s_binary_pub = rospy.Publisher("s_binary", Image, queue_size=10)
-        self.combined_binary1_pub = rospy.Publisher("combined_binary1", Image, queue_size=10)
+        # self.raw_pub = rospy.Publisher("raw_image", Image, queue_size=10)
+        # self.blurred_pub = rospy.Publisher("blurred", Image, queue_size=10)
+        # self.undist_pub = rospy.Publisher("undist", Image, queue_size=10)
+        # self.sxybinary_pub = rospy.Publisher("sxybinary", Image, queue_size=10)
+        # self.s_binary_pub = rospy.Publisher("s_binary", Image, queue_size=10)
+        # self.combined_binary1_pub = rospy.Publisher("combined_binary1", Image, queue_size=10)
         self.warped_im_pub = rospy.Publisher("warped_im", Image, queue_size=10)
-        self.lane_drawn_pub = rospy.Publisher("lane_drawn", Image, queue_size=10)
-        self.mag_binary_pub = rospy.Publisher("mag_binary", Image, queue_size=10)
-        self.denoised_pub = rospy.Publisher("denoised", Image, queue_size=10)
+        # self.lane_drawn_pub = rospy.Publisher("lane_drawn", Image, queue_size=10)
+        # self.mag_binary_pub = rospy.Publisher("mag_binary", Image, queue_size=10)
+        # self.denoised_pub = rospy.Publisher("denoised", Image, queue_size=10)
 
         self.lane_pub = rospy.Publisher('/lanes', Lane, queue_size=10)
         
