@@ -23,6 +23,11 @@ sudo apt install -y ros-kinetic-pcl-ros
 sudo apt install -y ros-kinetic-usb-cam
 ```
 
+Also install the ZED SDK. Instructions are here:
+```
+https://www.stereolabs.com/developers/
+```
+
 Create a catkin workspace and clone our repository:
 ```
 mkdir ~/URC

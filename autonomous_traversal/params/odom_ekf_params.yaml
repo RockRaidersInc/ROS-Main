@@ -30,17 +30,17 @@ odom_ekf:
   base_link_frame: base_link
   world_frame: odom
 
-  # Wheel Odometry Settings
-  odom0: /odometry/wheel
-  odom0_config: [false, false, false,     # [x_pos   , y_pos    , z_pos,
-                 false, false, false,     #  roll    , pitch    , yaw,
-                 true,  true,  true,      #  x_vel   , y_vel    , z_vel,
-                 false, false, false,      #  roll_vel, pitch_vel, yaw_vel,
-                 false, false, false]     #  x_accel , y_accel  , z_accel]
-  odom0_queue_size: 10
-  odom0_nodelay: true
-  odom0_differential: false
-  odom0_relative: false
+#  # Wheel Odometry Settings
+#  odom0: /odometry/wheel
+#  odom0_config: [false, false, false,     # [x_pos   , y_pos    , z_pos,
+#                 false, false, false,     #  roll    , pitch    , yaw,
+#                 true,  true,  true,      #  x_vel   , y_vel    , z_vel,
+#                 false, false, false,      #  roll_vel, pitch_vel, yaw_vel,
+#                 false, false, false]     #  x_accel , y_accel  , z_accel]
+#  odom0_queue_size: 10
+#  odom0_nodelay: true
+#  odom0_differential: false
+#  odom0_relative: false
 
   # Visual Odometry Settings
   odom1: /odometry/visual
@@ -54,18 +54,18 @@ odom_ekf:
   odom1_differential: false
   odom1_relative: false
 
-  # IMU Settings
-  imu0: /imu/data
-  imu0_config: [false, false, false,
-                true, true, true,
-                false, false, false,
-                false,  false,  false,
-                false,  false,  false]
-  imu0_nodelay: false
-  imu0_differential: true
-  imu0_relative: false
-  imu0_queue_size: 10
-  imu0_remove_gravitational_acceleration: true
+#  # IMU Settings
+#  imu0: /imu/data
+#  imu0_config: [false, false, false,
+#                true, true, true,
+#                false, false, false,
+#                false,  false,  false,
+#                false,  false,  false]
+#  imu0_nodelay: false
+#  imu0_differential: true
+#  imu0_relative: false
+#  imu0_queue_size: 10
+#  imu0_remove_gravitational_acceleration: true
 
   # Covariance Settings
   process_noise_covariance: [0.05, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
