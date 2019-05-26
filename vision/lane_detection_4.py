@@ -27,8 +27,16 @@ bridge = CvBridge()
 
 class LaneDetector:
 
+    # # 720p
+    # x_resolution = 1280.0
+    # y_resolution = 720.0
+
+    # 640p
     x_resolution = 640.0
     y_resolution = 480.0
+
+    debug = True
+    print_timing_info = False
 
     def __init__(self):
         self.cv2_img = None
@@ -220,24 +228,61 @@ class LaneDetector:
                 return skeleton
 
     # Define a function for creating lane lines
-    def lane_detector(self, image, video_mode=False):
+    def lane_detector(self, input_image, video_mode=False):
+        if self.print_timing_info:
+            start_time = time.time()
+            prev_time = time.time()
+
+        image = cv2.resize(input_image, (int(self.x_resolution), int(self.y_resolution)))
+
+        if self.print_timing_info:
+            print("image resizing took", time.time() - prev_time, "seconds")
+            prev_time = time.time()
+
         # Image processing
         hsv_filtered = self.hsv_select(image)
+
+        if self.print_timing_info:
+            print("hsv filtering took", time.time() - prev_time, "seconds")
+            prev_time = time.time()
+
         skeletoned = self.skeleton(hsv_filtered.astype(np.uint8))
+
+        if self.print_timing_info:
+            print("skeleton took", time.time() - prev_time, "seconds")
+            prev_time = time.time()
+
         # Calculate lane points
         lane_points_image_frame_yx = np.array(np.where(skeletoned != 0))
         lane_points_image_frame = np.array([lane_points_image_frame_yx[1,:], lane_points_image_frame_yx[0,:]])
         # Warp perspective
         lane_points_map_frame, roi = self.warp_points(lane_points_image_frame, skeletoned.shape)
+
+        if self.print_timing_info:
+            print("selecting points took", time.time() - prev_time, "seconds")
+            prev_time = time.time()
+
         warped_im, roi, Minv = self.warp(np.dstack([skeletoned, skeletoned, skeletoned]))
+
+        if self.print_timing_info:
+            print("warping input image took", time.time() - prev_time, "seconds")
+            prev_time = time.time()
+
         # Publish points and image
         self.publish_lane_pts(roi, lane_points_map_frame)
         self.warped_im_pub.publish(bridge.cv2_to_imgmsg(warped_im))
 
+        if self.print_timing_info:
+            print("publishing points and data took", time.time() - prev_time, "seconds")
+            print("took", time.time() - start_time, "seconds in total")
+            print
+
     def image_callback(self, msg):
         print("Received an image!")
         try:
-            self.cv2_img = cv2.resize(bridge.imgmsg_to_cv2(msg, "bgr8"), (int(self.x_resolution), int(self.y_resolution)))
+            # self.cv2_img = cv2.resize(bridge.imgmsg_to_cv2(msg, "bgr8"), (int(self.x_resolution), int(self.y_resolution)))
+            self.cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
+            self.lane_detector(self.cv2_img)
         except CvBridgeError as e:
             print("error recieving image\n", e)
 
@@ -254,9 +299,12 @@ class LaneDetector:
         self.lane_pub = rospy.Publisher('/lanes', Lane, queue_size=10)
 
         while not rospy.is_shutdown():
-            if self.cv2_img is not None:
-                self.lane_detector(self.cv2_img)
-                self.cv2_img = None
+            # if self.cv2_img is not None:
+            #     self.lane_detector(self.cv2_img)
+            #     self.cv2_img = None
+
+            # turn this delay down if running image detection in main thread
+            time.sleep(0.5)
 
 
 if __name__ == '__main__':
