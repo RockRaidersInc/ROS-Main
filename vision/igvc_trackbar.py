@@ -1,6 +1,3 @@
-# Basically Shu-Nong's Trackbar script with Hough Circle Transforms - xieo
-# Code not yet integrated with ROS
-
 import numpy as np
 import cv2
 import sys
