@@ -26,6 +26,10 @@ from geometry_msgs.msg import Vector3
 bridge = CvBridge()
 
 class LaneDetector:
+
+    x_resolution = 640.0
+    y_resolution = 480.0
+
     def __init__(self):
         self.cv2_img = None
         # train svm
@@ -91,15 +95,15 @@ class LaneDetector:
 
         img_x_half = img.shape[1] / 2
         img_y_half = img.shape[0] / 2
-        y_offset = 480 / 2 - 80*480.0/720.0
+        y_offset = self.y_resolution / 2 - 80*self.y_resolution/720.0
         square_size_y = 0.508 * 100
         square_size_x = 0.762 * 100
         scale_factor = 50
 
-        src = np.float32([[640 - 387*640.0/1280.0, 480 - 81*480.0/720.0],  # bottom left
-                         [640 - 515*640.0/1280.0, 480 - 370*480.0/720.0],  # top left
-                         [640 - 865*640.0/1280.0, 480 - 371*480.0/720.0],  # top right
-                         [640 - 1020*640.0/1280.0, 480 - 65*480.0/720.0]]) # bottom right
+        src = np.float32([[self.x_resolution - 387*self.x_resolution/1280.0, self.y_resolution - 81*self.y_resolution/720.0],  # bottom left
+                         [self.x_resolution - 515*self.x_resolution/1280.0, self.y_resolution - 370*self.y_resolution/720.0],  # top left
+                         [self.x_resolution - 865*self.x_resolution/1280.0, self.y_resolution - 371*self.y_resolution/720.0],  # top right
+                         [self.x_resolution - 1020*self.x_resolution/1280.0, self.y_resolution - 65*self.y_resolution/720.0]]) # bottom right
 
         dst = np.float32([[2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset],   # bottom left
                           [2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],   # top left
@@ -123,17 +127,17 @@ class LaneDetector:
         return warped, roi_warped, Minv
 
     def warp_points(self, point_array, img_shape):
-        img_size = [480, 640]
+        img_size = [self.y_resolution, self.x_resolution]
 
         img_x_half = img_shape[1] / 2
         img_y_half = img_shape[0] / 2
-        y_offset = 480 / 2 - 80*480.0/720.0
+        y_offset = self.y_resolution / 2 - 80*self.y_resolution/720.0
         scale_factor = 50
 
-        src = np.float32([[640 - 387*640.0/1280.0, 480 - 81*480.0/720.0],  # bottom left
-                         [640 - 515*640.0/1280.0, 480 - 370*480.0/720.0],  # top left
-                         [640 - 865*640.0/1280.0, 480 - 371*480.0/720.0],  # top right
-                         [640 - 1020*640.0/1280.0, 480 - 65*480.0/720.0]]) # bottom right
+        src = np.float32([[self.x_resolution - 387*self.x_resolution/1280.0, self.y_resolution - 81*self.y_resolution/720.0],  # bottom left
+                         [self.x_resolution - 515*self.x_resolution/1280.0, self.y_resolution - 370*self.y_resolution/720.0],  # top left
+                         [self.x_resolution - 865*self.x_resolution/1280.0, self.y_resolution - 371*self.y_resolution/720.0],  # top right
+                         [self.x_resolution - 1020*self.x_resolution/1280.0, self.y_resolution - 65*self.y_resolution/720.0]]) # bottom right
         dst = np.float32([[0.9144, -0.6096],     # bottom left
                         [2.1336, -0.6096],       # top left
                         [2.1336, 0.6096],  # top right
@@ -233,7 +237,7 @@ class LaneDetector:
     def image_callback(self, msg):
         print("Received an image!")
         try:
-            self.cv2_img = cv2.resize(bridge.imgmsg_to_cv2(msg, "bgr8"), (640, 480))
+            self.cv2_img = cv2.resize(bridge.imgmsg_to_cv2(msg, "bgr8"), (int(self.x_resolution), int(self.y_resolution)))
         except CvBridgeError as e:
             print("error recieving image\n", e)
 
