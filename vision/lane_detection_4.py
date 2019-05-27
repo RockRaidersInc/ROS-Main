@@ -31,12 +31,15 @@ class LaneDetector:
     # x_resolution = 1280.0
     # y_resolution = 720.0
 
-    # 640p
+    # 480p
     x_resolution = 640.0
     y_resolution = 480.0
 
+    max_x_dist = 5  # maximum distance away from the rover at which lanes will be detected
+
     debug = True
-    print_timing_info = False
+    print_timing_info = True
+
 
     def __init__(self):
         self.cv2_img = None
@@ -101,22 +104,20 @@ class LaneDetector:
     def warp(self, img):
         img_size = (img.shape[1], img.shape[0])
 
-        img_x_half = img.shape[1] / 2
-        img_y_half = img.shape[0] / 2
-        y_offset = self.y_resolution / 2 - 80*self.y_resolution/720.0
-        square_size_y = 0.508 * 100
-        square_size_x = 0.762 * 100
-        scale_factor = 50
+        img_x_half = self.x_resolution / 2
+        img_y_half = self.y_resolution / 2
+        y_offset = self.y_resolution / 2 - 100
+        scale_factor = 25
 
-        src = np.float32([[self.x_resolution - 387*self.x_resolution/1280.0, self.y_resolution - 81*self.y_resolution/720.0],  # bottom left
-                         [self.x_resolution - 515*self.x_resolution/1280.0, self.y_resolution - 370*self.y_resolution/720.0],  # top left
-                         [self.x_resolution - 865*self.x_resolution/1280.0, self.y_resolution - 371*self.y_resolution/720.0],  # top right
-                         [self.x_resolution - 1020*self.x_resolution/1280.0, self.y_resolution - 65*self.y_resolution/720.0]]) # bottom right
+        src = np.float32([[193 *self.x_resolution/640.0, 426 *self.y_resolution/480.0],  # bottom left
+                         [256 *self.x_resolution/640.0, 233 *self.y_resolution/480.0],  # top left
+                         [430 *self.x_resolution/640.0, 232 *self.y_resolution/480.0],  # top right
+                         [510 *self.x_resolution/640.0, 436 *self.y_resolution/480.0]]) # bottom right
 
-        dst = np.float32([[2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset],   # bottom left
-                          [2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],   # top left
-                          [-2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],    # top right
-                          [-2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset]])  # bottom right
+        dst = np.float32([[-2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset],   # bottom left
+                          [-2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],   # top left
+                          [2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],    # top right
+                          [2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset]])  # bottom right
 
         M = cv2.getPerspectiveTransform(src, dst)
 
@@ -126,7 +127,7 @@ class LaneDetector:
         # create a warped image
         warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
 
-        roi_unwarped = np.array([[[0, 0]], [[0, img_size[0]]], [[img_size[1], img_size[0]]], [[img_size[1], 0]]], dtype=np.float32)
+        roi_unwarped = np.array([[[0, self.y_resolution]], [[0, 0]], [[self.x_resolution, 0]], [[self.x_resolution, self.y_resolution]]], dtype=np.float32)
         roi_warped = cv2.perspectiveTransform(roi_unwarped, M)
 
         # unpersp = cv2.warpPerspective(warped, Minv, img_size, flags=cv2.INTER_LINEAR)
@@ -135,29 +136,27 @@ class LaneDetector:
         return warped, roi_warped, Minv
 
     def warp_points(self, point_array, img_shape):
-        img_size = [self.y_resolution, self.x_resolution]
 
-        img_x_half = img_shape[1] / 2
-        img_y_half = img_shape[0] / 2
-        y_offset = self.y_resolution / 2 - 80*self.y_resolution/720.0
-        scale_factor = 50
-
-        src = np.float32([[self.x_resolution - 387*self.x_resolution/1280.0, self.y_resolution - 81*self.y_resolution/720.0],  # bottom left
-                         [self.x_resolution - 515*self.x_resolution/1280.0, self.y_resolution - 370*self.y_resolution/720.0],  # top left
-                         [self.x_resolution - 865*self.x_resolution/1280.0, self.y_resolution - 371*self.y_resolution/720.0],  # top right
-                         [self.x_resolution - 1020*self.x_resolution/1280.0, self.y_resolution - 65*self.y_resolution/720.0]]) # bottom right
-        dst = np.float32([[0.9144, -0.6096],     # bottom left
-                        [2.1336, -0.6096],       # top left
-                        [2.1336, 0.6096],  # top right
-                        [0.9144, 0.6096]])  # bottom right
+        src = np.float32([[193 *self.x_resolution/640.0, 426 *self.y_resolution/480.0],  # bottom left
+                         [256 *self.x_resolution/640.0, 233 *self.y_resolution/480.0],  # top left
+                         [430 *self.x_resolution/640.0, 232 *self.y_resolution/480.0],  # top right
+                         [510 *self.x_resolution/640.0, 436 *self.y_resolution/480.0]]) # bottom right
+        dst = np.float32([[0.9144, 0.6096],     # bottom left
+                        [2.1336, 0.6096],       # top left
+                        [2.1336, -0.6096],  # top right
+                        [0.9144, -0.6096]])  # bottom right
 
         M = cv2.getPerspectiveTransform(src, dst)
 
-        roi_unwarped = np.array([[[img_size[1]*.1, img_size[0]*.1]], 
-                                [[ img_size[1]*.1, img_size[0]*.9]], 
-                                [[ img_size[1]*.9, img_size[0]*.9]], 
-                                [[ img_size[1]*.9, img_size[0]*.1]]], dtype=np.float32)
+        roi_unwarped = np.array([[[0, self.y_resolution]],   # bottom left
+                                 [[0, 0]],                   # top left
+                                 [[self.x_resolution, 0]],   # top right
+                                 [[self.x_resolution, self.y_resolution]]])  # bottom right
         roi_warped = cv2.perspectiveTransform(roi_unwarped, M)
+
+        for i in range(roi_warped.shape[0]):
+            if roi_warped[i, 0, 0] > self.max_x_dist:
+                roi_warped[i, 0, 0] = self.max_x_dist
 
         point_array = point_array.transpose()
         reshaped_point_array = point_array.reshape([point_array.shape[0], 1, point_array.shape[1]]).astype(np.float32)
@@ -277,6 +276,17 @@ class LaneDetector:
             print("took", time.time() - start_time, "seconds in total")
             print
 
+        if self.debug:
+            # publish the warped image for debugging purposes
+            warped_im_raw, roi, Minv = self.warp(image)
+            for i in range(len(roi) - 1):
+                cv2.line(warped_im_raw, tuple(roi[i, 0]), tuple(roi[i + 1, 0]), (0, 255, 0), 4)
+            self.debug_img_pub.publish(bridge.cv2_to_imgmsg(warped_im_raw))
+
+            # publish resized input image
+            self.resized_pub.publish(bridge.cv2_to_imgmsg(image.astype(np.uint8), "bgr8"))
+
+
     def image_callback(self, msg):
         print("Received an image!")
         try:
@@ -293,10 +303,11 @@ class LaneDetector:
         image_topic = "/zed_node/left/image_rect_color"
         rospy.Subscriber(image_topic, Image, self.image_callback)
 
-        self.raw_pub = rospy.Publisher("raw_image", Image, queue_size=10)
-        self.warped_im_pub = rospy.Publisher("warped_im", Image, queue_size=10)
+        self.raw_pub = rospy.Publisher("/raw_image", Image, queue_size=10)
+        self.warped_im_pub = rospy.Publisher("/warped_im", Image, queue_size=10)
         self.debug_img_pub = rospy.Publisher('/debug_img', Image, queue_size=10)
         self.lane_pub = rospy.Publisher('/lanes', Lane, queue_size=10)
+        self.resized_pub = rospy.Publisher('/resized_input', Image, queue_size=10)
 
         while not rospy.is_shutdown():
             # if self.cv2_img is not None:

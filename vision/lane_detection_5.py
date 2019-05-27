@@ -29,7 +29,11 @@ class LaneDetector:
     x_resolution = 640.0
     y_resolution = 480.0
 
-    debug = True
+    post_filtering_scaling_factor = 4
+
+    max_x_dist = 3.0  # maximum distance away from the rover at which lanes will be detected
+
+    debug = False
     print_timing_info = True
 
     def __init__(self):
@@ -51,65 +55,62 @@ class LaneDetector:
         return clr_filt_mask
 
     def warp(self, img):
-        img_size = (img.shape[1], img.shape[0])
+        img_x_half = self.x_resolution / 2
+        img_y_half = self.y_resolution / 2
+        y_offset = self.y_resolution / 2 - 100
+        scale_factor = 25
 
-        img_x_half = img.shape[1] / 2
-        img_y_half = img.shape[0] / 2
-        y_offset = self.y_resolution / 2 - 80*self.y_resolution/720.0
-        square_size_y = 0.508 * 100
-        square_size_x = 0.762 * 100
-        scale_factor = 50
+        src = np.float32([[193 *self.x_resolution/640.0, 426 *self.y_resolution/480.0],  # bottom left
+                         [256 *self.x_resolution/640.0, 233 *self.y_resolution/480.0],  # top left
+                         [430 *self.x_resolution/640.0, 232 *self.y_resolution/480.0],  # top right
+                         [510 *self.x_resolution/640.0, 436 *self.y_resolution/480.0]]) # bottom right
 
-        src = np.float32([[self.x_resolution - 387*self.x_resolution/1280.0, self.y_resolution - 81*self.y_resolution/720.0],  # bottom left
-                         [self.x_resolution - 515*self.x_resolution/1280.0, self.y_resolution - 370*self.y_resolution/720.0],  # top left
-                         [self.x_resolution - 865*self.x_resolution/1280.0, self.y_resolution - 371*self.y_resolution/720.0],  # top right
-                         [self.x_resolution - 1020*self.x_resolution/1280.0, self.y_resolution - 65*self.y_resolution/720.0]]) # bottom right
-
-        dst = np.float32([[2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset],   # bottom left
-                          [2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],   # top left
-                          [-2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],    # top right
-                          [-2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset]])  # bottom right
+        dst = np.float32([[-2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset],   # bottom left
+                          [-2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],   # top left
+                          [2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],    # top right
+                          [2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset]])  # bottom right
 
         M = cv2.getPerspectiveTransform(src, dst)
 
         # inverse
-        Minv = cv2.getPerspectiveTransform(dst, src)
+        M_inv = cv2.getPerspectiveTransform(dst, src)
 
         # create a warped image
-        warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_LINEAR)
+        warped = cv2.warpPerspective(img, M, (img.shape[1], img.shape[0]), flags=cv2.INTER_LINEAR)
 
-        roi_unwarped = np.array([[[0, 0]], [[0, img_size[0]]], [[img_size[1], img_size[0]]], [[img_size[1], 0]]], dtype=np.float32)
+        roi_unwarped = np.array([[[0, self.y_resolution]], [[0, 0]], [[self.x_resolution, 0]], [[self.x_resolution, self.y_resolution]]], dtype=np.float32)
         roi_warped = cv2.perspectiveTransform(roi_unwarped, M)
 
         # unpersp = cv2.warpPerspective(warped, Minv, img_size, flags=cv2.INTER_LINEAR)
         unpersp = img
 
-        return warped, roi_warped, Minv
+        return warped, roi_warped, M_inv
 
     def warp_points(self, point_array, img_shape):
-        img_size = [480, 640]
 
-        img_x_half = img_shape[1] / 2
-        img_y_half = img_shape[0] / 2
-        y_offset = 480 / 2 - 80*480.0/720.0
-        scale_factor = 50
-
-        src = np.float32([[640 - 387*640.0/1280.0, 480 - 81*480.0/720.0],  # bottom left
-                         [640 - 515*640.0/1280.0, 480 - 370*480.0/720.0],  # top left
-                         [640 - 865*640.0/1280.0, 480 - 371*480.0/720.0],  # top right
-                         [640 - 1020*640.0/1280.0, 480 - 65*480.0/720.0]]) # bottom right
-        dst = np.float32([[0.9144, -0.6096],     # bottom left
-                        [2.1336, -0.6096],       # top left
-                        [2.1336, 0.6096],  # top right
-                        [0.9144, 0.6096]])  # bottom right
+        src = np.float32([[193 *self.x_resolution/640.0, 426 *self.y_resolution/480.0],  # bottom left
+                         [256 *self.x_resolution/640.0, 233 *self.y_resolution/480.0],   # top left
+                         [430 *self.x_resolution/640.0, 232 *self.y_resolution/480.0],   # top right
+                         [510 *self.x_resolution/640.0, 436 *self.y_resolution/480.0]])  # bottom right
+        dst = np.float32([[0.9144, 0.6096],  # bottom left
+                        [2.1336, 0.6096],    # top left
+                        [2.1336, -0.6096],   # top right
+                        [0.9144, -0.6096]])  # bottom right
 
         M = cv2.getPerspectiveTransform(src, dst)
+        M_inv = cv2.getPerspectiveTransform(dst, src)
+        pt = np.array([[[self.max_x_dist, 0]]], dtype=np.float32)
+        max_x_dist_img = cv2.perspectiveTransform(pt, M_inv)
 
-        roi_unwarped = np.array([[[img_size[1]*.1, img_size[0]*.1]], 
-                                [[ img_size[1]*.1, img_size[0]*.9]], 
-                                [[ img_size[1]*.9, img_size[0]*.9]], 
-                                [[ img_size[1]*.9, img_size[0]*.1]]], dtype=np.float32)
+        roi_unwarped = np.array([[[0, self.y_resolution]],                   # bottom left
+                                 [[0, max_x_dist_img[0, 0, 1]]],                      # top left
+                                 [[self.x_resolution, max_x_dist_img[0, 0, 1]]],      # top right
+                                 [[self.x_resolution, self.y_resolution]]])  # bottom right
         roi_warped = cv2.perspectiveTransform(roi_unwarped, M)
+
+        for i in range(roi_warped.shape[0]):
+            if roi_warped[i, 0, 0] > self.max_x_dist:
+                roi_warped[i, 0, 0] = self.max_x_dist
 
         point_array = point_array.transpose()
         reshaped_point_array = point_array.reshape([point_array.shape[0], 1, point_array.shape[1]]).astype(np.float32)
@@ -124,33 +125,43 @@ class LaneDetector:
             # print points.shape
             lane = Lane()
 
-            lower_x_bound = 1.9144
-            upper_x_bound = 5.
-            lower_y_bound = -2.
-            upper_y_bound = 2.
+            # lower_x_bound = 1.9144
+            # upper_x_bound = 5.
+            # lower_y_bound = -2.
+            # upper_y_bound = 2.
+            #
+            # lane.bound_polygon.append(Vector3(lower_x_bound,lower_y_bound,0))
+            # lane.bound_polygon.append(Vector3(lower_x_bound,upper_y_bound,0))
+            # lane.bound_polygon.append(Vector3(upper_x_bound,upper_y_bound,0))
+            # lane.bound_polygon.append(Vector3(upper_x_bound,lower_y_bound,0))
 
-            lane.bound_polygon.append(Vector3(lower_x_bound,lower_y_bound,0))
-            lane.bound_polygon.append(Vector3(lower_x_bound,upper_y_bound,0))
-            lane.bound_polygon.append(Vector3(upper_x_bound,upper_y_bound,0))
-            lane.bound_polygon.append(Vector3(upper_x_bound,lower_y_bound,0))
+            for point in roi:
+                lane.bound_polygon.append(Vector3(point[0], point[1], 0))
 
             points_filtered_x = []
             points_filtered_y = []
             for i in range(points.shape[0]):
                 point_x = points[i, 0]
                 point_y = points[i, 1]
-                if lower_x_bound < point_x and point_x < upper_x_bound and \
-                   lower_y_bound < point_y and point_y < upper_y_bound:
+                if self.max_x_dist < point_x:
                     # if True:
                     # print(point_x, point_y)
                     points_filtered_x.append(point_x)
                     points_filtered_y.append(point_y)
 
-            for i in range(len(points_filtered_y)):
-                point_x = points_filtered_x[i]
-                point_y = points_filtered_y[i]
-                lane_pt = Vector3(point_x, point_y, 0.0)    
-                lane.lane_points.append(lane_pt)
+            # for i in range(len(points_filtered_y)):
+                # point_x = points_filtered_x[i]
+                # point_y = points_filtered_y[i]
+
+            for i in range(points.shape[0]):
+                point_x = points[i, 0]
+                point_y = points[i, 1]
+                if self.max_x_dist > point_x:
+                    lane_pt = Vector3(point_x, point_y, 0.0)
+                    lane.lane_points.append(lane_pt)
+                else:
+                    pass
+                    x = 1
 
             self.lane_pub.publish(lane)
         except IndexError as e:
@@ -198,6 +209,13 @@ class LaneDetector:
             print("hsv filtering took", time.time() - prev_time, "seconds")
             prev_time = time.time()
 
+        hsv_filtered = cv2.resize(hsv_filtered, (int(self.x_resolution / self.post_filtering_scaling_factor),
+                                                 int(self.y_resolution / self.post_filtering_scaling_factor)))
+
+        if self.print_timing_info:
+            print("resizing filtered image took", time.time() - prev_time, "seconds")
+            prev_time = time.time()
+
         skeletoned = self.skeleton(hsv_filtered.astype(np.uint8))
 
         if self.print_timing_info:
@@ -205,29 +223,41 @@ class LaneDetector:
             prev_time = time.time()
 
         # Calculate lane points
-        lane_points_image_frame_yx = np.array(np.where(skeletoned != 0))
+        lane_points_image_frame_yx = np.array(np.where(skeletoned != 0)) * self.post_filtering_scaling_factor
         lane_points_image_frame = np.array([lane_points_image_frame_yx[1,:], lane_points_image_frame_yx[0,:]])
         # Warp perspective
-        lane_points_map_frame, roi = self.warp_points(lane_points_image_frame, skeletoned.shape)
+        lane_points_map_frame, point_roi = self.warp_points(lane_points_image_frame, skeletoned.shape)
 
         if self.print_timing_info:
             print("selecting points took", time.time() - prev_time, "seconds")
             prev_time = time.time()
 
-        warped_im, roi, Minv = self.warp(np.dstack([skeletoned, skeletoned, skeletoned]))
+        if self.debug:
+            warped_im, _, Minv = self.warp(np.dstack([skeletoned, skeletoned, skeletoned]))
+            self.warped_im_pub.publish(bridge.cv2_to_imgmsg(skeletoned))
 
-        if self.print_timing_info:
-            print("warping input image took", time.time() - prev_time, "seconds")
-            prev_time = time.time()
+            if self.print_timing_info:
+                print("warping and publishing input image took", time.time() - prev_time, "seconds")
+                prev_time = time.time()
 
         # Publish points and image
-        self.publish_lane_pts(roi, lane_points_map_frame)
-        self.warped_im_pub.publish(bridge.cv2_to_imgmsg(warped_im))
+        self.publish_lane_pts(point_roi, lane_points_map_frame)
 
         if self.print_timing_info:
             print("publishing points and data took", time.time() - prev_time, "seconds")
             print("took", time.time() - start_time, "seconds in total")
             print
+
+        if self.debug:
+            # publish the warped image for debugging purposes
+            warped_im_raw, roi, Minv = self.warp(image)
+            for i in range(len(roi) - 1):
+                cv2.line(warped_im_raw, tuple(roi[i, 0]), tuple(roi[i + 1, 0]), (0, 255, 0), 4)
+            self.debug_img_pub.publish(bridge.cv2_to_imgmsg(warped_im_raw))
+
+            # publish resized input image
+            self.resized_pub.publish(bridge.cv2_to_imgmsg(image.astype(np.uint8), "bgr8"))
+            self.color_filtered_pub.publish((bridge.cv2_to_imgmsg(np.dstack([hsv_filtered, hsv_filtered, hsv_filtered]).astype(np.uint8), "bgr8")))
 
     def image_callback(self, msg):
         print("Received an image!")
@@ -241,19 +271,22 @@ class LaneDetector:
 
     def main(self):
         rospy.init_node('image_listener')
-        # image_topic = "/zed/image/image_raw"
-        image_topic = "/zed_node/left/image_rect_color"
+        image_topic = "/zed/image/image_raw"
+        # image_topic = "/zed_node/left/image_rect_color"
         rospy.Subscriber(image_topic, Image, self.image_callback)
 
         self.raw_pub = rospy.Publisher("raw_image", Image, queue_size=10)
         self.warped_im_pub = rospy.Publisher("warped_im", Image, queue_size=10)
         self.debug_img_pub = rospy.Publisher('/debug_img', Image, queue_size=10)
         self.lane_pub = rospy.Publisher('/lanes', Lane, queue_size=10)
+        self.resized_pub = rospy.Publisher('/resized_input', Image, queue_size=10)
+        self.color_filtered_pub = rospy.Publisher('/color_filtered', Image, queue_size=10)
 
         while not rospy.is_shutdown():
-            if self.cv2_img is not None:
-                self.lane_detector(self.cv2_img)
-                self.cv2_img = None
+            # if self.cv2_img is not None:
+            #     self.lane_detector(self.cv2_img)
+            #     self.cv2_img = None
+            time.sleep(0.25)
 
 
 if __name__ == '__main__':
