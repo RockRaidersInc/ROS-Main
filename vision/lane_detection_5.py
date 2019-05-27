@@ -36,6 +36,9 @@ class LaneDetector:
     debug = False
     print_timing_info = True
 
+    depth_img = None
+    depth_img_time = None
+
     def __init__(self):
         self.cv2_img = None
         # TODO: Make this file name be inputed as a option
@@ -124,16 +127,6 @@ class LaneDetector:
             points = np.array(points).squeeze()
             # print points.shape
             lane = Lane()
-
-            # lower_x_bound = 1.9144
-            # upper_x_bound = 5.
-            # lower_y_bound = -2.
-            # upper_y_bound = 2.
-            #
-            # lane.bound_polygon.append(Vector3(lower_x_bound,lower_y_bound,0))
-            # lane.bound_polygon.append(Vector3(lower_x_bound,upper_y_bound,0))
-            # lane.bound_polygon.append(Vector3(upper_x_bound,upper_y_bound,0))
-            # lane.bound_polygon.append(Vector3(upper_x_bound,lower_y_bound,0))
 
             for point in roi:
                 lane.bound_polygon.append(Vector3(point[0], point[1], 0))
@@ -262,18 +255,29 @@ class LaneDetector:
     def image_callback(self, msg):
         print("Received an image!")
         try:
-            # self.cv2_img = cv2.resize(bridge.imgmsg_to_cv2(msg, "bgr8"), (int(self.x_resolution), int(self.y_resolution)))
-            self.cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
+            self.cv2_img, self.cv2_img_time = bridge.imgmsg_to_cv2(msg, "bgr8"), msg.header.stamp
             self.lane_detector(self.cv2_img)
         except CvBridgeError as e:
             print("error recieving image\n", e)
 
+    def depth_image_callback(self, msg):
+        print("recieved depth image")
+        try:
+            depth_img = cv2.resize(bridge.imgmsg_to_cv2(msg), (int(self.x_resolution), int(self.y_resolution)))
+            self.depth_img, self.depth_image_time = depth_img, msg.header.stamp
+
+        except CvBridgeError as e:
+            print("error receiving depth image\n", e)
+
 
     def main(self):
         rospy.init_node('image_listener')
-        image_topic = "/zed/image/image_raw"
-        # image_topic = "/zed_node/left/image_rect_color"
+        # image_topic = "/zed/image/image_raw"
+        image_topic = "/zed_node/left/image_rect_color"
         rospy.Subscriber(image_topic, Image, self.image_callback)
+
+        depth_image_topic = "/zed_node/depth/depth_registered"
+        rospy.Subscriber(depth_image_topic, Image, self.depth_image_callback)
 
         self.raw_pub = rospy.Publisher("raw_image", Image, queue_size=10)
         self.warped_im_pub = rospy.Publisher("warped_im", Image, queue_size=10)
