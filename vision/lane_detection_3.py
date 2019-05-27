@@ -28,6 +28,7 @@ bridge = CvBridge()
 
 class LaneDetector:
     cv2_img = None
+    seq = 0
 
     def __init__(self):
         # train svm
@@ -241,7 +242,10 @@ class LaneDetector:
 
         M = cv2.getPerspectiveTransform(src, dst)
 
-        roi_unwarped = np.array([[[0, 0]], [[0, img_size[0]]], [[img_size[1], img_size[0]]], [[img_size[1], 0]]], dtype=np.float32)
+        roi_unwarped = np.array([[[img_size[1]*.1, img_size[0]*.1]], 
+                                [[ img_size[1]*.1, img_size[0]*.9]], 
+                                [[ img_size[1]*.9, img_size[0]*.9]], 
+                                [[ img_size[1]*.9, img_size[0]*.1]]], dtype=np.float32)
         roi_warped = cv2.perspectiveTransform(roi_unwarped, M)
 
         point_array = point_array.transpose()
@@ -259,13 +263,13 @@ class LaneDetector:
         return outfile
 
 
-    def u_pts_pub_test(self, roi, points):
+    def publish_lane_pts(self, roi, points):
         try:
             roi = np.array(roi).squeeze()
             points = np.array(points).squeeze()
             # print points.shape
             lane = Lane()
-            
+
             lower_x_bound = 1.9144
             upper_x_bound = 5.
             lower_y_bound = -2.
@@ -291,7 +295,7 @@ class LaneDetector:
             for i in range(len(points_filtered_y)):
                 point_x = points_filtered_x[i]
                 point_y = points_filtered_y[i]
-                lane_pt = Vector3(point_x, point_y, 0.0)	
+                lane_pt = Vector3(point_x, point_y, 0.0)    
                 lane.lane_points.append(lane_pt)
 
             self.lane_pub.publish(lane)
@@ -358,7 +362,7 @@ class LaneDetector:
 
         # lane_points_image_frame = np.array([[485, 199], [326, 438], [1171, 442]]).transpose()
         lane_points_map_frame, roi = self.warp_points(lane_points_image_frame, denoised.shape)
-        self.u_pts_pub_test(roi, lane_points_map_frame)
+        self.publish_lane_pts(roi, lane_points_map_frame)
 
 
         # Apply perspective transform
@@ -387,11 +391,11 @@ class LaneDetector:
     def main(self):
         rospy.init_node('image_listener')
         # Define your image topic
-        # image_topic = "/zed_node/left/image_rect_color"
-        image_topic = "/zed/depth/image_raw"
+        image_topic = "/zed_node/left/image_rect_color"
+        # image_topic = "/zed/image/image_raw"
         # Set up your subscriber and define its callback
         rospy.Subscriber(image_topic, Image, self.image_callback)
-        # self.raw_pub = rospy.Publisher("raw_image", Image, queue_size=10)
+        self.raw_pub = rospy.Publisher("raw_image", Image, queue_size=10)
         # self.blurred_pub = rospy.Publisher("blurred", Image, queue_size=10)
         # self.undist_pub = rospy.Publisher("undist", Image, queue_size=10)
         # self.sxybinary_pub = rospy.Publisher("sxybinary", Image, queue_size=10)

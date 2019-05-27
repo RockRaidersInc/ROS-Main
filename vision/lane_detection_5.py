@@ -33,7 +33,7 @@ class LaneDetector:
 
     max_x_dist = 3.0  # maximum distance away from the rover at which lanes will be detected
 
-    debug = False
+    debug = True
     print_timing_info = True
 
     depth_img = None
@@ -192,37 +192,39 @@ class LaneDetector:
         image = cv2.resize(input_image, (int(self.x_resolution), int(self.y_resolution)))
 
         if self.print_timing_info:
-            print("image resizing took", time.time() - prev_time, "seconds")
+            print('image resizing took', time.time() - prev_time, 'seconds')
             prev_time = time.time()
 
-        # Image processing
+        ## Image processing
+        # HSV Filter
         hsv_filtered = self.hsv_clr_filter(image)
-
         if self.print_timing_info:
-            print("hsv filtering took", time.time() - prev_time, "seconds")
+            print('hsv filtering took', time.time() - prev_time, 'seconds')
             prev_time = time.time()
-
-        hsv_filtered = cv2.resize(hsv_filtered, (int(self.x_resolution / self.post_filtering_scaling_factor),
-                                                 int(self.y_resolution / self.post_filtering_scaling_factor)))
-
+        # Open to filter out noise
+        kernel = np.ones((2,2),np.uint8)
+        hsv_filtered = cv2.morphologyEx(hsv_filtered, cv2.MORPH_OPEN, kernel)
         if self.print_timing_info:
-            print("resizing filtered image took", time.time() - prev_time, "seconds")
+            print('Opening took', time.time() - prev_time, 'seconds')
             prev_time = time.time()
-
+        # Make the image smaller by a factor of post_filtering_scaling_factor
+        resize_dim = (int(self.x_resolution / self.post_filtering_scaling_factor),
+                      int(self.y_resolution / self.post_filtering_scaling_factor))
+        hsv_filtered = cv2.resize(hsv_filtered, resize_dim)
+        if self.print_timing_info:
+            print('resizing filtered image took', time.time() - prev_time, 'seconds')
+            prev_time = time.time()
+        # Skeletonize mask to reduce number of lane points
         skeletoned = self.skeleton(hsv_filtered.astype(np.uint8))
-
         if self.print_timing_info:
-            print("skeleton took", time.time() - prev_time, "seconds")
+            print('skeleton took', time.time() - prev_time, 'seconds')
             prev_time = time.time()
-
-        # Calculate lane points
+        # Calculate lane points and Warp perspective
         lane_points_image_frame_yx = np.array(np.where(skeletoned != 0)) * self.post_filtering_scaling_factor
         lane_points_image_frame = np.array([lane_points_image_frame_yx[1,:], lane_points_image_frame_yx[0,:]])
-        # Warp perspective
         lane_points_map_frame, point_roi = self.warp_points(lane_points_image_frame, skeletoned.shape)
-
         if self.print_timing_info:
-            print("selecting points took", time.time() - prev_time, "seconds")
+            print('selecting points took', time.time() - prev_time, 'seconds')
             prev_time = time.time()
 
         if self.debug:
@@ -230,15 +232,15 @@ class LaneDetector:
             self.warped_im_pub.publish(bridge.cv2_to_imgmsg(skeletoned))
 
             if self.print_timing_info:
-                print("warping and publishing input image took", time.time() - prev_time, "seconds")
+                print('warping and publishing input image took', time.time() - prev_time, 'seconds')
                 prev_time = time.time()
 
         # Publish points and image
         self.publish_lane_pts(point_roi, lane_points_map_frame)
 
         if self.print_timing_info:
-            print("publishing points and data took", time.time() - prev_time, "seconds")
-            print("took", time.time() - start_time, "seconds in total")
+            print('publishing points and data took', time.time() - prev_time, 'seconds')
+            print('took', time.time() - start_time, 'seconds in total')
             print
 
         if self.debug:
@@ -249,16 +251,16 @@ class LaneDetector:
             self.debug_img_pub.publish(bridge.cv2_to_imgmsg(warped_im_raw))
 
             # publish resized input image
-            self.resized_pub.publish(bridge.cv2_to_imgmsg(image.astype(np.uint8), "bgr8"))
-            self.color_filtered_pub.publish((bridge.cv2_to_imgmsg(np.dstack([hsv_filtered, hsv_filtered, hsv_filtered]).astype(np.uint8), "bgr8")))
+            self.resized_pub.publish(bridge.cv2_to_imgmsg(image.astype(np.uint8), 'bgr8'))
+            self.color_filtered_pub.publish((bridge.cv2_to_imgmsg(np.dstack([hsv_filtered, hsv_filtered, hsv_filtered]).astype(np.uint8), 'bgr8')))
 
     def image_callback(self, msg):
-        print("Received an image!")
+        print('Received an image!')
         try:
             self.cv2_img, self.cv2_img_time = bridge.imgmsg_to_cv2(msg, "bgr8"), msg.header.stamp
             self.lane_detector(self.cv2_img)
         except CvBridgeError as e:
-            print("error recieving image\n", e)
+            print('error recieving image\n', e)
 
     def depth_image_callback(self, msg):
         print("recieved depth image")
