@@ -43,7 +43,7 @@
             will control the frame rate. -->
           <updateRate>0.0</updateRate>
           <cameraName>camera_ir</cameraName>
-          <imageTopicName>/zed/image/image_raw</imageTopicName>
+          <imageTopicName>/zed_node/left/image_rect_color</imageTopicName>
           <cameraInfoTopicName>/zed/depth/camera_info</cameraInfoTopicName>
           <depthImageTopicName>/zed/depth/image_raw</depthImageTopicName>
           <depthImageInfoTopicName>/zed/depth/camera_info</depthImageInfoTopicName>

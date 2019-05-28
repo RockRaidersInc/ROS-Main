@@ -41,19 +41,7 @@ odom_ekf:
   odom0_nodelay: true
   odom0_differential: false
   odom0_relative: false
-
-  # Visual Odometry Settings
-  odom1: /odometry/visual
-  odom1_config: [true,  true,  true,    # [x_pos   , y_pos    , z_pos,
-                 true,  true,  true,    #  roll    , pitch    , yaw,
-                 false, false, false,   #  x_vel   , y_vel    , z_vel,
-                 false, false, false,   #  roll_vel, pitch_vel, yaw_vel,
-                 false, false, false]   #  x_accel , y_accel  , z_accel]
-  odom1_queue_size: 10
-  odom1_nodelay: true
-  odom1_differential: false
-  odom1_relative: false
-
+  
   # IMU Settings
   imu0: /imu/data
   imu0_config: [false,  false,  false,

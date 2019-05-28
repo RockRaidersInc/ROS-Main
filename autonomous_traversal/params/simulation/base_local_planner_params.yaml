@@ -5,7 +5,7 @@ GlobalPlanner:
     use_dijkstra: true
 
 TrajectoryPlannerROS:
-    max_vel_x: 0.5
+    max_vel_x: 2.0
     min_vel_x: 0.1  # Allowing velocities too low will will stop the 
                     # obstacle avoidance because low velocities won't 
                     # actually be high enough to move the robot
@@ -26,7 +26,7 @@ TrajectoryPlannerROS:
     latch_xy_goal_tolerance: false
 
     ## Forward Simulation Parameters
-    # These parameters change how the planner simulates trajectories at each update and therefore changes the optimal trajectory that is chosen.These should be adjusted based on your computer performance
+    # These parameters change how the planner simulates trajectoryjectories at each update and therefore changes the optimal trajectory that is chosen.These should be adjusted based on your computer performance
     sim_time: 1.5   # setting time of each simulation that it must evaluate. Higher will create longer curves but too low can limit performance (<2)
     sim_granularity: 0.02 # the step size to take between points on a trajectory, or how frequent should the points on this trajectory should be examined
     angular_sim_granularity: 0.02
