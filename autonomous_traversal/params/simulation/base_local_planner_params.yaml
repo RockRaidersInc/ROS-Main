@@ -32,7 +32,7 @@ TrajectoryPlannerROS:
     angular_sim_granularity: 0.02
     vx_samples: 6  # how many samples of x velocity are taken for simulated trajectories
     vtheta_samples: 20 # how many samples of theta velocity are taken for simulated trajectories
-    controller_frequency: 5.0  # how often the planning algorithm is performed (hz)
+    controller_frequency: 10.0  # how often the planning algorithm is performed (hz)
 
     ## Trajectory scoring parameters
     # Whether the gdist_scale and pdist_scale parameters should assume that goal_distance and path_distance are expressed in units of meters or cells. Cells are assumed by default (false).
@@ -42,7 +42,7 @@ TrajectoryPlannerROS:
     # The weighting for how much the controller should stay close to the path it was given . default 0.6
     pdist_scale: 0.8  
     # The weighting for how much the controller should attempt to reach its local goal, also controls speed  default 0.8
-    gdist_scale: 0.8
+    gdist_scale: 0.2
 
     # How far to look ahead in meters when scoring different in-place-rotation trajectories
     heading_lookahead: 0.1  
