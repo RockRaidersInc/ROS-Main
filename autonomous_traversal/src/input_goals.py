@@ -51,13 +51,24 @@ def input_origin():
 
 
 def main():
+	# Initialization
 	rospy.init_node('input_goals')
 	rospy.Subscriber('gps/fix', NavSatFix, save_gps_loc_callback)
 	orig_lat, orig_lon = input_origin()
 	set_mapviz_origin(orig_lat, orig_lon)
 	set_datum(orig_lat, orig_lon)
-	waypoint_navigator = WaypointNavigator(orig_lat, orig_lon)
 
+	# Check if we want to dynamically recalculate goals
+	recalc_goals = rospy.get_param('recalc_goals')
+	if recalc_goals:
+		waypoint_navigator = WaypointNavigator(orig_lat, 
+											   orig_lon, 
+											   recalc_goals=True, 
+											   recalc_rate=3.0)
+	else:
+		waypoint_navigator = WaypointNavigator(orig_lat, orig_lon)	
+
+ 	# Input and send goals
 	while not rospy.is_shutdown():
 		try:	
 			# Input GPS coordinate
@@ -74,7 +85,7 @@ def main():
 			# Stop?
 			if str(raw_input('Stop (y)? ')) == 'y':
 				break
-		except:
+		except ValueError as ve:
 			rospy.logwarn('Invalid input, try again')
 
 	sys.exit()

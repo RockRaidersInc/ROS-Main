@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
 <launch>
+	<arg name="recalc_goals" default="false"/>
+	<param name="recalc_goals" value="$(arg recalc_goals)" type="bool"/>
 	<node name="input_goals" pkg="autonomous_traversal" type="input_goals.py" output="screen"/>
 </launch>
