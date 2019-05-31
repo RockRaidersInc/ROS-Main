@@ -16,7 +16,7 @@ http://wiki.ros.org/kinetic/Installation/Ubuntu
 Install some more tools:
 ```
 sudo apt install -y cmake python-catkin-pkg python-empy python-nose libgtest-dev python-catkin-tools
-sudo apt install -y ros-kinetic-joy ros-kinetic-geographic-msgs ros-kinetic-tf2-geometry-msgs ros-kinetic-move-base ros-kinetic-map-server ros-kinetic-global-planner
+sudo apt install -y ros-kinetic-joy ros-kinetic-geographic-msgs ros-kinetic-tf2-geometry-msgs ros-kinetic-move-base ros-kinetic-map-server ros-kinetic-global-planner sudo apt install ros-kinetic-eband-local-planner
 sudo apt install -y ros-kinetic-desktop
 sudo apt install -y ros-kinetic-gazebo-ros
 sudo apt install -y ros-kinetic-pcl-ros
