@@ -1,4 +1,4 @@
-footprint: [[0.61,0.45],[-0.61,0.45],[-0.61,-0.45],[0.61,-0.45],[0.65,0]]
+footprint: [[0.61,0.55],[-0.61,0.55],[-0.61,-0.55],[0.61,-0.55],[0.65,0]]
 footprint_padding: 0.05
 
 map_type: costmap
@@ -10,6 +10,7 @@ static_layer:
     first_map_only: false
     use_maximum: true
     subscribe_to_updates: true
+
 
 obstacle_layer:
     enabled: true
@@ -31,11 +32,11 @@ obstacle_layer:
                  topic: /zed/depth/depth_registered, 
                  clearing: true,
                  marking: true, 
-                 max_obstacle_height: .7,
+                 max_obstacle_height: 2,
                  min_obstacle_height: 0.1,
-                 obstacle_range: 9.5,
-                 raytrace_range: 10.0}
+                 obstacle_range: 8.5,
+                 raytrace_range: 9.0}
 
 inflation_layer:
-    inflation_radius: 2.5     # Controls how far away the zero cost point is from the obstacle
+    inflation_radius: 1.5     # Controls how far away the zero cost point is from the obstacle
     cost_scaling_factor: 4.5  # Controls how much the cost gets scaled at a distance
