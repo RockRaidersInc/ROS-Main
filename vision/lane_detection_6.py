@@ -16,7 +16,6 @@ from geometry_msgs.msg import Vector3
 
 from debug_utils import *
 
-
 bridge = CvBridge()
 
 
@@ -50,11 +49,11 @@ class LaneDetector:
 
     def hsv_clr_filter(self, img):
         hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        
-        lower_hsv = np.array([self.settings['hl'],self.settings['sl'],self.settings['vl']])
-        upper_hsv = np.array([self.settings['hh'],self.settings['sh'],self.settings['vh']])
-        clr_filt_mask = cv2.inRange(hsv_img,lower_hsv,upper_hsv)
-        
+
+        lower_hsv = np.array([self.settings['hl'], self.settings['sl'], self.settings['vl']])
+        upper_hsv = np.array([self.settings['hh'], self.settings['sh'], self.settings['vh']])
+        clr_filt_mask = cv2.inRange(hsv_img, lower_hsv, upper_hsv)
+
         return clr_filt_mask
 
     def warp(self, img):
@@ -63,14 +62,14 @@ class LaneDetector:
         y_offset = self.y_resolution / 2 - 100
         scale_factor = 25
 
-        src = np.float32([[193 *self.x_resolution/640.0, 426 *self.y_resolution/480.0],  # bottom left
-                         [256 *self.x_resolution/640.0, 233 *self.y_resolution/480.0],  # top left
-                         [430 *self.x_resolution/640.0, 232 *self.y_resolution/480.0],  # top right
-                         [510 *self.x_resolution/640.0, 436 *self.y_resolution/480.0]]) # bottom right
+        src = np.float32([[193 * self.x_resolution / 640.0, 426 * self.y_resolution / 480.0],  # bottom left
+                          [256 * self.x_resolution / 640.0, 233 * self.y_resolution / 480.0],  # top left
+                          [430 * self.x_resolution / 640.0, 232 * self.y_resolution / 480.0],  # top right
+                          [510 * self.x_resolution / 640.0, 436 * self.y_resolution / 480.0]])  # bottom right
 
-        dst = np.float32([[-2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset],   # bottom left
-                          [-2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],   # top left
-                          [2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],    # top right
+        dst = np.float32([[-2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset],  # bottom left
+                          [-2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],  # top left
+                          [2 * scale_factor + img_x_half, -2 * scale_factor + img_y_half + y_offset],  # top right
                           [2 * scale_factor + img_x_half, 2 * scale_factor + img_y_half + y_offset]])  # bottom right
 
         M = cv2.getPerspectiveTransform(src, dst)
@@ -81,7 +80,9 @@ class LaneDetector:
         # create a warped image
         warped = cv2.warpPerspective(img, M, (img.shape[1], img.shape[0]), flags=cv2.INTER_LINEAR)
 
-        roi_unwarped = np.array([[[0, self.y_resolution]], [[0, 0]], [[self.x_resolution, 0]], [[self.x_resolution, self.y_resolution]]], dtype=np.float32)
+        roi_unwarped = np.array(
+            [[[0, self.y_resolution]], [[0, 0]], [[self.x_resolution, 0]], [[self.x_resolution, self.y_resolution]]],
+            dtype=np.float32)
         roi_warped = cv2.perspectiveTransform(roi_unwarped, M)
 
         # unpersp = cv2.warpPerspective(warped, Minv, img_size, flags=cv2.INTER_LINEAR)
@@ -91,23 +92,23 @@ class LaneDetector:
 
     def warp_points(self, point_array, img_shape):
 
-        src = np.float32([[193 *self.x_resolution/640.0, 426 *self.y_resolution/480.0],  # bottom left
-                         [256 *self.x_resolution/640.0, 233 *self.y_resolution/480.0],   # top left
-                         [430 *self.x_resolution/640.0, 232 *self.y_resolution/480.0],   # top right
-                         [510 *self.x_resolution/640.0, 436 *self.y_resolution/480.0]])  # bottom right
+        src = np.float32([[193 * self.x_resolution / 640.0, 426 * self.y_resolution / 480.0],  # bottom left
+                          [256 * self.x_resolution / 640.0, 233 * self.y_resolution / 480.0],  # top left
+                          [430 * self.x_resolution / 640.0, 232 * self.y_resolution / 480.0],  # top right
+                          [510 * self.x_resolution / 640.0, 436 * self.y_resolution / 480.0]])  # bottom right
         dst = np.float32([[0.9144, 0.6096],  # bottom left
-                        [2.1336, 0.6096],    # top left
-                        [2.1336, -0.6096],   # top right
-                        [0.9144, -0.6096]])  # bottom right
+                          [2.1336, 0.6096],  # top left
+                          [2.1336, -0.6096],  # top right
+                          [0.9144, -0.6096]])  # bottom right
 
         M = cv2.getPerspectiveTransform(src, dst)
         M_inv = cv2.getPerspectiveTransform(dst, src)
         pt = np.array([[[self.max_x_dist, 0]]], dtype=np.float32)
         max_x_dist_img = cv2.perspectiveTransform(pt, M_inv)
 
-        roi_unwarped = np.array([[[0, self.y_resolution]],                   # bottom left
-                                 [[0, max_x_dist_img[0, 0, 1]]],                      # top left
-                                 [[self.x_resolution, max_x_dist_img[0, 0, 1]]],      # top right
+        roi_unwarped = np.array([[[0, self.y_resolution]],  # bottom left
+                                 [[0, max_x_dist_img[0, 0, 1]]],  # top left
+                                 [[self.x_resolution, max_x_dist_img[0, 0, 1]]],  # top right
                                  [[self.x_resolution, self.y_resolution]]])  # bottom right
         roi_warped = cv2.perspectiveTransform(roi_unwarped, M)
 
@@ -143,8 +144,8 @@ class LaneDetector:
                     points_filtered_y.append(point_y)
 
             # for i in range(len(points_filtered_y)):
-                # point_x = points_filtered_x[i]
-                # point_y = points_filtered_y[i]
+            # point_x = points_filtered_x[i]
+            # point_y = points_filtered_y[i]
 
             for i in range(points.shape[0]):
                 point_x = points[i, 0]
@@ -163,21 +164,21 @@ class LaneDetector:
     def skeleton(self, img):
         # from stackoverflow user Dan Masek (non askii character was replaced with s)
         # https://stackoverflow.com/questions/42845747/optimized-skeleton-function-for-opencv-with-python
-        skeleton = np.zeros(img.shape,np.uint8)
-        eroded = np.zeros(img.shape,np.uint8)
-        temp = np.zeros(img.shape,np.uint8)
+        skeleton = np.zeros(img.shape, np.uint8)
+        eroded = np.zeros(img.shape, np.uint8)
+        temp = np.zeros(img.shape, np.uint8)
 
-        _,thresh = cv2.threshold(img,127,255,0)
+        _, thresh = cv2.threshold(img, 127, 255, 0)
 
-        kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+        kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
 
         iters = 0
-        while(True):
+        while (True):
             cv2.erode(thresh, kernel, eroded)
             cv2.dilate(eroded, kernel, temp)
             cv2.subtract(thresh, temp, temp)
             cv2.bitwise_or(skeleton, temp, skeleton)
-            thresh, eroded = eroded, thresh # Swap instead of copy
+            thresh, eroded = eroded, thresh  # Swap instead of copy
 
             iters += 1
             if cv2.countNonZero(thresh) == 0:
@@ -207,7 +208,7 @@ class LaneDetector:
             prev_time = time.time()
 
         # Open to filter out noise
-        kernel = np.ones((2,2),np.uint8)
+        kernel = np.ones((2, 2), np.uint8)
         hsv_filtered = cv2.morphologyEx(hsv_filtered, cv2.MORPH_OPEN, kernel)
         if self.print_timing_info:
             print('Opening took', time.time() - prev_time, 'seconds')
@@ -221,7 +222,6 @@ class LaneDetector:
         if self.print_timing_info:
             print('resizing filtered image took', time.time() - prev_time, 'seconds')
             prev_time = time.time()
-
 
         # use depth data to mask out obstacles
         if depth_img is not None:
@@ -246,7 +246,7 @@ class LaneDetector:
 
         # Calculate lane points and Warp perspective
         lane_points_image_frame_yx = np.array(np.where(skeletoned != 0)) * self.post_filtering_scaling_factor
-        lane_points_image_frame = np.array([lane_points_image_frame_yx[1,:], lane_points_image_frame_yx[0,:]])
+        lane_points_image_frame = np.array([lane_points_image_frame_yx[1, :], lane_points_image_frame_yx[0, :]])
         lane_points_map_frame, point_roi = self.warp_points(lane_points_image_frame, skeletoned.shape)
         if self.print_timing_info:
             print('selecting points took', time.time() - prev_time, 'seconds')
@@ -278,8 +278,91 @@ class LaneDetector:
 
             # publish resized input image
             self.resized_pub.publish(bridge.cv2_to_imgmsg(image.astype(np.uint8), 'bgr8'))
-            self.color_filtered_pub.publish((bridge.cv2_to_imgmsg(np.dstack([hsv_filtered, hsv_filtered, hsv_filtered]).astype(np.uint8), 'bgr8')))
+            self.color_filtered_pub.publish(
+                (bridge.cv2_to_imgmsg(np.dstack([hsv_filtered, hsv_filtered, hsv_filtered]).astype(np.uint8), 'bgr8')))
 
+    def get_obstacle_points_approx_ground(self, depth_img, output_size, color_img):
+
+        depth_img = cv2.resize(depth_img, output_size)
+
+        sobely = cv2.Sobel(depth_img, cv2.CV_64F, 0, 1, ksize=-1)
+        averages = np.nanmean(sobely, axis=1)
+
+        average_img = sobely - averages[:, np.newaxis]
+
+        # import matplotlib.pyplot as plt
+        # plt.imshow(filtered)
+        # plt.show()
+
+        # x_half_len = depth_img.shape[1] / 2  # half the image x resolution
+        # y_half_len = depth_img.shape[0] / 2  # half the image y resolution
+        #
+        # top_left = np.nanmean(depth_img[:y_half_len, :x_half_len])
+        # top_right = np.nanmean(depth_img[:y_half_len, x_half_len:])
+        # bottom_left = np.nanmean(depth_img[y_half_len:, :x_half_len])
+        # bottom_right = np.nanmean(depth_img[y_half_len:, x_half_len:])
+        #
+        # dx = np.mean([(top_right - top_left) / x_half_len, (bottom_right - bottom_left) / x_half_len])
+        # dy = np.mean([(bottom_left - top_left) / y_half_len, (bottom_right - top_right) / y_half_len])
+        # global_average = np.mean([top_left, top_right, bottom_left, bottom_right])
+        #
+        # xv, yv = np.meshgrid(np.linspace(0, depth_img.shape[1] - 1, depth_img.shape[1]),
+        #                      np.linspace(0, depth_img.shape[0] - 1, depth_img.shape[0]))
+        #
+        # top_left_val = global_average - dx * x_half_len - dy * y_half_len
+        # average_img = xv * dx + yv * dy + top_left_val
+        #
+        # filtered = np.zeros_like(average_img, dtype=np.uint8)
+        # filtered[depth_img - average_img > 0.25] = 1
+
+        # average_img = np.zeros_like(depth_img)
+
+        # filtered = average_img
+
+        filtered = np.zeros_like(average_img, dtype=np.uint8)
+        filtered[depth_img - average_img > 0.3] = 1
+
+        # kernel = np.ones((3, 3), np.uint8)
+        # filtered = cv2.morphologyEx(filtered, cv2.MORPH_CLOSE, kernel)
+
+        # # now use grabcuts to segment out obstacles
+        # filtered[filtered == 1] = cv2.GC_FGD
+        # filtered[filtered == 0] = cv2.GC_BGD
+        # filtered[np.isnan(depth_img)] = cv2.GC_PR_FGD
+        # bgdModel = np.zeros((1, 65), np.float64)
+        # fgdModel = np.zeros((1, 65), np.float64)
+        # cv2.grabCut(color_img, filtered, None, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_MASK)
+        # filtered = np.where((filtered==2)|(filtered==0),0,1).astype('uint8')
+
+        expanded = 1 - filtered.astype(np.uint8)
+
+        # expanded = cv2.erode(filtered, np.ones((5, 5), np.uint8)).astype(np.uint8)
+        if self.debug:
+            # self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(color_img * expanded[:, :, np.newaxis], "bgr8"))
+            self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(expanded.astype(np.float32)))
+        return expanded
+
+    def get_obstacle_points_contour(self, depth_img, output_size, color_img):
+        depth_img = cv2.resize(depth_img, output_size)
+        blurred = cv2.GaussianBlur(depth_img, (3, 3), 0)
+        sobely = cv2.Sobel(blurred, cv2.CV_64F, 0, 1, ksize=-1)
+
+        filtered = np.zeros_like(sobely, dtype=np.uint8)
+        filtered[sobely > -0.03] = 1
+        nan_img = np.isnan(depth_img)
+        nan_img_filtered = cv2.morphologyEx(nan_img.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((1, 1), np.uint8))
+
+        filtered = filtered | nan_img_filtered
+        # import matplotlib.pyplot as plt
+        # plt.imshow(nan_img_filtered)
+        # plt.show()
+
+        expanded = 1 - filtered
+        expanded = cv2.morphologyEx(expanded, cv2.MORPH_ERODE, np.ones((11, 11), np.uint8))
+        # expanded = cv2.erode(filtered, np.ones((5, 5), np.uint8)).astype(np.uint8)
+        if self.debug:
+            self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(color_img * expanded[:, :, np.newaxis], "bgr8"))
+        return expanded
 
     def get_obstacle_points_y_deriv2(self, depth_img, output_size, color_img):
         depth_img = cv2.resize(depth_img, output_size)
@@ -298,17 +381,39 @@ class LaneDetector:
 
         expanded = 1 - filtered
         expanded = cv2.morphologyEx(expanded, cv2.MORPH_ERODE, np.ones((11, 11), np.uint8))
-        # expanded = cv2.morphologyEx(expanded, cv2.MORPH_ERODE, np.ones((11, 11), np.uint8))
-
-        expanded[:, :3] = 0
-        expanded[:, -3:] = 0
-        # expanded[:3, :] = 0
-        # expanded[-3:, :] = 0
         # expanded = cv2.erode(filtered, np.ones((5, 5), np.uint8)).astype(np.uint8)
         if self.debug:
             self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(color_img * expanded[:, :, np.newaxis], "bgr8"))
         return expanded
 
+    def get_obstacle_points_y_deriv(self, depth_img, output_size, color_img):
+
+        depth_img = cv2.resize(depth_img, output_size)
+
+        blurred = cv2.GaussianBlur(depth_img, (3, 3), 0)
+        sobely = cv2.Sobel(blurred, cv2.CV_64F, 0, 1, ksize=-1)
+
+        filtered = np.zeros_like(sobely, dtype=np.uint8)
+        filtered[sobely > -0.23] = 1
+
+        # kernel = np.ones((3, 3), np.uint8)
+        # filtered = cv2.morphologyEx(filtered, cv2.MORPH_CLOSE, kernel)
+
+        # now use grabcuts to segment out obstacles
+        filtered[filtered == 1] = cv2.GC_FGD
+        filtered[filtered == 0] = cv2.GC_BGD
+        filtered[np.isnan(depth_img)] = cv2.GC_PR_FGD
+        bgdModel = np.zeros((1, 65), np.float64)
+        fgdModel = np.zeros((1, 65), np.float64)
+        cv2.grabCut(color_img, filtered, None, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_MASK)
+        filtered = np.where((filtered == 2) | (filtered == 0), 0, 1).astype('uint8')
+
+        expanded = 1 - filtered
+
+        # expanded = cv2.erode(filtered, np.ones((5, 5), np.uint8)).astype(np.uint8)
+        if self.debug:
+            self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(color_img * expanded[:, :, np.newaxis], "bgr8"))
+        return expanded
 
     # from https://stackoverflow.com/questions/21690608/numpy-inpaint-nans-interpolate-and-extrapolate
     def inpaint_nans(self, img):
@@ -349,7 +454,6 @@ class LaneDetector:
 
         except CvBridgeError as e:
             print('error receiving depth image\n', e)
-
 
     def main(self):
         rospy.init_node('image_listener')
