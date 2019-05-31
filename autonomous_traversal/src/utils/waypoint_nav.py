@@ -3,6 +3,7 @@
 import rospy
 import actionlib
 import time
+import sys
 from sensor_msgs.msg import NavSatFix
 from geonav_transform import geonav_conversions as gc
 from move_base_msgs.msg import MoveBaseAction
@@ -40,7 +41,7 @@ class WaypointNavigator:
 					  .format(goal_lat, goal_lon, goal_x, goal_y))
 		# With odom drift compensation
 		if self.recalc_goals:
-			while(1):
+			while not rospy.is_shutdown():
 				# Check if we have gps readings
 				if self.gps_fix is None or self.gps_filtered is None:
 					time.sleep(.1)
@@ -54,16 +55,16 @@ class WaypointNavigator:
 				if state == actionlib.SimpleGoalState.DONE:
 					rospy.loginfo('Goal successfully reached')
 					break
-				elif state == actionlib.SimpleGoalState.PENDING:
-					rospy.logwarn('PENDING State, this should only happen if you ctrl-c')
-					sys.exit()
+				# elif state == actionlib.SimpleGoalState.PENDING:
+				# 	rospy.logwarn('PENDING State, this should only happen if you ctrl-c')
+				# 	sys.exit()
 		# Normal gps waypoint to waypoint navigation
 		else:
 			move_base_goal = make_goal(goal_x, goal_y)
 			rospy.loginfo('Sending goal')
 			self.mb_client.send_goal(move_base_goal)
 			rospy.loginfo('Waiting for results')
-			success = self.mb_client.wait_for_result(rospy.Duration.as_sec(timeout))
+			success = self.mb_client.wait_for_result(rospy.Duration.from_sec(timeout))
 			if success:
 				rospy.loginfo('Goal successfully reached')
 			else:

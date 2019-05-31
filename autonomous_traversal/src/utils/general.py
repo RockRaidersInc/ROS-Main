@@ -68,4 +68,4 @@ def set_datum(datum_lat, datum_lon):
 		resp = datum_srv(datum_pose)
 		rospy.loginfo('SetDatum Response: {}'.format(resp))
 	except rospy.ServiceException as se:
-		rospy.roswarn('Service call failed: {}'.format(se))
+		rospy.logerror('Service call failed: {}'.format(se))
