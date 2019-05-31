@@ -1,6 +1,7 @@
 image: maze_medium.pgm
 resolution: 0.1
 origin: [-25.65, -25.65, 0]
+datum: [42.729306, -73.680906, 0.0]
 occupied_thresh: 0.2
 free_thresh: 0.01
 negate: 0

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- TEMPORARY, DELETE LATER -->
+    <node pkg="tf" type="static_transform_publisher" name="base_to_gps" args="0 0 0 0 0 0 base_link gps0_link 100" />
+    <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 3.14159 base_link base_imu_link 100" />
+    <node name="camera_transform_publisher" pkg="tf" type="static_transform_publisher" args="0.6 0 0.894 -1.57 0.0 -2.2243 base_link zed_camera_center 10"/>
+    
+    <!-- Simulator only, TODO: Re name simulator imu link to base_imu_link -->
+    <!--<node pkg="tf" type="static_transform_publisher" name="base_to_imu_sim" args="0 0 0 0 0 0 base_link base_imu_link 100" />-->
+
+    <!-- Sensor fusion for IMUs -->
+    <!--
+   <rosparam command="load" file="$(find autonomous_traversal)/params/imu_filter_params.yaml"/>
+    <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node"/>
+    -->
+
+    <!-- Kalman Filter localization - Odom Frame-->
+    <rosparam command="load" file="$(find autonomous_traversal)/params/simulation/odom_ekf_params.yaml"/>
+    <node name="odom_ekf" pkg="robot_localization" type="ekf_localization_node" respawn="true"/>
+        
+    <!-- Kalman Filter localization - Map Frame-->
+    <rosparam command="load" file="$(find autonomous_traversal)/params/simulation/map_ekf_params.yaml"/>
+    <node name="map_ekf" pkg="robot_localization" type="ekf_localization_node" respawn="true">
+        <remap from="/odometry/filtered" to="/odometry/filtered_map"/>
+    </node>
+
+    <!-- GPS Coordinates to Odometry (x,y) -->
+    <rosparam command="load" file="$(find autonomous_traversal)/params/simulation/navsat_params.yaml"/>
+    <node name="navsat_tf" pkg="robot_localization" type="navsat_transform_node" respawn="true">
+        <remap from="/odometry/filtered" to="/odometry/filtered_map"/>
+    </node>
+
+    <!-- =========================== Debugging =========================== -->
+    <node name="odom_msg_to_to_xyz_rpy" pkg="utils" type="odom_msg_to_xyz_rpy.py">
+        <remap from="~odom_msg_in" to="/odometry/filtered"/>
+        <remap from="~xyz_rpy_msg_out" to="/debug/odom_filtered_xyz_rpy"/>
+    </node>
+
+    <node name="odom_map_msg_to_to_xyz_rpy" pkg="utils" type="odom_msg_to_xyz_rpy.py">
+        <remap from="~odom_msg_in" to="/odometry/filtered_map"/>
+        <remap from="~xyz_rpy_msg_out" to="/debug/odom_filtered_map_xyz_rpy"/>
+    </node>
+
+    <node name="imu_quaternion_to_rpy" pkg="utils" type="imu_msg_to_xyz_rpy.py">
+        <remap from="~imu_msg_in" to="/imu/data"/>
+        <remap from="~imu_msg_out" to="/debug/imu_rpy"/>
+    </node>
+</launch>
