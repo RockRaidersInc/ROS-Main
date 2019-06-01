@@ -7,6 +7,7 @@ import time
 import sys
 import os
 import yaml
+from threading import Event, Lock
 
 import rospy
 from sensor_msgs.msg import Image
@@ -35,17 +36,20 @@ class LaneDetector:
     debug = True
     print_timing_info = True
 
+    cv2_img = None
+    cv2_img_time = None
     depth_img = None
     depth_img_time = None
 
     def __init__(self):
-        self.cv2_img = None
         # TODO: Make this file name be inputed as a option
         self.setting_filename = 'settings/trackbar_settings.yaml'
         with open(self.setting_filename, 'r') as file:
             self.settings = yaml.load(file)[int(sys.argv[1])]
             print('Loading image processing settings')
             print(yaml.dump(self.settings, default_flow_style=False))
+
+        self.main_thread_alerter = Event()
 
     def hsv_clr_filter(self, img):
         hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -281,89 +285,6 @@ class LaneDetector:
             self.color_filtered_pub.publish(
                 (bridge.cv2_to_imgmsg(np.dstack([hsv_filtered, hsv_filtered, hsv_filtered]).astype(np.uint8), 'bgr8')))
 
-    def get_obstacle_points_approx_ground(self, depth_img, output_size, color_img):
-
-        depth_img = cv2.resize(depth_img, output_size)
-
-        sobely = cv2.Sobel(depth_img, cv2.CV_64F, 0, 1, ksize=-1)
-        averages = np.nanmean(sobely, axis=1)
-
-        average_img = sobely - averages[:, np.newaxis]
-
-        # import matplotlib.pyplot as plt
-        # plt.imshow(filtered)
-        # plt.show()
-
-        # x_half_len = depth_img.shape[1] / 2  # half the image x resolution
-        # y_half_len = depth_img.shape[0] / 2  # half the image y resolution
-        #
-        # top_left = np.nanmean(depth_img[:y_half_len, :x_half_len])
-        # top_right = np.nanmean(depth_img[:y_half_len, x_half_len:])
-        # bottom_left = np.nanmean(depth_img[y_half_len:, :x_half_len])
-        # bottom_right = np.nanmean(depth_img[y_half_len:, x_half_len:])
-        #
-        # dx = np.mean([(top_right - top_left) / x_half_len, (bottom_right - bottom_left) / x_half_len])
-        # dy = np.mean([(bottom_left - top_left) / y_half_len, (bottom_right - top_right) / y_half_len])
-        # global_average = np.mean([top_left, top_right, bottom_left, bottom_right])
-        #
-        # xv, yv = np.meshgrid(np.linspace(0, depth_img.shape[1] - 1, depth_img.shape[1]),
-        #                      np.linspace(0, depth_img.shape[0] - 1, depth_img.shape[0]))
-        #
-        # top_left_val = global_average - dx * x_half_len - dy * y_half_len
-        # average_img = xv * dx + yv * dy + top_left_val
-        #
-        # filtered = np.zeros_like(average_img, dtype=np.uint8)
-        # filtered[depth_img - average_img > 0.25] = 1
-
-        # average_img = np.zeros_like(depth_img)
-
-        # filtered = average_img
-
-        filtered = np.zeros_like(average_img, dtype=np.uint8)
-        filtered[depth_img - average_img > 0.3] = 1
-
-        # kernel = np.ones((3, 3), np.uint8)
-        # filtered = cv2.morphologyEx(filtered, cv2.MORPH_CLOSE, kernel)
-
-        # # now use grabcuts to segment out obstacles
-        # filtered[filtered == 1] = cv2.GC_FGD
-        # filtered[filtered == 0] = cv2.GC_BGD
-        # filtered[np.isnan(depth_img)] = cv2.GC_PR_FGD
-        # bgdModel = np.zeros((1, 65), np.float64)
-        # fgdModel = np.zeros((1, 65), np.float64)
-        # cv2.grabCut(color_img, filtered, None, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_MASK)
-        # filtered = np.where((filtered==2)|(filtered==0),0,1).astype('uint8')
-
-        expanded = 1 - filtered.astype(np.uint8)
-
-        # expanded = cv2.erode(filtered, np.ones((5, 5), np.uint8)).astype(np.uint8)
-        if self.debug:
-            # self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(color_img * expanded[:, :, np.newaxis], "bgr8"))
-            self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(expanded.astype(np.float32)))
-        return expanded
-
-    def get_obstacle_points_contour(self, depth_img, output_size, color_img):
-        depth_img = cv2.resize(depth_img, output_size)
-        blurred = cv2.GaussianBlur(depth_img, (3, 3), 0)
-        sobely = cv2.Sobel(blurred, cv2.CV_64F, 0, 1, ksize=-1)
-
-        filtered = np.zeros_like(sobely, dtype=np.uint8)
-        filtered[sobely > -0.03] = 1
-        nan_img = np.isnan(depth_img)
-        nan_img_filtered = cv2.morphologyEx(nan_img.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((1, 1), np.uint8))
-
-        filtered = filtered | nan_img_filtered
-        # import matplotlib.pyplot as plt
-        # plt.imshow(nan_img_filtered)
-        # plt.show()
-
-        expanded = 1 - filtered
-        expanded = cv2.morphologyEx(expanded, cv2.MORPH_ERODE, np.ones((11, 11), np.uint8))
-        # expanded = cv2.erode(filtered, np.ones((5, 5), np.uint8)).astype(np.uint8)
-        if self.debug:
-            self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(color_img * expanded[:, :, np.newaxis], "bgr8"))
-        return expanded
-
     def get_obstacle_points_y_deriv2(self, depth_img, output_size, color_img):
         depth_img = cv2.resize(depth_img, output_size)
         blurred = cv2.GaussianBlur(depth_img, (3, 3), 0)
@@ -381,35 +302,14 @@ class LaneDetector:
 
         expanded = 1 - filtered
         expanded = cv2.morphologyEx(expanded, cv2.MORPH_ERODE, np.ones((11, 11), np.uint8))
-        # expanded = cv2.erode(filtered, np.ones((5, 5), np.uint8)).astype(np.uint8)
-        if self.debug:
-            self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(color_img * expanded[:, :, np.newaxis], "bgr8"))
-        return expanded
 
-    def get_obstacle_points_y_deriv(self, depth_img, output_size, color_img):
+        # SHU-NONG, RUIJIE: UNCOMMENT THE FOLLOWING LINE TO MORE AGRESSIVELY MASK OUT OBSTACLES
+        # expanded = cv2.morphologyEx(expanded, cv2.MORPH_ERODE, np.ones((11, 11), np.uint8))
 
-        depth_img = cv2.resize(depth_img, output_size)
-
-        blurred = cv2.GaussianBlur(depth_img, (3, 3), 0)
-        sobely = cv2.Sobel(blurred, cv2.CV_64F, 0, 1, ksize=-1)
-
-        filtered = np.zeros_like(sobely, dtype=np.uint8)
-        filtered[sobely > -0.23] = 1
-
-        # kernel = np.ones((3, 3), np.uint8)
-        # filtered = cv2.morphologyEx(filtered, cv2.MORPH_CLOSE, kernel)
-
-        # now use grabcuts to segment out obstacles
-        filtered[filtered == 1] = cv2.GC_FGD
-        filtered[filtered == 0] = cv2.GC_BGD
-        filtered[np.isnan(depth_img)] = cv2.GC_PR_FGD
-        bgdModel = np.zeros((1, 65), np.float64)
-        fgdModel = np.zeros((1, 65), np.float64)
-        cv2.grabCut(color_img, filtered, None, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_MASK)
-        filtered = np.where((filtered == 2) | (filtered == 0), 0, 1).astype('uint8')
-
-        expanded = 1 - filtered
-
+        # expanded[:, :3] = 0
+        # expanded[:, -3:] = 0
+        # expanded[:3, :] = 0
+        # expanded[-3:, :] = 0
         # expanded = cv2.erode(filtered, np.ones((5, 5), np.uint8)).astype(np.uint8)
         if self.debug:
             self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(color_img * expanded[:, :, np.newaxis], "bgr8"))
@@ -429,29 +329,23 @@ class LaneDetector:
             img = im2
             nans = np.isnan(img)
         return img
-        # nan_img = np.zeros_like(img)
-        # nan_img[np.isnan(img)] = 1
-        # nan_img = nan_img.astype(np.uint8)
-        # image, contours, hierarchy = cv2.findContours(nan_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        #
-        # for contour in contours:
-        #     x_max, x_min = np.max(contour[0]), np.min(contour[0])
-        #     y_max, y_min = np.max(contour[1]), np.min(contour[1])
+
 
     def image_callback(self, msg):
-        print('Received an image!')
         try:
             self.cv2_img, self.cv2_img_time = bridge.imgmsg_to_cv2(msg, "bgr8"), msg.header.stamp
-            self.lane_detector(self.cv2_img)
+            print('Received an image with timestamp \t\t' + str(self.cv2_img_time))
+            # self.lane_detector(self.cv2_img)
+            self.main_thread_alerter.set()
         except CvBridgeError as e:
             print('error recieving image\n', e)
 
     def depth_image_callback(self, msg):
-        print('recieved depth image')
+        print('recieved depth image with timestamp \t' + str(self.cv2_img_time))
         try:
             depth_img = cv2.resize(bridge.imgmsg_to_cv2(msg), (int(self.x_resolution), int(self.y_resolution)))
             self.depth_img, self.depth_image_time = depth_img, msg.header.stamp
-
+            self.main_thread_alerter.set()
         except CvBridgeError as e:
             print('error receiving depth image\n', e)
 
@@ -479,11 +373,155 @@ class LaneDetector:
         self.depth_mask_pub = rospy.Publisher('/depth_mask', Image, queue_size=10)
 
         while not rospy.is_shutdown():
-            time.sleep(0.1)
-            # if self.cv2_img is not None and self.depth_img is not None:
-            #     self.lane_detector(self.cv2_img, depth_img=self.depth_img)
+            self.main_thread_alerter.wait(1.0)
+            cv2_img, cv2_img_time, depth_img, depth_image_time = self.cv2_img, self.cv2_img_time, self.depth_img, self.depth_image_time
+
+            if self.cv2_img is not None and self.depth_img is not None and cv2_img_time is not None and depth_image_time is not None:
+                if cv2_img_time == depth_image_time:
+                    self.lane_detector(cv2_img, depth_img=depth_img)
 
 
 if __name__ == '__main__':
     detector = LaneDetector()
     detector.main()
+
+
+
+
+
+
+    # def get_obstacle_points_approx_ground(self, depth_img, output_size, color_img):
+    #
+    #     depth_img = cv2.resize(depth_img, output_size)
+    #
+    #     sobely = cv2.Sobel(depth_img, cv2.CV_64F, 0, 1, ksize=-1)
+    #     averages = np.nanmean(sobely, axis=1)
+    #
+    #     average_img = sobely - averages[:, np.newaxis]
+    #
+    #     # import matplotlib.pyplot as plt
+    #     # plt.imshow(filtered)
+    #     # plt.show()
+    #
+    #     # x_half_len = depth_img.shape[1] / 2  # half the image x resolution
+    #     # y_half_len = depth_img.shape[0] / 2  # half the image y resolution
+    #     #
+    #     # top_left = np.nanmean(depth_img[:y_half_len, :x_half_len])
+    #     # top_right = np.nanmean(depth_img[:y_half_len, x_half_len:])
+    #     # bottom_left = np.nanmean(depth_img[y_half_len:, :x_half_len])
+    #     # bottom_right = np.nanmean(depth_img[y_half_len:, x_half_len:])
+    #     #
+    #     # dx = np.mean([(top_right - top_left) / x_half_len, (bottom_right - bottom_left) / x_half_len])
+    #     # dy = np.mean([(bottom_left - top_left) / y_half_len, (bottom_right - top_right) / y_half_len])
+    #     # global_average = np.mean([top_left, top_right, bottom_left, bottom_right])
+    #     #
+    #     # xv, yv = np.meshgrid(np.linspace(0, depth_img.shape[1] - 1, depth_img.shape[1]),
+    #     #                      np.linspace(0, depth_img.shape[0] - 1, depth_img.shape[0]))
+    #     #
+    #     # top_left_val = global_average - dx * x_half_len - dy * y_half_len
+    #     # average_img = xv * dx + yv * dy + top_left_val
+    #     #
+    #     # filtered = np.zeros_like(average_img, dtype=np.uint8)
+    #     # filtered[depth_img - average_img > 0.25] = 1
+    #
+    #     # average_img = np.zeros_like(depth_img)
+    #
+    #     # filtered = average_img
+    #
+    #     filtered = np.zeros_like(average_img, dtype=np.uint8)
+    #     filtered[depth_img - average_img > 0.3] = 1
+    #
+    #     # kernel = np.ones((3, 3), np.uint8)
+    #     # filtered = cv2.morphologyEx(filtered, cv2.MORPH_CLOSE, kernel)
+    #
+    #     # # now use grabcuts to segment out obstacles
+    #     # filtered[filtered == 1] = cv2.GC_FGD
+    #     # filtered[filtered == 0] = cv2.GC_BGD
+    #     # filtered[np.isnan(depth_img)] = cv2.GC_PR_FGD
+    #     # bgdModel = np.zeros((1, 65), np.float64)
+    #     # fgdModel = np.zeros((1, 65), np.float64)
+    #     # cv2.grabCut(color_img, filtered, None, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_MASK)
+    #     # filtered = np.where((filtered==2)|(filtered==0),0,1).astype('uint8')
+    #
+    #     expanded = 1 - filtered.astype(np.uint8)
+    #
+    #     # expanded = cv2.erode(filtered, np.ones((5, 5), np.uint8)).astype(np.uint8)
+    #     if self.debug:
+    #         # self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(color_img * expanded[:, :, np.newaxis], "bgr8"))
+    #         self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(expanded.astype(np.float32)))
+    #     return expanded
+    #
+    # def get_obstacle_points_contour(self, depth_img, output_size, color_img):
+    #     depth_img = cv2.resize(depth_img, output_size)
+    #     blurred = cv2.GaussianBlur(depth_img, (3, 3), 0)
+    #     sobely = cv2.Sobel(blurred, cv2.CV_64F, 0, 1, ksize=-1)
+    #
+    #     filtered = np.zeros_like(sobely, dtype=np.uint8)
+    #     filtered[sobely > -0.03] = 1
+    #     nan_img = np.isnan(depth_img)
+    #     nan_img_filtered = cv2.morphologyEx(nan_img.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((1, 1), np.uint8))
+    #
+    #     filtered = filtered | nan_img_filtered
+    #     # import matplotlib.pyplot as plt
+    #     # plt.imshow(nan_img_filtered)
+    #     # plt.show()
+    #
+    #     expanded = 1 - filtered
+    #     expanded = cv2.morphologyEx(expanded, cv2.MORPH_ERODE, np.ones((11, 11), np.uint8))
+    #     # expanded = cv2.erode(filtered, np.ones((5, 5), np.uint8)).astype(np.uint8)
+    #     if self.debug:
+    #         self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(color_img * expanded[:, :, np.newaxis], "bgr8"))
+    #     return expanded
+
+
+    # def get_obstacle_points_y_deriv(self, depth_img, output_size, color_img):
+    #
+    #     depth_img = cv2.resize(depth_img, output_size)
+    #
+    #     blurred = cv2.GaussianBlur(depth_img, (3, 3), 0)
+    #     sobely = cv2.Sobel(blurred, cv2.CV_64F, 0, 1, ksize=-1)
+    #
+    #     filtered = np.zeros_like(sobely, dtype=np.uint8)
+    #     filtered[sobely > -0.23] = 1
+    #
+    #     # kernel = np.ones((3, 3), np.uint8)
+    #     # filtered = cv2.morphologyEx(filtered, cv2.MORPH_CLOSE, kernel)
+    #
+    #     # now use grabcuts to segment out obstacles
+    #     filtered[filtered == 1] = cv2.GC_FGD
+    #     filtered[filtered == 0] = cv2.GC_BGD
+    #     filtered[np.isnan(depth_img)] = cv2.GC_PR_FGD
+    #     bgdModel = np.zeros((1, 65), np.float64)
+    #     fgdModel = np.zeros((1, 65), np.float64)
+    #     cv2.grabCut(color_img, filtered, None, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_MASK)
+    #     filtered = np.where((filtered == 2) | (filtered == 0), 0, 1).astype('uint8')
+    #
+    #     expanded = 1 - filtered
+    #
+    #     # expanded = cv2.erode(filtered, np.ones((5, 5), np.uint8)).astype(np.uint8)
+    #     if self.debug:
+    #         self.depth_mask_pub.publish(bridge.cv2_to_imgmsg(color_img * expanded[:, :, np.newaxis], "bgr8"))
+    #     return expanded
+    #
+    # # from https://stackoverflow.com/questions/21690608/numpy-inpaint-nans-interpolate-and-extrapolate
+    # def inpaint_nans(self, img):
+    #     ipn_kernel = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]]).astype(np.uint8)  # kernel for inpaint_nans
+    #     nans = np.isnan(img)
+    #     while np.sum(nans) > 0:
+    #         img[nans] = 0
+    #         vNeighbors = cv2.filter2D((nans == False).astype(np.uint8), -1, ipn_kernel)
+    #         im2 = cv2.filter2D(img, -1, ipn_kernel)
+    #         im2[vNeighbors > 0] = im2[vNeighbors > 0] / vNeighbors[vNeighbors > 0]
+    #         im2[vNeighbors == 0] = np.nan
+    #         im2[(nans == False)] = img[(nans == False)]
+    #         img = im2
+    #         nans = np.isnan(img)
+    #     return img
+    #     # nan_img = np.zeros_like(img)
+    #     # nan_img[np.isnan(img)] = 1
+    #     # nan_img = nan_img.astype(np.uint8)
+    #     # image, contours, hierarchy = cv2.findContours(nan_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    #     #
+    #     # for contour in contours:
+    #     #     x_max, x_min = np.max(contour[0]), np.min(contour[0])
+    #     #     y_max, y_min = np.max(contour[1]), np.min(contour[1])

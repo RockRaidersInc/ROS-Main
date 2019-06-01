@@ -60,3 +60,14 @@ TrajectoryPlannerROS:
     oscillation_reset_dist: 1.0 
     escape_reset_dist: 0.1
     escape_reset_theta: 0.1
+
+
+EBandPlannerROS:
+    # Goal Tolerance Parameters
+    yaw_goal_tolerance: 1.633123935319537e+16
+    xy_goal_tolerance: .5  
+
+    max_vel_lin: 0.5        # (double, default: 0.75) Maximum linear velocity
+    max_vel_th: 1.0         # (double, default: 1.0)  Maximum angular velocity 
+
+    k_damp: 8.0             # (double, default: 3.5)  Damping gain of the PID controller 

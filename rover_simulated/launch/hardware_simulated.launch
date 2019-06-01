@@ -19,6 +19,8 @@
     </node>
 
     <node name="camera_transform_publisher" pkg="tf" type="static_transform_publisher" args="0.2 0 0.894 -1.57 0.0 -2.22 base_link zed_camera_center 10"/>
+    <node pkg="tf" type="static_transform_publisher" name="base_to_gps" args="0 0 0 0 0 0 base_link gps0_link 100" />
+    <node pkg="tf" type="static_transform_publisher" name="base_to_imu" args="0 0 0 0 0 3.14159 base_link base_imu_link 100" />
     
     <!-- <node name="rviz_sim" pkg="rviz" type="rviz" output="screen" /> -->
 </launch>
