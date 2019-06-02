@@ -33,7 +33,7 @@ class LaneDetector:
     max_x_dist = 3.0  # maximum distance away from the rover at which lanes will be detected
 
     debug = True
-    print_timing_info = True
+    print_timing_info = False
 
     depth_img = None
     depth_img_time = None
