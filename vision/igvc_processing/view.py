@@ -9,6 +9,7 @@ from PIL import Image
 class ProcessingWindow(QMainWindow):
     SETTING_FILENAME = 'settings/trackbar_settings.yaml'
     SCALING_FACTOR = 0.4
+    SCALING_SETTING = 0.1
 
     def __init__(self, processing):
         super(ProcessingWindow, self).__init__()
@@ -32,8 +33,6 @@ class ProcessingWindow(QMainWindow):
 
         self.main_layout = QVBoxLayout(self.central_widget)
         self.main_layout.addLayout(self.image_layout)
-        #self.main_layout.addLayout(self.slider_layout)
-        #self.main_layout.addWidget(mygroupbox)
         self.main_layout.addWidget(scroll)
         self.setCentralWidget(self.central_widget)
 
@@ -45,46 +44,61 @@ class ProcessingWindow(QMainWindow):
 
 
     def setup_sliders(self):
-        self.average_slider = LabeledSlider('Avg_filt', 'avg', self.settings['avg'], 1, 10, lambda value:self.update_slider(value, 'avg'))
-        self.gauss_slider = LabeledSlider('Gauss_filt', 'gauss', self.settings['gauss'], 1, 10, lambda value:self.update_slider(value, 'gauss'), ['odd'])
-        self.median_slider = LabeledSlider('Med_filt', 'med', self.settings['med'], 1, 5, lambda value:self.update_slider(value, 'med'), ['odd'])
-
-        self.h_low_slider = LabeledSlider('H_low', 'hl', self.settings['hl'], 0, 255, lambda value:self.update_slider(value, 'hl'))
-        self.h_high_slider = LabeledSlider('H_high', 'hh', self.settings['hh'], 0, 255, lambda value:self.update_slider(value, 'hh'))
-        self.s_low_slider = LabeledSlider('S_low', 'sl', self.settings['sl'], 0, 255, lambda value:self.update_slider(value, 'sl'))
-        self.s_high_slider = LabeledSlider('S_high', 'sh', self.settings['sh'], 0, 255, lambda value:self.update_slider(value, 'sh'))
-        self.v_low_slider = LabeledSlider('V_low', 'vl', self.settings['vl'], 0, 255, lambda value:self.update_slider(value, 'vl'))
-        self.v_high_slider = LabeledSlider('V_high', 'vh', self.settings['vh'], 0, 255, lambda value:self.update_slider(value, 'vh'))
-
-        self.erode_slider = LabeledSlider('Erode', 'erode', self.settings['erode'], 0, 10, lambda value:self.update_slider(value, 'erode'))
-        self.dilate_slider = LabeledSlider('Dilate', 'dilate', self.settings['dilate'], 0, 10, lambda value:self.update_slider(value, 'dilate'))
-        self.open_slider = LabeledSlider('Opening', 'open', self.settings['open'], 1, 10, lambda value:self.update_slider(value, 'open'))
-        self.close_slider = LabeledSlider('Closing', 'close', self.settings['close'], 1, 10, lambda value:self.update_slider(value, 'close'))
-        self.skel_slider = LabeledSlider('Skel', 'skel', self.settings['skel'], 0, 100, lambda value:self.update_slider(value, 'skel'))
-
         self.slider_layout = QVBoxLayout()
-        self.slider_layout.addLayout(self.average_slider.layout)
-        self.slider_layout.addLayout(self.gauss_slider.layout)
-        self.slider_layout.addLayout(self.median_slider.layout)
-        self.slider_layout.addLayout(self.h_low_slider.layout)
-        self.slider_layout.addLayout(self.h_high_slider.layout)
-        self.slider_layout.addLayout(self.s_low_slider.layout)
-        self.slider_layout.addLayout(self.s_high_slider.layout)
-        self.slider_layout.addLayout(self.v_low_slider.layout)
-        self.slider_layout.addLayout(self.v_high_slider.layout)
-        self.slider_layout.addLayout(self.erode_slider.layout)
-        self.slider_layout.addLayout(self.dilate_slider.layout)
-        self.slider_layout.addLayout(self.open_slider.layout)
-        self.slider_layout.addLayout(self.close_slider.layout)
-        self.slider_layout.addLayout(self.skel_slider.layout)
 
+        self.scale_slider = LabeledSlider('Image scale', 'scale', self.settings['scale'], 1, 10, lambda value:self.update_scale(value), self.slider_layout)
+
+        self.average_slider = LabeledSlider('Avg_filt', 'avg', self.settings['avg'], 1, 10, lambda value:self.update_slider(value, 'avg'), self.slider_layout)
+        self.gauss_slider = LabeledSlider('Gauss_filt', 'gauss', self.settings['gauss'], 1, 10, lambda value:self.update_slider(value, 'gauss'), self.slider_layout, ['odd'])
+        self.median_slider = LabeledSlider('Med_filt', 'med', self.settings['med'], 1, 5, lambda value:self.update_slider(value, 'med'), self.slider_layout, ['odd'])
+
+        self.h_low_slider = LabeledSlider('H_low', 'hl', self.settings['hl'], 0, 255, lambda value:self.update_slider(value, 'hl'), self.slider_layout)
+        self.h_high_slider = LabeledSlider('H_high', 'hh', self.settings['hh'], 0, 255, lambda value:self.update_slider(value, 'hh'), self.slider_layout)
+        self.s_low_slider = LabeledSlider('S_low', 'sl', self.settings['sl'], 0, 255, lambda value:self.update_slider(value, 'sl'), self.slider_layout)
+        self.s_high_slider = LabeledSlider('S_high', 'sh', self.settings['sh'], 0, 255, lambda value:self.update_slider(value, 'sh'), self.slider_layout)
+        self.v_low_slider = LabeledSlider('V_low', 'vl', self.settings['vl'], 0, 255, lambda value:self.update_slider(value, 'vl'), self.slider_layout)
+        self.v_high_slider = LabeledSlider('V_high', 'vh', self.settings['vh'], 0, 255, lambda value:self.update_slider(value, 'vh'), self.slider_layout)
+
+        self.erode_slider = LabeledSlider('Erode', 'erode', self.settings['erode'], 0, 10, lambda value:self.update_slider(value, 'erode'), self.slider_layout)
+        self.dilate_slider = LabeledSlider('Dilate', 'dilate', self.settings['dilate'], 0, 10, lambda value:self.update_slider(value, 'dilate'), self.slider_layout)
+        self.open_slider = LabeledSlider('Opening', 'open', self.settings['open'], 1, 10, lambda value:self.update_slider(value, 'open'), self.slider_layout)
+        self.close_slider = LabeledSlider('Closing', 'close', self.settings['close'], 1, 10, lambda value:self.update_slider(value, 'close'), self.slider_layout)
+        self.skel_slider = LabeledSlider('Skel', 'skel', self.settings['skel'], 0, 100, lambda value:self.update_slider(value, 'skel'), self.slider_layout)
+
+
+    def update_scale(self, value):
+        self.SCALING_FACTOR = value * self.SCALING_SETTING
+        
 
     def setup_images(self):
+        self.image_layout = QVBoxLayout()
+        row1 = QHBoxLayout()
+        row2 = QHBoxLayout()
+        row3 = QHBoxLayout()
+
+        self.image_layout.addLayout(row1)
+        self.image_layout.addLayout(row2)
+        self.image_layout.addLayout(row3)
+
+        self.clean_image = LabeledImage('clean', row1)
+        self.average_image = LabeledImage('average', row1)
+        self.gauss_image = LabeledImage('gauss', row1)
+        self.median_image = LabeledImage('median', row2)
+        self.hsv_image = LabeledImage('hsv', row2)
+        self.erode_image = LabeledImage('erode', row2)
+        self.dilate_image = LabeledImage('dilate', row3)
+        self.open_image = LabeledImage('open', row3)
+        self.close_image = LabeledImage('close', row3)
+        self.skel_image = LabeledImage('skel', row3)
+
+        return
+
+
         self.clean_image = QLabel()
-        self.hsv_image = QLabel()
         self.average_image = QLabel()
         self.gauss_image = QLabel()
         self.median_image = QLabel()
+        self.hsv_image = QLabel()
         self.erode_image = QLabel()
         self.dilate_image = QLabel()
         self.open_image = QLabel()
@@ -127,34 +141,34 @@ class ProcessingWindow(QMainWindow):
         self.frame = self.processing.get_frame()
         if self.frame is None:
             return
-        self.clean_image.setPixmap(self.convert(self.frame))
+        self.clean_image.image.setPixmap(self.convert(self.frame))
 
         average_frame = self.processing.average_filter(self.frame)
-        self.average_image.setPixmap(self.convert(average_frame))
+        self.average_image.image.setPixmap(self.convert(average_frame))
 
         gauss_frame = self.processing.gaussian_filter(average_frame)
-        self.gauss_image.setPixmap(self.convert(gauss_frame))
+        self.gauss_image.image.setPixmap(self.convert(gauss_frame))
 
         median_frame = self.processing.median_filter(gauss_frame)
-        self.median_image.setPixmap(self.convert(median_frame))
+        self.median_image.image.setPixmap(self.convert(median_frame))
 
         hsv_frame = self.processing.hsv_color_filter(median_frame)
-        self.hsv_image.setPixmap(self.convert(hsv_frame))
+        self.hsv_image.image.setPixmap(self.convert(hsv_frame))
 
         erode_frame = self.processing.erode(hsv_frame)
-        self.erode_image.setPixmap(self.convert(erode_frame))
+        self.erode_image.image.setPixmap(self.convert(erode_frame))
 
         dilate_frame = self.processing.dilate(erode_frame)
-        self.dilate_image.setPixmap(self.convert(dilate_frame))
+        self.dilate_image.image.setPixmap(self.convert(dilate_frame))
 
         open_frame = self.processing.opening(dilate_frame)
-        self.open_image.setPixmap(self.convert(open_frame))
+        self.open_image.image.setPixmap(self.convert(open_frame))
 
         close_frame = self.processing.closing(open_frame)
-        self.close_image.setPixmap(self.convert(close_frame))
+        self.close_image.image.setPixmap(self.convert(close_frame))
 
         skel_frame = self.processing.skeletonize(close_frame)
-        self.skel_image.setPixmap(self.convert(skel_frame))
+        self.skel_image.image.setPixmap(self.convert(skel_frame))
 
 
     def convert(self, frame):
@@ -195,7 +209,7 @@ class ProcessingWindow(QMainWindow):
             yaml.dump([self.settings], f)
 
 class LabeledSlider():
-    def __init__(self, label_text, key, initial_val, min_val, max_val, func, args = []):
+    def __init__(self, label_text, key, initial_val, min_val, max_val, func, layout, args = []):
         self.label_text = label_text
         self.key = key
         self.func = func
@@ -215,6 +229,8 @@ class LabeledSlider():
         self.layout.addWidget(self.label)
         self.layout.addWidget(self.slider)
 
+        layout.addLayout(self.layout)
+
     def update_slider(self, value):
         if 'odd' in self.args:
             value = value * 2 - 1
@@ -223,6 +239,18 @@ class LabeledSlider():
 
     def set_label(self, value):
         self.label.setText(str(self.label_text) + ': ' + str(value))
+
+class LabeledImage():
+    def __init__(self, label, layout):
+        self.image = QLabel()
+        self.label = QLabel()
+        self.label.setText(str(label))
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.image)
+        self.layout.addWidget(self.label)
+
+        layout.addLayout(self.layout)
 
 
 
