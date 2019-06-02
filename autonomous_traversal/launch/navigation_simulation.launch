@@ -41,4 +41,7 @@
 		<remap from="odom" to="/odometry/filtered" unless="$(arg use_perfect_odom)"/>
 		<remap from="/cmd_vel" to="/cmd_vel_autonomy" />
 	</node>
+
+	<node pkg="autonomous_traversal" type="pointcloud_derivative_layer" name="pointcloud_derivative_layer" output="screen"/>
+
 </launch>

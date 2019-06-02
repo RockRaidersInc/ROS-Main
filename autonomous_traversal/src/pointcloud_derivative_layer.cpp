@@ -51,7 +51,7 @@ bool is_finite(float num) {
 
 // void timerCallback(const ros::TimerEvent&) {
 void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input_cloud_msg) {
-    float resolution = 0.1;
+    float resolution = 0.2;
 
     // Container for original & filtered data
     //TODO: make a shared pointer, this is a memory leak?
@@ -177,14 +177,17 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input_cloud_msg) {
     std::vector<float> gaussian_weights_3x3 = {0.077847, 0.123317, 0.077847, 0.123317, 0.195346, 0.123317, 0.077847, 0.123317, 0.077847};
     std::vector<float> gaussian_weights_1x1 = {1.0};
 
-    for (int x = 1; x < x_len - 1; x++) {
-        for (int y = 1; y < y_len - 1; y++) {
-            max_heights_smoothed.at(y * x_len + x) = apply_3x3_kernel(max_heights, gaussian_weights_3x3, x, y, x_len);
-            min_heights_smoothed.at(y * x_len + x) = apply_3x3_kernel(min_heights, gaussian_weights_3x3, x, y, x_len);
-            // max_heights_smoothed.at(y * x_len + x) = apply_1x1_kernel(max_heights, gaussian_weights_1x1, x, y, x_len);
-            // min_heights_smoothed.at(y * x_len + x) = apply_1x1_kernel(min_heights, gaussian_weights_1x1, x, y, x_len);
-        }
-    }
+//    for (int x = 1; x < x_len - 1; x++) {
+//        for (int y = 1; y < y_len - 1; y++) {
+//            max_heights_smoothed.at(y * x_len + x) = apply_3x3_kernel(max_heights, gaussian_weights_3x3, x, y, x_len);
+//            min_heights_smoothed.at(y * x_len + x) = apply_3x3_kernel(min_heights, gaussian_weights_3x3, x, y, x_len);
+//            // max_heights_smoothed.at(y * x_len + x) = apply_1x1_kernel(max_heights, gaussian_weights_1x1, x, y, x_len);
+//            // min_heights_smoothed.at(y * x_len + x) = apply_1x1_kernel(min_heights, gaussian_weights_1x1, x, y, x_len);
+//        }
+//    }
+
+    max_heights_smoothed = max_heights;
+    min_heights_smoothed = min_heights;
 
 
     std::vector<float> derivatives((y_len - 1) * (x_len - 1), std::numeric_limits<float>::quiet_NaN());
@@ -272,8 +275,8 @@ int main (int argc, char** argv)
             break;
         }
         catch (tf::TransformException &ex) {
-            ROS_ERROR("could not look up transform /base_link to /zed_camera_center");
-            ROS_ERROR("%s",ex.what());
+            ROS_INFO("could not look up transform /base_link to /zed_camera_center");
+            ROS_INFO("%s",ex.what());
             ros::Duration(1.0).sleep();
             continue;
         }
@@ -284,8 +287,8 @@ int main (int argc, char** argv)
     // // Create a ROS subscriber for the input point cloud
     ros::Subscriber sub = nh.subscribe("/zed/depth/depth_registered", 1, cloud_cb);
     // Create a ROS publisher for the output point cloud
-    pub_unfiltered = nh.advertise<sensor_msgs::PointCloud2>("/unfiltered", 1);
-    pub = nh.advertise<sensor_msgs::PointCloud2>("/filtered", 1);
+//    pub_unfiltered = nh.advertise<sensor_msgs::PointCloud2>("/unfiltered", 1);
+    pub = nh.advertise<sensor_msgs::PointCloud2>("/zed/depth/depth_registered_filtered", 1);
 
     // ros::Timer timer = nh.createTimer(ros::Duration(0.25), timerCallback);
 
