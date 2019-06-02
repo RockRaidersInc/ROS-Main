@@ -202,6 +202,8 @@ class LaneDetector:
 
         if self.print_timing_info:
             print('image resizing took', time.time() - prev_time, 'seconds')
+            sys.stdout.flush()
+            sys.stdout.flush()
             prev_time = time.time()
 
         ## Image processing
@@ -209,6 +211,7 @@ class LaneDetector:
         hsv_filtered = self.hsv_clr_filter(image)
         if self.print_timing_info:
             print('hsv filtering took', time.time() - prev_time, 'seconds')
+            sys.stdout.flush()
             prev_time = time.time()
 
         # Open to filter out noise
@@ -216,6 +219,7 @@ class LaneDetector:
         hsv_filtered = cv2.morphologyEx(hsv_filtered, cv2.MORPH_OPEN, kernel)
         if self.print_timing_info:
             print('Opening took', time.time() - prev_time, 'seconds')
+            sys.stdout.flush()
             prev_time = time.time()
 
         # Make the image smaller by a factor of post_filtering_scaling_factor
@@ -225,6 +229,7 @@ class LaneDetector:
         image_smaller = cv2.resize(image, resize_dim)
         if self.print_timing_info:
             print('resizing filtered image took', time.time() - prev_time, 'seconds')
+            sys.stdout.flush()
             prev_time = time.time()
 
         # use depth data to mask out obstacles
@@ -237,6 +242,7 @@ class LaneDetector:
             hsv_filtered *= valid_mask
             if self.print_timing_info:
                 print('removing obstacles based on depth took', time.time() - prev_time, 'seconds')
+                sys.stdout.flush()
                 prev_time = time.time()
         else:
             print("WARNING: no depth image recieved")
@@ -246,6 +252,7 @@ class LaneDetector:
         # skeletoned = hsv_filtered.astype(np.uint8)
         if self.print_timing_info:
             print('skeleton took', time.time() - prev_time, 'seconds')
+            sys.stdout.flush()
             prev_time = time.time()
 
         # Calculate lane points and Warp perspective
@@ -254,6 +261,7 @@ class LaneDetector:
         lane_points_map_frame, point_roi = self.warp_points(lane_points_image_frame, skeletoned.shape)
         if self.print_timing_info:
             print('selecting points took', time.time() - prev_time, 'seconds')
+            sys.stdout.flush()
             prev_time = time.time()
 
         if self.debug:
@@ -262,6 +270,7 @@ class LaneDetector:
 
             if self.print_timing_info:
                 print('warping and publishing input image took', time.time() - prev_time, 'seconds')
+                sys.stdout.flush()
                 prev_time = time.time()
 
         # Publish points and image
@@ -272,6 +281,7 @@ class LaneDetector:
             print('publishing points and data took', time.time() - prev_time, 'seconds')
             print('took', time.time() - start_time, 'seconds in total')
             print
+            sys.stdout.flush()
 
         if self.debug:
             # publish the warped image for debugging purposes
@@ -335,19 +345,33 @@ class LaneDetector:
         try:
             self.cv2_img, self.cv2_img_time = bridge.imgmsg_to_cv2(msg, "bgr8"), msg.header.stamp
             print('Received an image with timestamp \t\t' + str(self.cv2_img_time))
+            sys.stdout.flush()
+
             # self.lane_detector(self.cv2_img)
+            print("alerting at " + str(time.time()))
             self.main_thread_alerter.set()
         except CvBridgeError as e:
             print('error recieving image\n', e)
 
     def depth_image_callback(self, msg):
-        print('recieved depth image with timestamp \t' + str(self.cv2_img_time))
+        sys.stdout.flush()
         try:
             depth_img = cv2.resize(bridge.imgmsg_to_cv2(msg), (int(self.x_resolution), int(self.y_resolution)))
-            self.depth_img, self.depth_image_time = depth_img, msg.header.stamp
+            self.depth_img, self.depth_img_time = depth_img, msg.header.stamp
+            print('recieved depth image with timestamp \t' + str(self.cv2_img_time))
+            print("alerting at " + str(time.time()))
             self.main_thread_alerter.set()
         except CvBridgeError as e:
             print('error receiving depth image\n', e)
+
+    def run_matching(self):
+        print("alerting at " + str(time.time()))
+        cv2_img, cv2_img_time, depth_img, depth_img_time = self.cv2_img, self.cv2_img_time, self.depth_img, self.depth_img_time
+
+        if self.cv2_img is not None and self.depth_img is not None and cv2_img_time is not None and depth_img_time is not None:
+            if cv2_img_time == depth_img_time:
+                self.cv2_img, self.cv2_img_time, self.depth_img, self.depth_img_time = None, None, None, None
+                self.lane_detector(cv2_img, depth_img=depth_img)
 
     def main(self):
         rospy.init_node('image_listener')
@@ -373,13 +397,9 @@ class LaneDetector:
         self.depth_mask_pub = rospy.Publisher('/depth_mask', Image, queue_size=10)
 
         while not rospy.is_shutdown():
-            self.main_thread_alerter.wait(1.0)
-            cv2_img, cv2_img_time, depth_img, depth_image_time = self.cv2_img, self.cv2_img_time, self.depth_img, self.depth_image_time
-
-            if self.cv2_img is not None and self.depth_img is not None and cv2_img_time is not None and depth_image_time is not None:
-                if cv2_img_time == depth_image_time:
-                    self.lane_detector(cv2_img, depth_img=depth_img)
-
+            self.main_thread_alerter.wait(1000.0)
+            self.main_thread_alerter.clear()
+            self.run_matching()
 
 if __name__ == '__main__':
     detector = LaneDetector()
