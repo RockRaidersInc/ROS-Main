@@ -5,14 +5,15 @@ import yaml
 
 import rospy
 from sensor_msgs.msg import Image
-#from cv_bridge import CVBridge, CvBridgeError
+from cv_bridge import CvBridge, CvBridgeError
 
-#bridge = CvBridge()
+bridge = CvBridge()
 
 class Processing:
     def __init__(self, source_type, source):
         self.source_type = source_type
         self.source = source
+        self.settings = {}
 
         self.frame = None
         if self.source_type == 'image':
@@ -23,12 +24,8 @@ class Processing:
         if self.source_type == 'video':
             pass
         if self.source_type == 'cap':
-            self.cap = cv2.VideoCapture(0)
+            self.cap = cv2.VideoCapture(int(source))
 
-        #print('hello')
-        #print(yaml.load(open(self.SETTING_FILENAME)))
-        #print('hello')
-        self.settings = {}
 
     def ros_image_callback(self, msg):
         try:
@@ -49,39 +46,52 @@ class Processing:
 
     def average_filter(self, frame):
         s = self.settings['avg']
-        result = cv2.blur(frame, (s, s))
+        if s == 0:
+            result = frame
+        else:
+            result = cv2.blur(frame, (s, s))
         return result
 
     def gaussian_filter(self, frame):
         s = self.settings['gauss']
-        result = cv2.GaussianBlur(frame, (s, s), 0)
+        if s == 0:
+            result = frame
+        else:
+            result = cv2.GaussianBlur(frame, (s, s), 0)
         return result
 
     def median_filter(self, frame):
         s = self.settings['med']
-        result = cv2.medianBlur(frame, s)
+        if s == 0:
+            result = frame
+        else:
+            result = cv2.medianBlur(frame, s)
         return result
 
     def erode(self, frame):
-        s = self.settings['erode']
-        result = cv2.erode(frame, None, iterations = s)
+        k = self.settings['erode_ksize']
+        s = self.settings['erode_iter']
+        kernel = np.ones((k,k),np.uint8)
+        result = cv2.erode(frame, kernel, iterations = s)
         return result
 
     def dilate(self, frame):
-        s = self.settings['dilate']
-        result = cv2.dilate(frame, None, iterations = s)
+        k = self.settings['dilate_ksize']
+        s = self.settings['dilate_iter']
+        kernel = np.ones((k,k),np.uint8)
+        result = cv2.dilate(frame, kernel, iterations = s)
         return result
 
     def opening(self, frame):
-        s = self.settings['open']
-        kernel = np.ones((5,5),np.uint8)
-        opening = cv2.morphologyEx(frame, cv2.MORPH_OPEN, kernel, iterations = s)
+        k = self.settings['open_ksize']
+        kernel = np.ones((k,k),np.uint8)
+        opening = cv2.morphologyEx(frame, cv2.MORPH_OPEN, kernel, iterations = 1)
         return opening
 
     def closing(self, frame):
-        s = self.settings['close']
-        kernel = np.ones((5,5),np.uint8)
-        closing = cv2.morphologyEx(frame, cv2.MORPH_CLOSE, kernel, iterations = s)
+        k = self.settings['close_ksize']
+        kernel = np.ones((k,k),np.uint8)
+        closing = cv2.morphologyEx(frame, cv2.MORPH_CLOSE, kernel, iterations = 1)
         return closing
 
     def skeletonize(self, frame):
@@ -93,8 +103,6 @@ class Processing:
             skel = frame
         else:
             skel = np.zeros(img.shape,np.uint8)
-
-        for _ in range(s):
             eroded = cv2.erode(img,element)
             temp = cv2.dilate(eroded,element)
             temp = cv2.subtract(img,temp)

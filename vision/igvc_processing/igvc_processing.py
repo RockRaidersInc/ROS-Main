@@ -1,15 +1,14 @@
+import sys
 from view import ProcessingWindow
 from model import Processing
 
 from PyQt5.QtWidgets import QApplication
 
-def main():
-    source_type = 'cap'
-    source = ''
-    #source_type = 'ros'
-    #source = '/zed_node/left/image_rect_color'
-    p = Processing(source_type, source)
 
+def main():
+    source_type = str(sys.argv[1])
+    source = str(sys.argv[2]) # '/zed_node/left/image_rect_color'
+    p = Processing(source_type, source)
 
     app = QApplication([])
     window = ProcessingWindow(p)

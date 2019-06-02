@@ -44,69 +44,27 @@ class ProcessingWindow(QMainWindow):
 
 
     def setup_sliders(self):
-        self.average_slider = LabeledSlider('Avg_filt', 'avg', self.settings['avg'], 0, 10, lambda value:self.update_slider(value, 'avg'))
-        self.gauss_slider = LabeledSlider('Gauss_filt', 'gauss', self.settings['gauss'], 0, 10, lambda value:self.update_slider(value, 'gauss'), ['odd'])
-        self.median_slider = LabeledSlider('Med_filt', 'med', self.settings['med'], 0, 5, lambda value:self.update_slider(value, 'med'), ['odd'])
-
-        self.h_low_slider = LabeledSlider('H_low', 'hl', self.settings['hl'], 0, 255, lambda value:self.update_slider(value, 'hl'))
-        self.h_high_slider = LabeledSlider('H_high', 'hh', self.settings['hh'], 0, 255, lambda value:self.update_slider(value, 'hh'))
-        self.s_low_slider = LabeledSlider('S_low', 'sl', self.settings['sl'], 0, 255, lambda value:self.update_slider(value, 'sl'))
-        self.s_high_slider = LabeledSlider('S_high', 'sh', self.settings['sh'], 0, 255, lambda value:self.update_slider(value, 'sh'))
-        self.v_low_slider = LabeledSlider('V_low', 'vl', self.settings['vl'], 0, 255, lambda value:self.update_slider(value, 'vl'))
-        self.v_high_slider = LabeledSlider('V_high', 'vh', self.settings['vh'], 0, 255, lambda value:self.update_slider(value, 'vh'))
-
-        self.erode_ksize_slider = LabeledSlider('Erode_ksize', 'erode_ksize', self.settings['erode_ksize'], 0, 10, lambda value:self.update_slider(value, 'erode_ksize'))
-        self.erode_iter_slider = LabeledSlider('Erode_iter', 'erode_iter', self.settings['erode_iter'], 0, 10, lambda value:self.update_slider(value, 'erode_iter'))
-        self.dilate_ksize_slider = LabeledSlider('Dilate_ksize', 'dilate_ksize', self.settings['dilate_ksize'], 0, 10, lambda value:self.update_slider(value, 'dilate_ksize'))
-        self.dilate_iter_slider = LabeledSlider('Dilate_iter', 'dilate_iter', self.settings['dilate_iter'], 0, 10, lambda value:self.update_slider(value, 'dilate_iter'))
-        self.open_ksize_slider = LabeledSlider('Opening_ksize', 'open_ksize', self.settings['open_ksize'], 0, 10, lambda value:self.update_slider(value, 'open_ksize'))
-        self.open_iter_slider = LabeledSlider('Opening_iter', 'open_iter', self.settings['open_iter'], 0, 10, lambda value:self.update_slider(value, 'open_iter'))
-        self.close_ksize_slider = LabeledSlider('Closing_ksize', 'close_ksize', self.settings['close_ksize'], 0, 10, lambda value:self.update_slider(value, 'close_ksize'))
-        self.close_iter_slider = LabeledSlider('Closing_iter', 'close_iter', self.settings['close_iter'], 0, 10, lambda value:self.update_slider(value, 'close_iter'))
-        self.skel_slider = LabeledSlider('Skel', 'skel', self.settings['skel'], 0, 1, lambda value:self.update_slider(value, 'skel'))
-
         self.slider_layout = QVBoxLayout()
-        self.slider_layout.addLayout(self.average_slider.layout)
-        self.slider_layout.addLayout(self.gauss_slider.layout)
-        self.slider_layout.addLayout(self.median_slider.layout)
-        self.slider_layout.addLayout(self.h_low_slider.layout)
-        self.slider_layout.addLayout(self.h_high_slider.layout)
-        self.slider_layout.addLayout(self.s_low_slider.layout)
-        self.slider_layout.addLayout(self.s_high_slider.layout)
-        self.slider_layout.addLayout(self.v_low_slider.layout)
-        self.slider_layout.addLayout(self.v_high_slider.layout)
-        self.slider_layout.addLayout(self.erode_ksize_slider.layout)
-        self.slider_layout.addLayout(self.erode_iter_slider.layout)
-        self.slider_layout.addLayout(self.dilate_ksize_slider.layout)
-        self.slider_layout.addLayout(self.dilate_iter_slider.layout)
-        self.slider_layout.addLayout(self.open_ksize_slider.layout)
-        self.slider_layout.addLayout(self.open_iter_slider.layout)
-        self.slider_layout.addLayout(self.close_ksize_slider.layout)
-        self.slider_layout.addLayout(self.close_iter_slider.layout)
-        self.slider_layout.addLayout(self.skel_slider.layout)
 
-        # self.slider_layout = QVBoxLayout()
-        # febc1c5e2942bc4ce423fcb8d7e41a53474bcc9d
+        self.average_slider = LabeledSlider('Avg_filt', 'avg', self.settings['avg'], 0, 10, lambda value:self.update_slider(value, 'avg'), self.slider_layout)
+        self.gauss_slider = LabeledSlider('Gauss_filt', 'gauss', self.settings['gauss'], 0, 10, lambda value:self.update_slider(value, 'gauss'), self.slider_layout, ['odd'])
+        self.median_slider = LabeledSlider('Med_filt', 'med', self.settings['med'], 0, 5, lambda value:self.update_slider(value, 'med'), self.slider_layout, ['odd'])
 
-        # self.scale_slider = LabeledSlider('Image scale', 'scale', self.settings['scale'], 1, 10, lambda value:self.update_scale(value), self.slider_layout)
+        self.h_low_slider = LabeledSlider('H_low', 'hl', self.settings['hl'], 0, 255, lambda value:self.update_slider(value, 'hl'), self.slider_layout)
+        self.h_high_slider = LabeledSlider('H_high', 'hh', self.settings['hh'], 0, 255, lambda value:self.update_slider(value, 'hh'), self.slider_layout)
+        self.s_low_slider = LabeledSlider('S_low', 'sl', self.settings['sl'], 0, 255, lambda value:self.update_slider(value, 'sl'), self.slider_layout)
+        self.s_high_slider = LabeledSlider('S_high', 'sh', self.settings['sh'], 0, 255, lambda value:self.update_slider(value, 'sh'), self.slider_layout)
+        self.v_low_slider = LabeledSlider('V_low', 'vl', self.settings['vl'], 0, 255, lambda value:self.update_slider(value, 'vl'), self.slider_layout)
+        self.v_high_slider = LabeledSlider('V_high', 'vh', self.settings['vh'], 0, 255, lambda value:self.update_slider(value, 'vh'), self.slider_layout)
 
-        # self.average_slider = LabeledSlider('Avg_filt', 'avg', self.settings['avg'], 1, 10, lambda value:self.update_slider(value, 'avg'), self.slider_layout)
-        # self.gauss_slider = LabeledSlider('Gauss_filt', 'gauss', self.settings['gauss'], 1, 10, lambda value:self.update_slider(value, 'gauss'), self.slider_layout, ['odd'])
-        # self.median_slider = LabeledSlider('Med_filt', 'med', self.settings['med'], 1, 5, lambda value:self.update_slider(value, 'med'), self.slider_layout, ['odd'])
-
-        # self.h_low_slider = LabeledSlider('H_low', 'hl', self.settings['hl'], 0, 255, lambda value:self.update_slider(value, 'hl'), self.slider_layout)
-        # self.h_high_slider = LabeledSlider('H_high', 'hh', self.settings['hh'], 0, 255, lambda value:self.update_slider(value, 'hh'), self.slider_layout)
-        # self.s_low_slider = LabeledSlider('S_low', 'sl', self.settings['sl'], 0, 255, lambda value:self.update_slider(value, 'sl'), self.slider_layout)
-        # self.s_high_slider = LabeledSlider('S_high', 'sh', self.settings['sh'], 0, 255, lambda value:self.update_slider(value, 'sh'), self.slider_layout)
-        # self.v_low_slider = LabeledSlider('V_low', 'vl', self.settings['vl'], 0, 255, lambda value:self.update_slider(value, 'vl'), self.slider_layout)
-        # self.v_high_slider = LabeledSlider('V_high', 'vh', self.settings['vh'], 0, 255, lambda value:self.update_slider(value, 'vh'), self.slider_layout)
-
-        # self.erode_slider = LabeledSlider('Erode', 'erode', self.settings['erode'], 0, 10, lambda value:self.update_slider(value, 'erode'), self.slider_layout)
-        # self.dilate_slider = LabeledSlider('Dilate', 'dilate', self.settings['dilate'], 0, 10, lambda value:self.update_slider(value, 'dilate'), self.slider_layout)
-        # self.open_slider = LabeledSlider('Opening', 'open', self.settings['open'], 1, 10, lambda value:self.update_slider(value, 'open'), self.slider_layout)
-        # self.close_slider = LabeledSlider('Closing', 'close', self.settings['close'], 1, 10, lambda value:self.update_slider(value, 'close'), self.slider_layout)
-        # self.skel_slider = LabeledSlider('Skel', 'skel', self.settings['skel'], 0, 100, lambda value:self.update_slider(value, 'skel'), self.slider_layout)
-
+        self.erode_ksize_slider = LabeledSlider('Erode_ksize', 'erode_ksize', self.settings['erode_ksize'], 0, 10, lambda value:self.update_slider(value, 'erode_ksize'), self.slider_layout)
+        self.erode_iter_slider = LabeledSlider('Erode_iter', 'erode_iter', self.settings['erode_iter'], 0, 10, lambda value:self.update_slider(value, 'erode_iter'), self.slider_layout)
+        self.dilate_ksize_slider = LabeledSlider('Dilate_ksize', 'dilate_ksize', self.settings['dilate_ksize'], 0, 10, lambda value:self.update_slider(value, 'dilate_ksize'), self.slider_layout)
+        self.dilate_iter_slider = LabeledSlider('Dilate_iter', 'dilate_iter', self.settings['dilate_iter'], 0, 10, lambda value:self.update_slider(value, 'dilate_iter'), self.slider_layout)
+        self.open_ksize_slider = LabeledSlider('Opening_ksize', 'open_ksize', self.settings['open_ksize'], 0, 10, lambda value:self.update_slider(value, 'open_ksize'), self.slider_layout)
+        self.close_ksize_slider = LabeledSlider('Closing_ksize', 'close_ksize', self.settings['close_ksize'], 0, 10, lambda value:self.update_slider(value, 'close_ksize'), self.slider_layout)
+        self.skel_slider = LabeledSlider('Skel', 'skel', self.settings['skel'], 0, 1, lambda value:self.update_slider(value, 'skel'), self.slider_layout)
+        
 
     def update_scale(self, value):
         self.SCALING_FACTOR = value * self.SCALING_SETTING
