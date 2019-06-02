@@ -1,7 +1,7 @@
 local_costmap:
   global_frame: map
-  update_frequency: 20.0
-  publish_frequency: 20.0
+  update_frequency: 10.0
+  publish_frequency: 10.0
   static_map: false
   rolling_window: true
   width: 11.0
@@ -11,7 +11,7 @@ local_costmap:
   
   plugins:
     - {name: lanes_layer,     type: "lanes_layer::LanesLayer"}
-    # - {name: anti_reverse_layer, type: "anti_reverse_layer::AntiReverseLayer"}
+    - {name: anti_reverse_layer, type: "anti_reverse_layer::AntiReverseLayer"}
     - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
     # - {name: obstacle_layer,  type: "costmap_2d::VoxelLayer"}
     - {name: inflation_layer, type: "costmap_2d::InflationLayer"}

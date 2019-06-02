@@ -1,7 +1,7 @@
 global_costmap:
   global_frame: map
-  update_frequency: 2.0
-  publish_frequency: 2.0
+  update_frequency: 5.0
+  publish_frequency: 5.0
   static_map: true
   rolling_window: false
   width: 100.0
@@ -9,8 +9,8 @@ global_costmap:
 
   plugins:
     - {name: lanes_layer,        type: "lanes_layer::LanesLayer"}
+    - {name: anti_reverse_layer, type: "anti_reverse_layer::AntiReverseLayer"}
+    - {name: obstacle_layer,     type: "costmap_2d::ObstacleLayer"}
     - {name: static_layer,       type: "costmap_2d::StaticLayer"}
-    # - {name: obstacle_layer,     type: "costmap_2d::ObstacleLayer"}
     # - {name: obstacle_layer,   type: "costmap_2d::VoxelLayer"}
-    # - {name: anti_reverse_layer, type: "anti_reverse_layer::AntiReverseLayer"}
     - {name: inflation_layer,    type: "costmap_2d::InflationLayer"}

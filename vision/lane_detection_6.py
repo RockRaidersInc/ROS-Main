@@ -33,7 +33,7 @@ class LaneDetector:
     max_x_dist = 3.0  # maximum distance away from the rover at which lanes will be detected
 
     debug = True
-    print_timing_info = True
+    print_timing_info = False
 
     depth_img = None
     depth_img_time = None
@@ -208,7 +208,7 @@ class LaneDetector:
             prev_time = time.time()
 
         # Open to filter out noise
-        kernel = np.ones((2, 2), np.uint8)
+        kernel = np.ones((self.settings['open_k_size'], self.settings['open_k_size']), np.uint8)
         hsv_filtered = cv2.morphologyEx(hsv_filtered, cv2.MORPH_OPEN, kernel)
         if self.print_timing_info:
             print('Opening took', time.time() - prev_time, 'seconds')
@@ -238,8 +238,8 @@ class LaneDetector:
             print("WARNING: no depth image recieved")
 
         # Skeletonize mask to reduce number of lane points
-        skeletoned = self.skeleton(hsv_filtered.astype(np.uint8))
-        # skeletoned = hsv_filtered.astype(np.uint8)
+        # skeletoned = self.skeleton(hsv_filtered.astype(np.uint8))
+        skeletoned = hsv_filtered.astype(np.uint8)
         if self.print_timing_info:
             print('skeleton took', time.time() - prev_time, 'seconds')
             prev_time = time.time()

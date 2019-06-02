@@ -9,8 +9,8 @@ TrajectoryPlannerROS:
     min_vel_x: 0.1  # Allowing velocities too low will will stop the 
                     # obstacle avoidance because low velocities won't 
                     # actually be high enough to move the robot
-    max_vel_theta: 0.5
-    min_vel_theta: -0.5
+    max_vel_theta: .5
+    min_vel_theta: -.5
     min_in_place_vel_theta: 0.5
     escape_vel: -.1
 
@@ -38,11 +38,11 @@ TrajectoryPlannerROS:
     # Whether the gdist_scale and pdist_scale parameters should assume that goal_distance and path_distance are expressed in units of meters or cells. Cells are assumed by default (false).
     meter_scoring: true 
     # The weighting for how much the controller should attempt to avoid obstacles. default 0.01
-    occdist_scale:  0.05 
+    occdist_scale:  0.15
     # The weighting for how much the controller should stay close to the path it was given . default 0.6
-    pdist_scale: 0.8  
+    pdist_scale: .8
     # The weighting for how much the controller should attempt to reach its local goal, also controls speed  default 0.8
-    gdist_scale: 0.8
+    gdist_scale: 0.5
 
     # How far to look ahead in meters when scoring different in-place-rotation trajectories
     heading_lookahead: 0.1  

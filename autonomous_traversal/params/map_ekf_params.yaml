@@ -30,18 +30,6 @@ map_ekf:
   base_link_frame: base_link
   world_frame: map
 
-  # # GPS Settings
-  # odom0: /odometry/gps
-  # odom0_config: [true, true, false,     # [x_pos   , y_pos    , z_pos,
-  #                false, false, false,   #  roll    , pitch    , yaw,
-  #                false, false, false,   #  x_vel   , y_vel    , z_vel,
-  #                false, false, false,   #  roll_vel, pitch_vel, yaw_vel,
-  #                false, false, false]   #  x_accel , y_accel  , z_accel]
-  # odom0_queue_size: 10
-  # odom0_nodelay: true
-  # odom0_differential: false
-  # odom0_relative: false
-
   # Wheel Odometry Settings
   odom0: /odometry/wheel
   odom0_config: [false, false, false,   # [x_pos   , y_pos    , z_pos,
@@ -54,6 +42,17 @@ map_ekf:
   odom0_differential: false
   odom0_relative: false
 
+  # GPS Settings
+  # odom1: /odometry/gps
+  # odom1_config: [true, true, false,     # [x_pos   , y_pos    , z_pos,
+  #               false, false, false,   #  roll    , pitch    , yaw,
+  #               false, false, false,   #  x_vel   , y_vel    , z_vel,
+  #               false, false, false,   #  roll_vel, pitch_vel, yaw_vel,
+  #               false, false, false]   #  x_accel , y_accel  , z_accel]
+  # odom1_queue_size: 10
+  # odom1_nodelay: true
+  # odom1_differential: false
+  # odom1_relative: false
 
 #  # Visual Odometry Settings
 #  odom2: /odometry/visual

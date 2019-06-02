@@ -2,3 +2,7 @@
 - {hh: 255, hl: 0, sh: 255, sl: 0, vh: 255, vl: 190}
 - {hh: 180, hl: 80, sh: 255, sl: 0, vh: 255, vl: 190}
 - {hh: 255, hl: 0, sh: 255, sl: 0, vh: 255, vl: 150}
+- {hh: 170, hl: 40, sh: 160, sl: 0, vh: 255, vl: 140}
+- {hh: 110, hl: 45, sh: 255, sl: 0, vh: 255, vl: 135}
+- {hh: 135, hl: 70, open_k_size: 4, sh: 139, sl: 0, vh: 255, vl: 140}
+- {hh: 255, hl: 65, open_k_size: 1, sh: 244, sl: 0, vh: 255, vl: 154}
