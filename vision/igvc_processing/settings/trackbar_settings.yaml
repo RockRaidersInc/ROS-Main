@@ -1,0 +1,2 @@
+- {avg: 1, close: 1, dilate: 0, erode: 0, gauss: 1, hh: 161, hl: 24, med: 1, open: 1,
+  sh: 255, skel: 0, sl: 19, vh: 255, vl: 4}
