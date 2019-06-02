@@ -211,8 +211,10 @@ include_directories(
 include_directories(${catkin_INCLUDE_DIRS} include)
 
 add_library(anti_reverse_layer plugins/anti_reverse_layer.cpp)
-add_library(lanes_layer plugins/lanes_layer.cpp)
 target_link_libraries(anti_reverse_layer ${catkin_LIBRARIES})
+
+add_library(lanes_layer plugins/lanes_layer.cpp)
 target_link_libraries(lanes_layer ${catkin_LIBRARIES})
-# add_executable(pointcloud_derivative_layer src/pointcloud_derivative_layer.cpp)
-# target_link_libraries(pointcloud_derivative_layer ${catkin_LIBRARIES})
+
+add_executable(pointcloud_derivative_layer src/pointcloud_derivative_layer.cpp)
+target_link_libraries(pointcloud_derivative_layer ${catkin_LIBRARIES})

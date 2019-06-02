@@ -29,7 +29,8 @@ obstacle_layer:
     observation_sources: zed_camera
     zed_camera: {sensor_frame: /zed_camera_center, 
                  data_type: PointCloud2, 
-                 topic: /zed/depth/depth_registered, 
+                 # topic: /zed/depth/depth_registered, 
+                 topic: /zed/depth/depth_registered_filtered,
                  clearing: true,
                  marking: true, 
                  max_obstacle_height: 2.0,
