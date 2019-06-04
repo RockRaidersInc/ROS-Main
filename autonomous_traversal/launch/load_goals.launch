@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="coordinates"/>	
-	<param name="coordinates" value="$(arg coordinates)"/>
-	<node name="load_goals" pkg="autonomous_traversal" type="load_goals.py" output="screen"/>
+    <arg name="recalc_goals"/>
+    <param name="recalc_goals" value="$(arg recalc_goals)" type="bool"/>
+
+    <arg name="coordinates"/>   
+    <param name="coordinates" value="$(arg coordinates)"/>
+
+    <node name="load_goals" pkg="autonomous_traversal" type="load_goals.py" output="screen"/>
 </launch>

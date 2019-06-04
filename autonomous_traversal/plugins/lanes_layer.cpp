@@ -162,6 +162,8 @@ namespace lanes_layer
 			}
 			buffered_readings_++;
 		}
+
+		// ROS_INFO("Number of buffered lanes messages %d", lanes_msgs_buffer_copy.size());
 	}
 
 	void LanesLayer::resetCostmapLayer()

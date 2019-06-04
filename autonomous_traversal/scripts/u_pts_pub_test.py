@@ -14,7 +14,7 @@ def u_pts_pub_test():
 			u_pts.data = [0,0,0,0,0,0,0,0]
 		else:
 			print('Adding u obstacle')
-			u_pts.data = [3.5,1.5,-1.5,1.5,-1.5,-1.5,3.5,-1.5]
+			u_pts.data = [2.5,1.5,-1.5,1.5,-1.5,-1.5,2.5,-1.5]
 		
 		pub.publish(u_pts)
 
