@@ -46,7 +46,7 @@ class Processing:
 
     def average_filter(self, frame):
         s = self.settings['avg']
-        if s == 0:
+        if s < 1:
             result = frame
         else:
             result = cv2.blur(frame, (s, s))
@@ -54,15 +54,15 @@ class Processing:
 
     def gaussian_filter(self, frame):
         s = self.settings['gauss']
-        if s == 0:
+        if s < 1:
             result = frame
         else:
-            result = cv2.GaussianBlur(frame, (s, s), 0)
+            result = cv2.GaussianBlur(frame, (s, s), s)
         return result
 
     def median_filter(self, frame):
         s = self.settings['med']
-        if s == 0:
+        if s < 1:
             result = frame
         else:
             result = cv2.medianBlur(frame, s)

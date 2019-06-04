@@ -36,7 +36,6 @@ class ProcessingWindow(QMainWindow):
         self.main_layout.addWidget(scroll)
         self.setCentralWidget(self.central_widget)
 
-
         self.update_timer = QTimer()
         #TODO: Set correct function
         self.update_timer.timeout.connect(self.update_images)
