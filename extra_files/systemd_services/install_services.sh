@@ -12,6 +12,10 @@ systemctl restart xboxdrv.service
 cp drive_at_startup.service /etc/systemd/system/drive_at_startup.service
 systemctl enable drive_at_startup.service
 
+# blnking to arduino commands
+cp blinking.service /etc/systemd/system/blinking.service
+systemctl enable blinking.service
+
 # let the rock user run ```sudo /sbin/modprobe pcspkr``` without a password. This is required to make beeps with the industrial motherboard's built in speaker (we love legacy hardware)
 cp spkr_sudoers /etc/sudoers.d/.
 
