@@ -1,0 +1,13 @@
+[Unit]
+Description=Run the blinking mode detection after startup
+After=local-fs.target
+
+[Service]
+Restart=no
+User=rock
+ExecStart=/bin/bash /home/rock/URC/src/extra_files/systemd_services/blinking.sh
+# Type=forking
+KillSignal=SIGKILL
+
+[Install]
+WantedBy=multi-user.target
