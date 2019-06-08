@@ -193,14 +193,27 @@ class LaneDetector:
     @img_proc_timeit('warping pts')
     def warp_points(self, point_array, img_shape):
 
-        src = np.float32([[193 * self.x_resolution / 640.0, 426 * self.y_resolution / 480.0],  # bottom left
-                          [256 * self.x_resolution / 640.0, 233 * self.y_resolution / 480.0],  # top left
-                          [430 * self.x_resolution / 640.0, 232 * self.y_resolution / 480.0],  # top right
-                          [510 * self.x_resolution / 640.0, 436 * self.y_resolution / 480.0]])  # bottom right
+
+        # igvc calibration
+        src = np.float32([[180 * self.x_resolution / 640.0, 463 * self.y_resolution / 480.0],  # bottom left
+                          [248 * self.x_resolution / 640.0, 261 * self.y_resolution / 480.0],  # top left
+                          [413 * self.x_resolution / 640.0, 258 * self.y_resolution / 480.0],  # top right
+                          [499 * self.x_resolution / 640.0, 455 * self.y_resolution / 480.0]])  # bottom right
         dst = np.float32([[0.9144, 0.6096],  # bottom left
                           [2.1336, 0.6096],  # top left
                           [2.1336, -0.6096],  # top right
                           [0.9144, -0.6096]])  # bottom right
+
+        
+        # # previous calibration
+        # src = np.float32([[193 * self.x_resolution / 640.0, 426 * self.y_resolution / 480.0],  # bottom left
+        #                   [256 * self.x_resolution / 640.0, 233 * self.y_resolution / 480.0],  # top left
+        #                   [430 * self.x_resolution / 640.0, 232 * self.y_resolution / 480.0],  # top right
+        #                   [510 * self.x_resolution / 640.0, 436 * self.y_resolution / 480.0]])  # bottom right
+        # dst = np.float32([[0.9144, 0.6096],  # bottom left
+        #                   [2.1336, 0.6096],  # top left
+        #                   [2.1336, -0.6096],  # top right
+        #                   [0.9144, -0.6096]])  # bottom right
 
         M = cv2.getPerspectiveTransform(src, dst)
         M_inv = cv2.getPerspectiveTransform(dst, src)
@@ -318,6 +331,11 @@ class LaneDetector:
         # Preprocessing
         resize_dim = (int(self.x_resolution), int(self.y_resolution))
         resized_input = self.resize(input_image, resize_dim)
+
+        if self.debug:
+            self.resized_pub.publish(bridge.cv2_to_imgmsg(resized_input.astype(np.uint8), 'bgr8'))
+
+
         # TODO: Noise filtering
         blurred = self.average_filter(resized_input)
         gaussed = self.gaussian_filter(blurred)
@@ -369,12 +387,32 @@ class LaneDetector:
     def main(self):
         rospy.init_node('image_listener')
 
-        image_topic = rospy.get_param('image_topic')
-        depth_image_topic = rospy.get_param('depth_image_topic') 
+        # image_topic = rospy.get_param('image_topic')
+        # depth_image_topic = rospy.get_param('depth_image_topic') 
+        # rospy.Subscriber(image_topic, Image, self.image_callback)
+        # rospy.loginfo('Subscribed to image topic: {}'.format(image_topic))
+        # rospy.Subscriber(depth_image_topic, Image, self.depth_image_callback)
+        # rospy.loginfo('Subscribed to depth image topic: {}'.format(depth_image_topic))
+
+
+        # simulator
+        sim_image_topic = "/zed/image/image_raw"
+        sim_depth_image_topic = '/zed/depth/image_raw'
+        rospy.Subscriber(sim_image_topic, Image, self.image_callback)
+        rospy.Subscriber(sim_depth_image_topic, Image, self.depth_image_callback)
+        rospy.loginfo('Subscribed to image topic: {}'.format(sim_image_topic))
+        rospy.loginfo('Subscribed to depth image topic: {}'.format(sim_depth_image_topic))
+
+
+        # physical rover
+        image_topic = '/zed_node/left/image_rect_color'
+        depth_image_topic = '/zed_node/depth/depth_registered'
         rospy.Subscriber(image_topic, Image, self.image_callback)
-        rospy.loginfo('Subscribed to image topic: {}'.format(image_topic))
         rospy.Subscriber(depth_image_topic, Image, self.depth_image_callback)
+        rospy.loginfo('Subscribed to image topic: {}'.format(image_topic))
         rospy.loginfo('Subscribed to depth image topic: {}'.format(depth_image_topic))
+
+        self.resized_pub = rospy.Publisher('/resized_input', Image, queue_size=10)
 
         while not rospy.is_shutdown():
             time.sleep(0.1)
