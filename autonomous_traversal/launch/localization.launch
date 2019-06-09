@@ -40,8 +40,8 @@
         <remap from="~xyz_rpy_msg_out" to="/debug/odom_filtered_map_xyz_rpy"/>
     </node>
 
-    <node name="imu_quaternion_to_rpy" pkg="utils" type="imu_msg_to_xyz_rpy.py">
+    <!--<node name="imu_quaternion_to_rpy" pkg="utils" type="imu_msg_to_xyz_rpy.py">
         <remap from="~imu_msg_in" to="/imu/data"/>
         <remap from="~imu_msg_out" to="/debug/imu_rpy"/>
-    </node>
+    </node>-->
 </launch>
