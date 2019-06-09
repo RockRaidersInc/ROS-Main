@@ -1,3 +1,5 @@
+# DEPRECATED, USE igvc_processing.py
+
 import numpy as np
 import cv2
 import sys
@@ -42,6 +44,7 @@ class Trackbar:
         cv2.createTrackbar('S_high','Settings',255,255,nothing)
         cv2.createTrackbar('V_low','Settings',0,255,nothing)
         cv2.createTrackbar('V_high','Settings',255,255,nothing)
+        cv2.createTrackbar('open_k_size','Settings',0,10,nothing)
 
     def save_settings(self):
         with open(self.SETTING_FILENAME, 'a') as file:
@@ -64,8 +67,40 @@ class Trackbar:
 
         return result
 
+    def open(self, frame):
+        self.settings['open_k_size'] = cv2.getTrackbarPos('open_k_size', 'Settings')
+        kernel = np.ones((self.settings['open_k_size'], self.settings['open_k_size']), np.uint8)
+        opened = cv2.morphologyEx(frame, cv2.MORPH_OPEN, kernel)
+        # cv2.imshow('opened', opened)
+        return opened
+ 
+    def skeleton(self, frame):
+        # from stackoverflow user Dan Masek (non askii character was replaced with s)
+        # https://stackoverflow.com/questions/42845747/optimized-skeleton-function-for-opencv-with-python
+        skeleton = np.zeros(frame.shape, np.uint8)
+        eroded = np.zeros(frame.shape, np.uint8)
+        temp = np.zeros(frame.shape, np.uint8)
+
+        _, thresh = cv2.threshold(frame, 127, 255, 0)
+
+        kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
+
+        iters = 0
+        while (True):
+            cv2.erode(thresh, kernel, eroded)
+            cv2.dilate(eroded, kernel, temp)
+            cv2.subtract(thresh, temp, temp)
+            cv2.bitwise_or(skeleton, temp, skeleton)
+            thresh, eroded = eroded, thresh  # Swap instead of copy
+
+            iters += 1
+            if cv2.countNonZero(thresh) == 0:
+                return skeleton
+
     def proc_frame(self, frame):
         result = self.hsv_color_filter(frame)
+        result = self.open(result)
+        # result = self.skeleton(result)
         return result
 
     def ros_image_callback(self, msg):

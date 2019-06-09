@@ -55,20 +55,18 @@ class WaypointNavigator:
 				if state == actionlib.SimpleGoalState.DONE:
 					rospy.loginfo('Goal successfully reached')
 					break
-				# elif state == actionlib.SimpleGoalState.PENDING:
-				# 	rospy.logwarn('PENDING State, this should only happen if you ctrl-c')
-				# 	sys.exit()
 		# Normal gps waypoint to waypoint navigation
 		else:
 			move_base_goal = make_goal(goal_x, goal_y)
 			rospy.loginfo('Sending goal')
 			self.mb_client.send_goal(move_base_goal)
 			rospy.loginfo('Waiting for results')
-			success = self.mb_client.wait_for_result(rospy.Duration.from_sec(timeout))
-			if success:
-				rospy.loginfo('Goal successfully reached')
-			else:
-				rospy.logwarn('Was not able to reach the goal in time')
+			state = self.mb_client.wait_for_result()
+			# if state == actionlib.SimpleGoalState.DONE:
+			# 	rospy.loginfo('Goal successfully reached')
+			# else:
+			# 	rospy.logwarn('Was not able to reach the goal in time')
+		return state
 
 	def save_gps_fix_callback(self, gps_msg):
 		self.gps_fix = (gps_msg.latitude, gps_msg.longitude)

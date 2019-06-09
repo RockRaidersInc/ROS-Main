@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="settings_file" default="lane_detection"/>
+	<param name="settings_file" value="$(arg settings_file)" type="str"/>
+
+	<arg name="source_type" default="ros"/>
+	<param name="source_type" value="$(arg source_type)" type="str"/>
+
+	<arg name="source" default="/zed_node/left/image_rect_color"/>
+	<param name="source" value="$(arg source)" type="str"/>
+	
+    <node name="trackbar" 
+          pkg="autonomous_traversal" 
+          type="trackbar.py" 
+          output="screen"/>
+</launch>

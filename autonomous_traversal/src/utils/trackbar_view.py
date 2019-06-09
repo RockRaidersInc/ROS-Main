@@ -1,3 +1,5 @@
+import rospy
+import rospkg
 import numpy as np
 import yaml
 
@@ -7,7 +9,6 @@ from PyQt5.QtGui import QImage, QPixmap
 from PIL import Image
 
 class ProcessingWindow(QMainWindow):
-    SETTING_FILENAME = 'settings/trackbar_settings.yaml'
     SCALING_FACTOR = 0.4
     SCALING_SETTING = 0.1
 
@@ -15,7 +16,12 @@ class ProcessingWindow(QMainWindow):
         super(ProcessingWindow, self).__init__()
         self.processing = processing
         
-        self.settings = yaml.load(open(self.SETTING_FILENAME))[0]
+        rospack = rospkg.RosPack()
+        AT_file_path = rospack.get_path('autonomous_traversal')
+        settings_file = rospy.get_param('settings_file')
+        self.setting_filepath= '{}/settings/{}.yaml'.format(AT_file_path, settings_file)
+        
+        self.settings = yaml.load(open(self.setting_filepath))[0]
         self.processing.update_settings(self.settings)
 
         self.setup_sliders()
@@ -196,14 +202,13 @@ class ProcessingWindow(QMainWindow):
 
     def keyPressEvent(self, event):
      key = event.key()
-     #print(key)
 
      if key == 83:
         self.save_settings()
 
     def save_settings(self):
-        with open(self.SETTING_FILENAME, 'a') as f:
-            print(yaml.dump(self.settings, default_flow_style=False))
+        with open(self.setting_filepath, 'a') as f:
+            rospy.loginfo(yaml.dump(self.settings, default_flow_style=False))
             yaml.dump([self.settings], f)
 
 class LabeledSlider():

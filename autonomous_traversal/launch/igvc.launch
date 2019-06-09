@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- Localization, navigation, and vision stuff -->
+    <include file="$(find autonomous_traversal)/launch/localization.launch"/>
+    <include file="$(find autonomous_traversal)/launch/navigation.launch">
+    	<!-- Increase the size of map if goal off map error -->
+    	<arg name="map" default="empty_big"/> 
+	</include>
+    <include file="$(find autonomous_traversal)/launch/lane_detection.launch">
+    	<!-- Use latest lane detection setting -->
+	    <arg name="setting" default="-1"/> 
+	</include>
+
+    <!-- recalculate goals to compensate for odometry drift -->
+    <param name="recalc_goals" value="false" type="bool"/>
+    <!-- Coordinates file, check file for use -->
+    <param name="coordinates" value="igvc" type="str"/>
+    <!-- Number of times we ought to republish the goal in case of failure  -->
+    <!-- NOT IMPLEMENTED, LET ME KNOW IF THIS IS NEEDED -->
+    <param name="num_retries" value="3" type="int"/> 
+    <!-- Loading goals and adding u obstacle publishing -->
+	<node name="igcv" pkg="autonomous_traversal" type="igvc.py" output="screen"/>
+</launch>

@@ -1,0 +1,16 @@
+- {avg: 1, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0, gauss: 1, hh: 161, hl: 24, med: 1, open_ksize: 1, sh: 255, skel: 0, sl: 19, vh: 255, vl: 4, scale: 4}
+- {avg: 1, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 1, hh: 161, hl: 24, med: 1, open_ksize: 1, scale: 4, sh: 255, skel: 0, sl: 19,
+  vh: 255, vl: 4}
+- {avg: 2, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 1, hh: 161, hl: 24, med: 1, open_ksize: 1, scale: 4, sh: 255, skel: 0, sl: 19,
+  vh: 255, vl: 4}
+- {avg: 2, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 1, hh: 161, hl: 24, med: -1, open_ksize: 4, scale: 4, sh: 197, skel: 0, sl: 19,
+  vh: 255, vl: 0}
+- {avg: 0, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 1, hh: 161, hl: 45, med: 1, open_ksize: 1, scale: 4, sh: 255, skel: 0, sl: 19,
+  vh: 255, vl: 4}
+- {avg: 0, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 1, hh: 161, hl: 45, med: 1, open_ksize: 1, scale: 4, sh: 255, skel: 0, sl: 19,
+  vh: 255, vl: 4}

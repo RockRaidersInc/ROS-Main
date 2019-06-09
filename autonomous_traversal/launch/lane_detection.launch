@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Use latest trackbar settings by default -->
+    <arg name="setting" default="-1"/> 
+    <param name="image_topic" value="/zed_node/left/image_rect_color" type="str"/>
+    <param name="depth_image_topic" value="/zed/depth/image_raw" type="str"/>
+    <node name="lane_detection" 
+          pkg="autonomous_traversal" 
+          type="lane_detection.py" 
+          args="$(arg setting)"
+          output="screen"/>
+</launch>
