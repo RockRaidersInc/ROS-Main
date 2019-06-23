@@ -237,6 +237,9 @@ class LaneDetector:
         else:
             print("WARNING: no depth image recieved")
 
+
+#        hsv_filtered = cv2.erode(hsv_filtered, np.ones((5, 5), np.uint8))
+
         # Skeletonize mask to reduce number of lane points
         # skeletoned = self.skeleton(hsv_filtered.astype(np.uint8))
         skeletoned = hsv_filtered.astype(np.uint8)

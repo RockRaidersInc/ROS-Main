@@ -16,7 +16,7 @@
   <node name="gps_covariance_booster" pkg="sensor_publisher" type="gps_covariance_booster.py" output="screen">
       <remap from="~gps_msg_in" to="/gps/fix_unadjusted"/>
       <remap from="~gps_msg_out" to="/gps/fix"/>
-      <rosparam param="gps_scale_factor" type="int" value="$(arg scale)"/>
+      <rosparam param="~gps_scale_factor" type="int" value="$(arg scale)"/>
   </node>
 
 </launch>

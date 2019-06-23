@@ -11,7 +11,8 @@ def callback(msg):
 
 if __name__ == "__main__":
     rospy.init_node("gps_covariance_booster")
-    adjustment_factor = rospy.get_param('~gps_scale_factor')
+    # adjustment_factor = rospy.get_param('~gps_scale_factor')
+    adjustment_factor = 3.0
     rospy.loginfo('gps_scale_factor: {}'.format(adjustment_factor))
     sub = rospy.Subscriber("~gps_msg_in", NavSatFix, callback, queue_size = 2)
     pub = rospy.Publisher("~gps_msg_out", NavSatFix, queue_size = 2)

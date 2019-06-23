@@ -6,12 +6,12 @@ GlobalPlanner:
 
 TrajectoryPlannerROS:
     max_vel_x: 0.5
-    min_vel_x: 0.1  # Allowing velocities too low will will stop the 
+    min_vel_x: 0.3  # Allowing velocities too low will will stop the 
                     # obstacle avoidance because low velocities won't 
                     # actually be high enough to move the robot
-    max_vel_theta: .5
-    min_vel_theta: -.5
-    min_in_place_vel_theta: 0.5
+    max_vel_theta: .4
+    min_vel_theta: -.4
+    min_in_place_vel_theta: 0.4
     escape_vel: -.1
 
     acc_lim_theta: 1.0
@@ -60,3 +60,15 @@ TrajectoryPlannerROS:
     oscillation_reset_dist: 1.0 
     escape_reset_dist: 0.1
     escape_reset_theta: 0.1
+
+
+
+EBandPlannerROS:
+    # Goal Tolerance Parameters
+    yaw_goal_tolerance: 1.633123935319537e+16
+    xy_goal_tolerance: .5
+
+    max_vel_lin: 0.6
+    max_vel_th: 0.2
+
+

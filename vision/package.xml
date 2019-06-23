@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+  <name>vision</name>
+  <version>0.0.1</version>
+  <description>vision related scripts</description>
+
+  <maintainer email="miched@rpi.edu">David Michelman sorta</maintainer>
+
+  <license>?????</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>rospy</run_depend>
+</package>
+

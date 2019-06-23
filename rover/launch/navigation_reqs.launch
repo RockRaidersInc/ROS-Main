@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+     <include file="$(find rover)/launch/start_joystick.launch"/>
+     <include file="$(find sensor_publisher)/launch/sensor_publisher.launch"/>
+     <include file="$(find autonomous_traversal)/launch/localization.launch"/>
+     <include file="$(find autonomous_traversal)/launch/navigation.launch" pass_all_args="true"/>
+
+<!--     <node name="lane_detector"
+          pkg="vision"
+          type="lane_detection_6.py"
+          args="7"
+          output="screen"/>  -->
+</launch>
+

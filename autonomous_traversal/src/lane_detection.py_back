@@ -367,9 +367,6 @@ class LaneDetector:
         if lane_points_map_frame is not None:
             self.publish_lane_pts(point_roi, lane_points_map_frame)
 
-        if self.debug:
-            self.color_filtered_pub.publish((bridge.cv2_to_imgmsg(np.dstack([masked_img, masked_img, masked_img]).astype(np.uint8), 'bgr8')))
-
     def image_callback(self, msg):
         # rospy.loginfo('Received an image!')
         try:
@@ -416,7 +413,6 @@ class LaneDetector:
         rospy.loginfo('Subscribed to depth image topic: {}'.format(depth_image_topic))
 
         self.resized_pub = rospy.Publisher('/resized_input', Image, queue_size=10)
-        self.color_filtered_pub = rospy.Publisher('/output_imaage', Image, queue_size=10)
 
         while not rospy.is_shutdown():
             time.sleep(0.1)

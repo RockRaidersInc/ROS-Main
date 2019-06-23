@@ -1,8 +1,9 @@
 #NOTE: the simulator does not automatically update. If a chassis redesign happens both these values and the simulator model have to be changed.
 
 rover_constants:
-  wheel_base_width: 0.901         # Horizontal distance between wheels (ft), 35.485/12
+  # wheel_base_width: 0.901         # Horizontal distance between wheels (ft), 35.485/12
+  wheel_base_width: 0.559
   wheel_base_length: 0.001    #0.762        # distance from the front wheels to the back wheels
   wheel_diameter: 0.305           # Wheel diameter (ft)
   encoder_ticks_per_rad: 154.7    # number of encoder ticks per wheel rotation
-  rover_body_length: 1.2192       # length of the rover chassis (not the wheel base)
+  rover_body_length: 0.8128       # length of the rover chassis (not the wheel base)

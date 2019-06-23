@@ -1,15 +1,17 @@
 #!/bin/bash
 
-DEVICE='/dev/serial/by-id/***/'
+source /home/rock/URC/devel/setup.bash
+
+DEVICE='/dev/serial/by-id/usb-Arduino_Srl_Arduino_Mega_7563331313335180E041-if00'
 NODE='move_base'
 # b for blink? dunno. Echo will add a newline
-ARDUINO_COMMAND='b'
-BAUD=115200
+ARDUINO_COMMAND='a'
+BAUD=9600
 
 while :
 do
 
-    while [ ! -f $DEVICE ]
+    while [ ! -e $DEVICE ]
     do
         # Loop until the device is found
         sleep 5
@@ -17,21 +19,23 @@ do
     done
     echo 'found device'
     
-    stty $BAUD -F $DEVICE 
+#    stty $BAUD -F $DEVICE 
 
     while :
     do
         sleep 2
-        if [ ! -f $DEVICE ]; then
+        if [ ! -e $DEVICE ]; then
             break
         fi
 
         # Check for move base
         if rosnode list | grep $NODE; then
-            echo $ARDUINO_COMMAND > $DEVICE
+ #           echo $ARDUINO_COMMAND > $DEVICE
+            python /home/rock/URC/src/extra_files/systemd_services/blink.py
             echo 'sending arduino command'
         fi
 
     done
 
 done
+

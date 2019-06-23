@@ -6,7 +6,7 @@ def u_pts_pub_test():
 	rospy.init_node('u_pts_pub_test')
 
 	while not rospy.is_shutdown():
-		keystroke = raw_input()
+		keystroke = "i"
 
 		u_pts = Float64MultiArray()
 		if keystroke == 'r':
@@ -14,7 +14,7 @@ def u_pts_pub_test():
 			u_pts.data = [0,0,0,0,0,0,0,0]
 		else:
 			print('Adding u obstacle')
-			u_pts.data = [2.5,1.5,-1.5,1.5,-1.5,-1.5,2.5,-1.5]
+			u_pts.data = [1.5,1.5,-1.5,1.5,-1.5,-1.5,1.5,-1.5]
 		
 		pub.publish(u_pts)
 
