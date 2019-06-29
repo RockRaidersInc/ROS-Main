@@ -124,20 +124,20 @@ void GazeboExactOdomPlugin::Update()
 
     #if (GAZEBO_MAJOR_VERSION >= 8)
 //TODO: make this compile. Gazebo 9 changed a lot of class and method names
-//        common::Time sim_time = world->SimTime();
-//        nav_msgs::Odometry msg;
-//        msg.header.stamp = ros::Time::now();
-//        msg.child_frame_id = "base_link";
+      common::Time sim_time = world->SimTime();
+      nav_msgs::Odometry msg;
+      msg.header.stamp = ros::Time::now();
+      msg.child_frame_id = "base_link";
 
-//        ignition::math::Pose3d pose = link->WorldPose();
-//        ignition::math::Vector3d velocity = link->WorldLinearVel();
+      ignition::math::Pose3d pose = link->WorldPose();
+      ignition::math::Vector3d velocity = link->WorldLinearVel();
 
-//        tf2::Vector3 pose_pos(pose.Pos()[0], pose.Pos()[1], 0);  // pose.pos.z - 1.06985 the offset makes z zero when the rover is on zero-height$
-//        tf2::Quaternion pose_rot(pose.Rot().X(), pose.Rot().Y(), pose.Rot().Z(), pose.Rot().W());
-//        tf2::Vector3 lin_vel(velocity[0], velocity[2], velocity[3]);
+      tf2::Vector3 pose_pos(pose.Pos()[0], pose.Pos()[1], 0);  // pose.pos.z - 1.06985 the offset makes z zero when the rover is on zero-height$
+      tf2::Quaternion pose_rot(pose.Rot().X(), pose.Rot().Y(), pose.Rot().Z(), pose.Rot().W());
+      tf2::Vector3 lin_vel(velocity[0], velocity[2], velocity[3]);
 
-//        ignition::math::Vector3 velocityAngular = link->AngularVel();
-//        tf2::Vector3 ang_vel(velocityAngular.x(), velocityAngular.y(), velocityAngular.z());
+      ignition::math::Vector3<double> velocityAngular = link->WorldAngularVel();
+      tf2::Vector3 ang_vel(velocityAngular.X(), velocityAngular.Y(), velocityAngular.Z());
 
 
     #else
@@ -156,6 +156,7 @@ void GazeboExactOdomPlugin::Update()
 
         gazebo::math::Vector3 velocityAngular = link->GetWorldAngularVel();
         tf2::Vector3 ang_vel(velocityAngular.x, velocityAngular.y, velocityAngular.z);
+    #endif
 
     for(int i = 0; i < 36; i++) {
       msg.pose.covariance[i] = 0;
@@ -180,8 +181,6 @@ void GazeboExactOdomPlugin::Update()
     map_publisher.publish(msg);
     msg.header.frame_id = "odom";
     odom_publisher.publish(msg);
-
-    #endif
   }
 }
 
