@@ -2,7 +2,7 @@ footprint: [[0.31,0.4],[-0.61,0.4],[-0.61,-0.4],[0.31,-0.4],[0.35,0]]
 footprint_padding: 0.05
 
 map_type: costmap
-robot_base_frame: /base_link
+robot_base_frame: base_link
 
 static_layer:
     enabled: true
