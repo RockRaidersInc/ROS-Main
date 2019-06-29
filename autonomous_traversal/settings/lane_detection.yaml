@@ -14,3 +14,63 @@
 - {avg: 0, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
   gauss: 1, hh: 161, hl: 45, med: 1, open_ksize: 1, scale: 4, sh: 255, skel: 0, sl: 19,
   vh: 255, vl: 4}
+- {avg: 0, close_ksize: 1, dilate_iter: 0, dilate_ksize: 1, erode_iter: 2, erode_ksize: 5,
+  gauss: 19, hh: 123, hl: 63, med: 1, open_ksize: 1, scale: 4, sh: 74, skel: 0, sl: 0,
+  vh: 223, vl: 45}
+- {avg: 0, close_ksize: 1, dilate_iter: 0, dilate_ksize: 1, erode_iter: 0, erode_ksize: 0,
+  gauss: 19, hh: 196, hl: 63, med: 1, open_ksize: 1, scale: 4, sh: 74, skel: 0, sl: 0,
+  vh: 223, vl: 45}
+- {avg: 0, close_ksize: 1, dilate_iter: 0, dilate_ksize: 1, erode_iter: 0, erode_ksize: 0,
+  gauss: 19, hh: 196, hl: 63, med: 1, open_ksize: 1, scale: 4, sh: 74, skel: 0, sl: 0,
+  vh: 223, vl: 45}
+- {avg: 0, close_ksize: 1, dilate_iter: 0, dilate_ksize: 1, erode_iter: 0, erode_ksize: 0,
+  gauss: 19, hh: 196, hl: 63, med: 1, open_ksize: 1, scale: 4, sh: 74, skel: 0, sl: 0,
+  vh: 223, vl: 45}
+- {avg: 0, close_ksize: 1, dilate_iter: 0, dilate_ksize: 1, erode_iter: 0, erode_ksize: 0,
+  gauss: 19, hh: 196, hl: 63, med: 1, open_ksize: 1, scale: 4, sh: 74, skel: 0, sl: 0,
+  vh: 223, vl: 45}
+- {avg: 0, close_ksize: 1, dilate_iter: 0, dilate_ksize: 1, erode_iter: 0, erode_ksize: 0,
+  gauss: 19, hh: 196, hl: 63, med: 1, open_ksize: 1, scale: 4, sh: 74, skel: 0, sl: 0,
+  vh: 223, vl: 45}
+- {avg: 0, close_ksize: 1, dilate_iter: 0, dilate_ksize: 1, erode_iter: 0, erode_ksize: 0,
+  gauss: 19, hh: 196, hl: 63, med: 1, open_ksize: 1, scale: 4, sh: 74, skel: 0, sl: 0,
+  vh: 223, vl: 45}
+- {avg: 0, close_ksize: 1, dilate_iter: 0, dilate_ksize: 1, erode_iter: 0, erode_ksize: 0,
+  gauss: 19, hh: 123, hl: 63, med: 1, open_ksize: 1, scale: 4, sh: 74, skel: 0, sl: 0,
+  vh: 223, vl: 45}
+- {avg: 10, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 19, hh: 76, hl: 18, med: 1, open_ksize: 1, scale: 4, sh: 85, skel: 0, sl: 14,
+  vh: 206, vl: 82}
+- {avg: 10, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 19, hh: 76, hl: 18, med: 1, open_ksize: 1, scale: 4, sh: 85, skel: 0, sl: 14,
+  vh: 206, vl: 82}
+- {avg: 10, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 19, hh: 76, hl: 18, med: 1, open_ksize: 1, scale: 4, sh: 85, skel: 0, sl: 14,
+  vh: 206, vl: 82}
+- {avg: 10, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 19, hh: 76, hl: 18, med: 1, open_ksize: 1, scale: 4, sh: 85, skel: 0, sl: 14,
+  vh: 206, vl: 82}
+- {avg: 10, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 19, hh: 76, hl: 18, med: 1, open_ksize: 1, scale: 4, sh: 85, skel: 0, sl: 14,
+  vh: 206, vl: 82}
+- {avg: 0, close_ksize: 0, dilate_iter: 4, dilate_ksize: 4, erode_iter: 1, erode_ksize: 3,
+  gauss: 7, hh: 92, hl: 44, med: 1, open_ksize: 3, scale: 4, sh: 86, skel: 0, sl: 50,
+  vh: 179, vl: 4}
+- {avg: 8, close_ksize: 0, dilate_iter: 4, dilate_ksize: 4, erode_iter: 1, erode_ksize: 3,
+  gauss: 13, hh: 69, hl: 52, med: 1, open_ksize: 3, scale: 4, sh: 57, skel: 0, sl: 20,
+  vh: 179, vl: 4}
+- {avg: 8, close_ksize: 0, dilate_iter: 4, dilate_ksize: 4, erode_iter: 1, erode_ksize: 4,
+  gauss: 13, hh: 86, hl: 62, med: -1, open_ksize: 3, scale: 4, sh: 41, skel: 0, sl: 23,
+  vh: 154, vl: 84}
+- {avg: 0, close_ksize: 0, dilate_iter: 4, dilate_ksize: 4, erode_iter: 1, erode_ksize: 4,
+  gauss: 3, hh: 86, hl: 62, med: -1, open_ksize: 3, scale: 4, sh: 41, skel: 0, sl: 23,
+  vh: 154, vl: 84}
+- {avg: 1, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 1, hh: 168, hl: 86, med: 1, open_ksize: 1, scale: 4, sh: 98, skel: 0, sl: 5,
+  vh: 255, vl: 4}
+- {avg: 1, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 1, hh: 168, hl: 86, med: 1, open_ksize: 1, scale: 4, sh: 98, skel: 0, sl: 5,
+  vh: 255, vl: 4}
+- {avg: 1, close_ksize: 0, dilate_iter: 0, dilate_ksize: 0, erode_iter: 0, erode_ksize: 0,
+  gauss: 1, hh: 168, hl: 86, med: 1, open_ksize: 1, scale: 4, sh: 98, skel: 0, sl: 5,
+  vh: 255, vl: 4}

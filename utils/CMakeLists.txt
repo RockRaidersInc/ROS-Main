@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   geometry_msgs
   message_generation
+  pcl_ros
 )
 
 

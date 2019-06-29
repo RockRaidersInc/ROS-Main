@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   costmap_2d
   pluginlib
   dynamic_reconfigure
+  pcl_ros
 )
 
 ## Compile as C++11, supported in ROS Kinetic and newer

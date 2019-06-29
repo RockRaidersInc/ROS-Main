@@ -36,15 +36,9 @@
       <ambient>1 1 1 1</ambient>
       <background>0.7 0.7 0.7 1</background>
       <shadows>1</shadows>
-      <!--<sky>
-        <clouds>
-          <speed>12</speed>
-        </clouds>
-      </sky>-->
     </scene>
 
 
-    <!-- this doesn't actually do anything since we're using the hector GPS plugin in -->
     <spherical_coordinates>
       <surface_model>EARTH_WGS84</surface_model>
       <latitude_deg> 042.729306 </latitude_deg>
@@ -55,13 +49,13 @@
 
 
 <!-- gazebo 7 doesn't seem to support changing the default camera location, this should be uncommented if we move to gazebo 9+ -->
-<!--
-    <gui>
-      <camera</name>
+
+    <!-- <gui>
+      <camera>
         <pose> -80 -7 7 0 -0.8 1.57</pose>
       </camera>
-    </gui>
--->
+    </gui> -->
+
 
     <include>
       <uri>model://sun</uri>
@@ -88,22 +82,10 @@
       <pose frame=''>-15.3597 -13.5767 0 0 -0 0</pose>
     </include>
 
-      <include> 
+    <include> 
         <uri>model://construction_barrel_blue</uri>
         <name>construction_barrel_blue_0</name>
         <pose frame=''>-3.22518 -16.2149 0 0 -0 0</pose>
-    </include>
-
-    <include> 
-      <uri>model://construction_barrel_blue</uri>
-       <name>construction_barrel_blue_1</name>
-        <pose frame=''>23.8405 0.640043 0 0 -0 0</pose>
-    </include>
-
-      <include> 
-      <uri>model://construction_barrel_blue</uri>
-       <name>construction_barrel_blue_1_clone</name>
-        <pose frame=''>26.12 0.509177 0 0 -0 0</pose>
     </include>
 
       <include> 
@@ -134,30 +116,6 @@
         <uri>model://construction_barrel_brown</uri>
         <name>construction_barrel_brown</name>
         <pose frame=''>-15.4095 13.8822 0 0 -0 0</pose>
-    </include>
-
-      <include>
-        <uri>model://construction_barrel_brown</uri>
-        <name>construction_barrel_brown_0</name>
-        <pose frame=''>22.5022 1.52812 0 0 -0 0</pose>
-    </include>
-
-      <include>
-        <uri>model://construction_barrel_brown</uri>
-        <name>construction_barrel_brown_1</name>
-        <pose frame=''>22.4151 0.792268 0 0 -0 0</pose>
-    </include>
-
-      <include>
-        <uri>model://construction_barrel_brown</uri>
-        <name>construction_barrel_brown_2</name>
-        <pose frame=''>22.4092 0.050704 0 0 -0 0</pose>
-    </include>
-
-      <include>
-        <uri>model://construction_barrel_brown</uri>
-        <name>construction_barrel_brown_3</name>
-        <pose frame=''>28.3348 0.502757 0 0 -0 0</pose>
     </include>
 
       <include>
@@ -274,49 +232,7 @@
         <pose frame=''>19.4672 -16.7316 0 0 -0 0</pose>
     </include>
 
-      <include>
-        <uri>model://construction_barrel_orange</uri>
-        <name>construction_barrel_orange_9</name>
-        <pose frame=''>27.523 0.496144 0 0 -0 0</pose>
-    </include>
-
-      <include>
-        <uri>model://construction_barrel_orange</uri>
-        <name>construction_barrel_orange_9_clone</name>
-        <pose frame=''>26.911 0.490531 0 0 -0 0</pose>
-    </include>
-
-      <include>
-        <uri>model://construction_barrel_orange</uri>
-        <name>construction_barrel_orange_9_clone_0</name>
-        <pose frame=''>25.2754 0.53319 0 0 -0 0</pose>
-    </include>
-
-      <include>
-        <uri>model://construction_barrel_orange</uri>
-        <name>construction_barrel_orange_9_clone_1</name>
-        <pose frame=''>24.5666 0.546369 0 0 -0 0</pose>
-    </include>
-
-      <include>
-        <uri>model://construction_barrel_orange</uri>
-        <name>construction_barrel_orange_9_clone_2</name>
-        <pose frame=''>23.0677 0.671831 0 0 -0 0</pose>
-    </include>
-
-      <include>
-        <uri>model://construction_barrel_orange</uri>
-        <name>construction_barrel_orange_9_clone_3</name>
-        <pose frame=''>21.7593 2.00696 0 0 -0 0</pose>
-    </include>
-
-      <include>
-        <uri>model://construction_barrel_orange</uri>
-        <name>construction_barrel_orange_9_clone_4</name>
-        <pose frame=''>21.6918 -0.847478 0 0 -0 0</pose>
-    </include>
-
-      <include>
+    <include>
         <uri>model://construction_barrel_orange</uri>
         <name>construction_barrel_orange_9_clone_4_clone</name>
         <pose frame=''>19.4485 -6.43545 0 0 -0 0</pose>
@@ -372,28 +288,28 @@
     </include>
 
 
-      <include>
+    <include>
         <uri>model://construction_barrel_orange</uri>
         <name>construction_barrel_orange_9_clone_4_clone_2_clone_4</name>
         <pose frame=''>1.29207 22.2602 0 0 -0 0</pose>
     </include>
 
 
-      <include>
+    <include>
         <uri>model://construction_barrel_orange</uri>
         <name>construction_barrel_orange_9_clone_5</name>
         <pose frame=''>21.7249 0.621743 0 0 -0 0</pose>
     </include>
 
 
-      <include>
+    <include>
         <uri>model://construction_barrel_red</uri>
         <name>construction_barrel_red</name>
         <pose frame=''>-16.2464 -18.0797 0 0 -0 0</pose>
     </include>
 
 
-      <include>
+    <include>
         <uri>model://construction_barrel_red</uri>
         <name>construction_barrel_red_0</name>
         <pose frame=''>-15.1488 -18.4582 0 0 -0 0</pose>
@@ -413,99 +329,67 @@
         <pose frame=''>-16.5441 13.2465 0 0 -0 0</pose>
     </include>
 
-
-      <include>
+    <include>
         <uri>model://construction_barrel_red</uri>
         <name>construction_barrel_red_2</name>
         <pose frame=''>-16.4394 -19.146 0 0 -0 0</pose>
     </include>
 
-
-      <include>
+    <include>
         <uri>model://construction_barrel_red</uri>
         <name>construction_barrel_red_3</name>
         <pose frame=''>-14.8865 -15.1605 0 0 -0 0</pose>
     </include>
 
-
-      <include>
+    <include>
         <uri>model://construction_barrel_red</uri>
         <name>construction_barrel_red_4</name>
         <pose frame=''>-15.7083 -14.3806 0 0 -0 0</pose>
     </include>
 
-
-      <include>
+    <include>
         <uri>model://construction_barrel_red</uri>
         <name>construction_barrel_red_5</name>
         <pose frame=''>-16.1374 -13.8207 0 0 -0 0</pose>
     </include>
 
-
-      <include>
+    <include>
         <uri>model://construction_barrel_red</uri>
         <name>construction_barrel_red_6</name>
         <pose frame=''>-0.067955 -22.2161 0 0 -0 0</pose>
     </include>
 
-
-      <include>
+    <include>
         <uri>model://construction_barrel_red</uri>
         <name>construction_barrel_red_7</name>
         <pose frame=''>19.6183 -17.3642 0 0 -0 0</pose>
     </include>
 
-
-      <include>
-        <uri>model://construction_barrel_red</uri>
-        <name>construction_barrel_red_8</name>
-        <pose frame=''>21.0252 0.601074 0 0 -0 0</pose>
-    </include>
-
-
-      <include>
+    <include>
         <uri>model://construction_barrel_red</uri>
         <name>construction_barrel_red_8_clone</name>
         <pose frame=''>19.649 17.8216 0 0 -0 0</pose>
     </include>
 
-
-      <include>
+    <include>
         <uri>model://construction_barrel_red</uri>
         <name>construction_barrel_red_8_clone_clone</name>
         <pose frame=''>-3.01014 16.1664 0 0 -0 0</pose>
     </include>
 
-
-      <include>
+    <include>
         <uri>model://construction_barrel_red</uri>
         <name>construction_barrel_red_9</name>
         <pose frame=''>-14.9275 17.3352 0 0 -0 0</pose>
     </include>
 
-
-      <include>
+    <include>
         <uri>model://construction_barrel_white</uri>
         <name>construction_barrel_white</name>
         <pose frame=''>-16.6152 -14.2578 0 0 -0 0</pose>
     </include>
 
-
-      <include>
-        <uri>model://construction_barrel_white</uri>
-        <name>construction_barrel_white_0</name>
-        <pose frame=''>21.7184 1.31852 0 0 -0 0</pose>
-    </include>
-
-
-      <include>
-        <uri>model://construction_barrel_white</uri>
-        <name>construction_barrel_white_0_clone</name>
-        <pose frame=''>21.6584 -0.177828 0 0 -0 0</pose>
-    </include>
-
-
-      <include>
+    <include>
         <uri>model://construction_barrel_white</uri>
         <name>construction_barrel_white_1</name>
         <pose frame=''>-16.9973 13.7012 0 0 -0 0</pose>
@@ -525,64 +409,32 @@
         <pose frame=''>6.95456 -16.4748 0 0 -0 0</pose>
     </include>
 
-
-      <include>
+    <include>
         <uri>model://construction_barrel_yellow</uri>
         <name>construction_barrel_yellow_1</name>
         <pose frame=''>27.922 -13.3336 0 0 -0 0</pose>
     </include>
 
-
-      <include>
-        <uri>model://construction_barrel_yellow</uri>
-        <name>construction_barrel_yellow_2</name>
-        <pose frame=''>28.358 1.27704 0 0 -0 0</pose>
-    </include>
-
-
-      <include>
+    <include>
         <uri>model://construction_barrel_yellow</uri>
         <name>construction_barrel_yellow_2_clone</name>
         <pose frame=''>28.3771 15.1656 0 0 -0 0</pose>
     </include>
 
-
-      <include>
-        <uri>model://construction_barrel_yellow</uri>
-        <name>construction_barrel_yellow_3</name>
-        <pose frame=''>28.2675 -0.306977 0 0 -0 0</pose>
-    </include>
-
-
-      <include>
-        <uri>model://construction_barrel_yellow</uri>
-        <name>construction_barrel_yellow_4</name>
-        <pose frame=''>21.731 2.68779 0 0 -0 0</pose>
-    </include>
-
-
-      <include>
-        <uri>model://construction_barrel_yellow</uri>
-        <name>construction_barrel_yellow_4_clone</name>
-        <pose frame=''>21.6999 -1.65047 0 0 -0 0</pose>
-    </include>
-
-
-      <include>
+    <include>
         <uri>model://construction_barrel_yellow</uri>
         <name>construction_barrel_yellow_5</name>
         <pose frame=''>-16.1644 17.0507 0 0 -0 0</pose>
     </include>
 
-
-      <include>
+    <include>
         <uri>model://construction_barrel_yellow</uri>
         <name>construction_barrel_yellow_6</name>
         <pose frame=''>8.44534 15.1003 0 0 -0 0</pose>
     </include>
 
 
-      <include>
+    <include>
         <uri>model://pothole</uri>
         <name>'pothole</name>
         <pose frame=''>-23.3323 -22.1328 0 0 -0 0</pose>
@@ -612,11 +464,11 @@
         <pose frame=''>25.0833 13.6135 0 0 -0 0</pose>
     </include>
 
-      <include>
+      <!-- <include>
         <uri>model://pothole</uri>
         <name>'pothole_4</name>
         <pose frame=''>12.2864 13.6641 0 0 -0 0</pose>
-    </include>
+    </include> -->
 
 
     <plugin name='FixFrictionNode' filename='libFixFrictionNode.so'/>
