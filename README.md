@@ -1,3 +1,12 @@
+# IGVC 2019 Snapshot
+
+This repo contains all code physically on the rover for the IGVC 2019 competition. It exists as a backup and for future reference. A lot of the code here was hacked together and large parts do not work.
+
+Simulation *should* work just fine though (it hasn't been tested). Running the code here requires Ubuntu 16 and ROS Kinetic. Navigate to src then run ./launchscripts/simulator.sh igvc17
+
+The rest of the readme contains install instructions.
+
+
 # ROS-Main
 
 First install Gazebo. Use these commands:
