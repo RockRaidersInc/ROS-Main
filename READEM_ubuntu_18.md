@@ -5,13 +5,9 @@ First install ROS melodic. Instructions are here:
 http://wiki.ros.org/melodic/Installation/Ubuntu
 ```
 
-Install some more tools:
+Install some tools:
 ```
-sudo apt install -y cmake python-catkin-pkg python-empy python-nose libgtest-dev python-catkin-tools
-sudo apt install -y ros-melodic-joy ros-melodic-geographic-msgs ros-melodic-tf2-geometry-msgs ros-melodic-move-base ros-melodic-map-server ros-kinetic-global-planner sudo apt install ros-kinetic-eband-local-planner
-sudo apt install -y ros-melodic-desktop
-sudo apt install -y ros-melodic-pcl-ros
-sudo apt install -y ros-melodic-usb-cam
+sudo apt install -y cmake python-catkin-pkg python-empy python-nose libgtest-dev python-catkin-tools ros-melodic-desktop ros-melodic-joy ros-melodic-geographic-msgs ros-melodic-tf2-geometry-msgs ros-melodic-move-base ros-melodic-map-server ros-melodic-global-planner ros-melodic-pcl-ros ros-melodic-usb-cam ros-pcl-msgs ros-melodic-key-teleop
 ```
 
 Next install Gazebo. Use this command:
@@ -19,7 +15,6 @@ Next install Gazebo. Use this command:
 sudo apt install -y ros-melodic-gazebo-ros
 
 ```
-
 
 Also install the ZED SDK. Instructions are here:
 ```
