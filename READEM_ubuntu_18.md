@@ -1,5 +1,14 @@
 # ROS-Main
 
+Welcome to Software!
+Ask David or Sid about any software-related problems.
+
+
+# Upgrade Instructions (from ubuntu 16)
+Upgrading Ubuntu to from 16 to 18 requires uninstalling all ros-related packages. ```sudo apt remove ros*``` works well. Also remove ROS Kinetic from your sources list (it should have a line in /etc/apt/sources.list.d/ros-latest.list). Then remove gazebo. Run ```sudo apt remove gazebo*``` and ```sudo apt remove libignition*``` and comment out any lines in /etc/apt/sources.list.d/gazebo-latest.list. 
+Then upgrade to ubuntu 18 and follow the install instructions to get everything back up and running again.
+
+# Install Instructions:
 First install ROS melodic. Instructions are here:
 ```
 http://wiki.ros.org/melodic/Installation/Ubuntu
