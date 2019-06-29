@@ -27,10 +27,10 @@ obstacle_layer:
     obstacle_range: 9.5 # The default maximum distance from the robot at which an obstacle will be inserted into the cost map in meters.
     raytrace_range: 10.0 # The default range in meters at which to raytrace out obstacles from the map using sensor data
     observation_sources: zed_camera
-    zed_camera: {sensor_frame: /zed_camera_center, 
+    zed_camera: {sensor_frame: zed_camera_center, 
                  data_type: PointCloud2, 
-                 # topic: /zed/depth/depth_registered, 
-                 topic: /zed/depth/depth_registered_filtered,
+                 topic: /zed/depth/depth_registered, 
+                 # topic: /zed/depth/depth_registered_filtered,
                  clearing: true,
                  marking: true, 
                  max_obstacle_height: 2,
