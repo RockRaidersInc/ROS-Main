@@ -16,12 +16,12 @@ http://wiki.ros.org/melodic/Installation/Ubuntu
 
 Install some tools:
 ```
-sudo apt install -y cmake python-catkin-pkg python-empy python-nose libgtest-dev python-catkin-tools ros-melodic-desktop ros-melodic-joy ros-melodic-geographic-msgs ros-melodic-tf2-geometry-msgs ros-melodic-move-base ros-melodic-map-server ros-melodic-global-planner ros-melodic-pcl-ros ros-melodic-usb-cam ros-pcl-msgs ros-melodic-key-teleop
+sudo apt install -y cmake python-catkin-pkg python-empy python-nose libgtest-dev python-catkin-tools ros-melodic-desktop ros-melodic-joy ros-melodic-geographic-msgs ros-melodic-tf2-geometry-msgs ros-melodic-move-base ros-melodic-map-server ros-melodic-global-planner ros-melodic-pcl-ros ros-melodic-usb-cam ros-pcl-msgs ros-melodic-key-teleop ros-melodic-joy  ros-melodic-geographic-msgs gpsd ros-melodic-gpsd-client ros-melodic-nmea-navsat-driver ros-melodic-gps-common ros-melodic-mapviz ros-melodic-mapviz-plugins ros-melodic-swri-transform-util ros-melodic-robot-localization
 ```
 
 Next install Gazebo. Use this command:
 ```
-sudo apt install -y ros-melodic-gazebo-ros
+sudo apt install -y ros-melodic-gazebo-ros libignition-math2-dev ros-melodic-gazebo-ros-pkgs ros-melodic-gazebo-ros-control
 
 ```
 
@@ -79,23 +79,6 @@ rosrun image_view image_view image:=/usb_cam/image_raw
 # RQT Mini Tutorial
 
 To run ROS with UI, you must download and install rqt (http://wiki.ros.org/rqt), which I believe comes with default packages. Launch RQT by typing rqt into shell (after running roscore), then go to perspectives tab, click on import, then locate ui.perspective under ROS-Main/user_interface/config directory
-
-
-# Other stuff that needs to be installed
-
-```
-sudo apt install -y ros-melodic-joy  ros-melodic-geographic-msgs
-```
-
-## autonomous traversal stuff
-```
-sudo apt install -y gpsd ros-melodic-gpsd-client ros-melodic-nmea-navsat-driver ros-melodic-gps-common ros-melodic-mapviz ros-melodic-mapviz-plugins ros-melodic-swri-transform-util ros-melodic-robot-localization
-```
-
-## simulation stuff
-```
-sudo apt install -y libignition-math2-dev ros-melodic-gazebo-ros-pkgs ros-melodic-gazebo-ros-control
-```
 
 
 ## xbox controller setup
