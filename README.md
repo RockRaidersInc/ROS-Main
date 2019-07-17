@@ -1,26 +1,28 @@
 # ROS-Main
 
-First install Gazebo. Use these commands:
+Welcome to Software!
+Ask David or Sid about any software-related problems.
+
+
+# Upgrade Instructions (from ubuntu 16)
+Upgrading Ubuntu to from 16 to 18 requires uninstalling all ros-related packages. ```sudo apt remove ros*``` works well. Also remove ROS Kinetic from your sources list (it should have a line in /etc/apt/sources.list.d/ros-latest.list). Then remove gazebo. Run ```sudo apt remove gazebo*``` and ```sudo apt remove libignition*``` and comment out any lines in /etc/apt/sources.list.d/gazebo-latest.list. 
+Then upgrade to ubuntu 18 and follow the install instructions to get everything back up and running again.
+
+# Install Instructions:
+First install ROS melodic. Instructions are here:
 ```
-sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-latest.list'
-wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-sudo apt update
-sudo apt install -y gazebo7
+http://wiki.ros.org/melodic/Installation/Ubuntu
 ```
 
-First install ROS Kinetic. Instructions are here:
+Install some tools:
 ```
-http://wiki.ros.org/kinetic/Installation/Ubuntu
+sudo apt install -y cmake python-catkin-pkg python-empy python-nose libgtest-dev python-catkin-tools ros-melodic-desktop ros-melodic-joy ros-melodic-geographic-msgs ros-melodic-tf2-geometry-msgs ros-melodic-move-base ros-melodic-map-server ros-melodic-global-planner ros-melodic-pcl-ros ros-melodic-usb-cam ros-pcl-msgs ros-melodic-key-teleop ros-melodic-joy  ros-melodic-geographic-msgs gpsd ros-melodic-gpsd-client ros-melodic-nmea-navsat-driver ros-melodic-gps-common ros-melodic-mapviz ros-melodic-mapviz-plugins ros-melodic-swri-transform-util ros-melodic-robot-localization
 ```
 
-Install some more tools:
+Next install Gazebo. Use this command:
 ```
-sudo apt install -y cmake python-catkin-pkg python-empy python-nose libgtest-dev python-catkin-tools
-sudo apt install -y ros-kinetic-joy ros-kinetic-geographic-msgs ros-kinetic-tf2-geometry-msgs ros-kinetic-move-base ros-kinetic-map-server ros-kinetic-global-planner sudo apt install ros-kinetic-eband-local-planner
-sudo apt install -y ros-kinetic-desktop
-sudo apt install -y ros-kinetic-gazebo-ros
-sudo apt install -y ros-kinetic-pcl-ros
-sudo apt install -y ros-kinetic-usb-cam
+sudo apt install -y ros-melodic-gazebo-ros libignition-math2-dev ros-melodic-gazebo-ros-pkgs ros-melodic-gazebo-ros-control
+
 ```
 
 Also install the ZED SDK. Instructions are here:
@@ -79,23 +81,6 @@ rosrun image_view image_view image:=/usb_cam/image_raw
 To run ROS with UI, you must download and install rqt (http://wiki.ros.org/rqt), which I believe comes with default packages. Launch RQT by typing rqt into shell (after running roscore), then go to perspectives tab, click on import, then locate ui.perspective under ROS-Main/user_interface/config directory
 
 
-# Other stuff that needs to be installed
-
-```
-sudo apt install -y ros-kinetic-joy  ros-kinetic-geographic-msgs
-```
-
-## autonomous traversal stuff
-```
-sudo apt install -y gpsd ros-kinetic-gpsd-client ros-kinetic-nmea-navsat-driver ros-kinetic-gps-common ros-kinetic-mapviz ros-kinetic-mapviz-plugins ros-kinetic-swri-transform-util ros-kinetic-robot-localization
-```
-
-## simulation stuff
-```
-sudo apt install -y libignition-math2-dev ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control
-```
-
-
 ## xbox controller setup
 A driver needs to be running to handle xbox controllers. It can be installed with
 ```
@@ -118,7 +103,7 @@ sudo systemctl status xboxdrv.service
 Add the following lines to .bashrc
 ```
 sudo systemctl kill drive_at_startup.service
-source /opt/ros/kinetic/setup.bash
+source /opt/ros/melodic/setup.bash
 source ~/URC/devel/setup.bash
 source ~/URC/src/launchscripts/export_remote_ros_vars.sh
 ```
@@ -129,5 +114,3 @@ cd extra_files/systemd_services && sudo ./remove_services.sh
 ```
 
 # Random useful commands
-
-
