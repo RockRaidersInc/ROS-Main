@@ -127,8 +127,8 @@ CATKIN_DEPENDS message_runtime
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-# ${catkin_INCLUDE_DIRS}
+  include
+  ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -215,6 +215,8 @@ add_library(anti_reverse_layer plugins/anti_reverse_layer.cpp)
 target_link_libraries(anti_reverse_layer ${catkin_LIBRARIES})
 
 add_library(lanes_layer plugins/lanes_layer.cpp)
+add_dependencies(lanes_layer autonomous_traversal_generate_messages_cpp)  # generate message headers before compiling lanes_layer
+add_dependencies(lanes_layer ${lanes_layer_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(lanes_layer ${catkin_LIBRARIES})
 
 add_executable(pointcloud_derivative_layer src/pointcloud_derivative_layer.cpp)
