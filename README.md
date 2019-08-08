@@ -114,3 +114,53 @@ cd extra_files/systemd_services && sudo ./remove_services.sh
 ```
 
 # Random useful commands
+
+# Installing using WSL
+The Windows Subsytem for Linux (WSL) allows for running Linux commands on Windows. This is not the ideal environment for ROS, and performance will be hurt, but ROS can be run under WSL.
+
+NOTE: WSL 2 is out/will be out soon. These instructions have not been tested with WSL 2, however performance will likely be better if it works. You may consider installing WSL 2 but you may also have more issues.
+Install WSL using the following instructions:
+
+https://docs.microsoft.com/en-us/windows/wsl/install-win10
+
+Use the Ubuntu distribution for best compatability with ROS. Make sure to install version 18.04.
+
+Install a XServer such as XMing. This will allow running graphical linux programs under WSL.
+
+Run the following commands to install ROS
+
+```shell
+$ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+$ sudo -E apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+$ sudo apt update
+$ sudo apt install -y ros-melodic-desktop-full
+$ sudo rosdep init
+$ rosdep update
+```
+
+Automatiacally source ros files with the following command:
+```shell
+$ echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+$ source ~/.bashrc
+```
+
+Automatically setup the XServer with the following command:
+```shell
+$ echo "export DISPLAY=:0" >> ~/.bashrc
+$ source ~/.bashrc
+```
+
+## Test your installation
+Open 3 bash terminals
+
+In the first run `roscore`
+
+In the second run `rosrun turtlesim turtlesim_node`
+
+In the third run `rosrun turtlesim turtle_teleop_key`
+
+A window with a turtle should pop up. By selecting the window where you ran turtle_teleop_key and pressing arrow keys you should be able to move the turtle around.
+
+Congrats you have installed ROS on WSL!
+
+Talk to Sid if you have issues installing on WSL.
