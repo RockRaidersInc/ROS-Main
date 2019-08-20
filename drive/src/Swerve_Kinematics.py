@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+#NEEDS TESTING!
+
 #Last edited by Connor McGowan 8/19/19
 
 from math import pi, sqrt, sin, cos, atan, fabs
@@ -50,6 +52,11 @@ def inverse_kinematics(v, theta, omega):
         v *= -1
     
     #Establish coordinates of the center of each wheel relative to the reference point
+    #Wheel definitions:
+    #0 = Front Left
+    #1 = Front Right
+    #2 = Back Left
+    #3 = Back Right
     wheel_x_coords = [track/-2.0, track/2.0, track/-2.0, track/2.0]
     wheel_y_coords = [front_wheelbase, front_wheelbase, -1*rear_wheelbase, -1*rear_wheelbase]
     
