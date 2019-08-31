@@ -8,6 +8,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <geometry_msgs/Vector3.h>
 #include <autonomous_traversal/Lane.h>
+#include <tf/tf.h>
 
 namespace lanes_layer
 {

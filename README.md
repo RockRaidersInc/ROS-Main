@@ -1,26 +1,28 @@
 # ROS-Main
 
-First install Gazebo. Use these commands:
+Welcome to Software!
+Ask David or Sid about any software-related problems.
+
+
+# Upgrade Instructions (from ubuntu 16)
+Upgrading Ubuntu to from 16 to 18 requires uninstalling all ros-related packages. ```sudo apt remove ros*``` works well. Also remove ROS Kinetic from your sources list (it should have a line in /etc/apt/sources.list.d/ros-latest.list). Then remove gazebo. Run ```sudo apt remove gazebo*``` and ```sudo apt remove libignition*``` and comment out any lines in /etc/apt/sources.list.d/gazebo-latest.list. 
+Then upgrade to ubuntu 18 and follow the install instructions to get everything back up and running again.
+
+# Install Instructions:
+First install ROS melodic. Instructions are here:
 ```
-sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-latest.list'
-wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-sudo apt update
-sudo apt install -y gazebo7
+http://wiki.ros.org/melodic/Installation/Ubuntu
 ```
 
-First install ROS Kinetic. Instructions are here:
+Install some tools:
 ```
-http://wiki.ros.org/kinetic/Installation/Ubuntu
+sudo apt install -y cmake python-catkin-pkg python-empy python-nose libgtest-dev python-catkin-tools ros-melodic-desktop ros-melodic-joy ros-melodic-geographic-msgs ros-melodic-tf2-geometry-msgs ros-melodic-move-base ros-melodic-map-server ros-melodic-global-planner ros-melodic-pcl-ros ros-melodic-usb-cam ros-pcl-msgs ros-melodic-key-teleop ros-melodic-joy  ros-melodic-geographic-msgs gpsd ros-melodic-gpsd-client ros-melodic-nmea-navsat-driver ros-melodic-gps-common ros-melodic-swri-transform-util ros-melodic-robot-localization
 ```
 
-Install some more tools:
+Next install Gazebo. Use this command:
 ```
-sudo apt install -y cmake python-catkin-pkg python-empy python-nose libgtest-dev python-catkin-tools
-sudo apt install -y ros-kinetic-joy ros-kinetic-geographic-msgs ros-kinetic-tf2-geometry-msgs ros-kinetic-move-base ros-kinetic-map-server ros-kinetic-global-planner sudo apt install ros-kinetic-eband-local-planner
-sudo apt install -y ros-kinetic-desktop
-sudo apt install -y ros-kinetic-gazebo-ros
-sudo apt install -y ros-kinetic-pcl-ros
-sudo apt install -y ros-kinetic-usb-cam
+sudo apt install -y ros-melodic-gazebo-ros libignition-math2-dev ros-melodic-gazebo-ros-pkgs ros-melodic-gazebo-ros-control
+
 ```
 
 Also install the ZED SDK. Instructions are here:
@@ -79,23 +81,6 @@ rosrun image_view image_view image:=/usb_cam/image_raw
 To run ROS with UI, you must download and install rqt (http://wiki.ros.org/rqt), which I believe comes with default packages. Launch RQT by typing rqt into shell (after running roscore), then go to perspectives tab, click on import, then locate ui.perspective under ROS-Main/user_interface/config directory
 
 
-# Other stuff that needs to be installed
-
-```
-sudo apt install -y ros-kinetic-joy  ros-kinetic-geographic-msgs
-```
-
-## autonomous traversal stuff
-```
-sudo apt install -y gpsd ros-kinetic-gpsd-client ros-kinetic-nmea-navsat-driver ros-kinetic-gps-common ros-kinetic-mapviz ros-kinetic-mapviz-plugins ros-kinetic-swri-transform-util ros-kinetic-robot-localization
-```
-
-## simulation stuff
-```
-sudo apt install -y libignition-math2-dev ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control
-```
-
-
 ## xbox controller setup
 A driver needs to be running to handle xbox controllers. It can be installed with
 ```
@@ -118,7 +103,7 @@ sudo systemctl status xboxdrv.service
 Add the following lines to .bashrc
 ```
 sudo systemctl kill drive_at_startup.service
-source /opt/ros/kinetic/setup.bash
+source /opt/ros/melodic/setup.bash
 source ~/URC/devel/setup.bash
 source ~/URC/src/launchscripts/export_remote_ros_vars.sh
 ```
@@ -130,4 +115,57 @@ cd extra_files/systemd_services && sudo ./remove_services.sh
 
 # Random useful commands
 
+# Installing using WSL
+The Windows Subsytem for Linux (WSL) allows for running Linux commands on Windows. This is not the ideal environment for ROS, and performance will be hurt, but ROS can be run under WSL.
 
+NOTE: WSL 2 is out/will be out soon. These instructions have not been tested with WSL 2, however performance will likely be better if it works. You may consider installing WSL 2 but you may also have more issues.
+Install WSL using the following instructions:
+
+https://docs.microsoft.com/en-us/windows/wsl/install-win10
+
+Use the Ubuntu distribution for best compatability with ROS. Make sure to install version 18.04.
+
+Install a XServer such as XMing. This will allow running graphical linux programs under WSL.
+
+Run the following commands to install ROS
+
+```shell
+$ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+$ sudo -E apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+$ sudo apt update
+$ sudo apt install -y ros-melodic-desktop-full
+$ sudo rosdep init
+$ rosdep update
+```
+
+Automatiacally source ros files with the following command:
+```shell
+$ echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+$ source ~/.bashrc
+```
+
+Automatically setup the XServer with the following command:
+```shell
+$ echo "export DISPLAY=:0" >> ~/.bashrc
+$ source ~/.bashrc
+```
+
+Extra settings for gazebo:
+```shell
+$ export GAZEBO_IP=127.0.0.1
+```
+
+## Test your installation
+Open 3 bash terminals
+
+In the first run `roscore`
+
+In the second run `rosrun turtlesim turtlesim_node`
+
+In the third run `rosrun turtlesim turtle_teleop_key`
+
+A window with a turtle should pop up. By selecting the window where you ran turtle_teleop_key and pressing arrow keys you should be able to move the turtle around.
+
+Congrats you have installed ROS on WSL!
+
+Talk to Sid if you have issues installing on WSL.

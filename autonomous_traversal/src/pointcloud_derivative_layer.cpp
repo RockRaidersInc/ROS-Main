@@ -108,7 +108,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input_cloud_msg) {
 
     // sensor_msgs::PointCloud2 output_unfiltered;
     // pcl::toROSMsg(cloud_filtered, output_unfiltered);
-    // output_unfiltered.header.frame_id = "/base_link";
+    // output_unfiltered.header.frame_id = "base_link";
     // pub_unfiltered.publish (output_unfiltered);
 
 
@@ -255,7 +255,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input_cloud_msg) {
     output.header.seq = input_cloud_msg->header.seq;
     output.header.stamp = input_cloud_msg->header.stamp;
     output.header.frame_id = input_cloud_msg->header.frame_id;
-    // output.header.frame_id = "/base_link";
+    // output.header.frame_id = "base_link";
 
     pub.publish (output);
     
@@ -271,11 +271,11 @@ int main (int argc, char** argv)
     tf_listener = new tf::TransformListener();
     while (nh.ok()){
         try{
-            tf_listener->lookupTransform("/zed_camera_center", "/base_link", ros::Time(0), base_link_to_camera_tf);
+            tf_listener->lookupTransform("zed_camera_center", "base_link", ros::Time(0), base_link_to_camera_tf);
             break;
         }
         catch (tf::TransformException &ex) {
-            ROS_INFO("could not look up transform /base_link to /zed_camera_center");
+            ROS_INFO("could not look up transform base_link to zed_camera_center");
             ROS_INFO("%s",ex.what());
             ros::Duration(1.0).sleep();
             continue;
@@ -513,7 +513,7 @@ int main (int argc, char** argv)
     // output.header.seq = input_cloud_msg->header.seq;
     // output.header.stamp = input_cloud_msg->header.stamp;
     // // output.header.frame_id = input_cloud_msg->header.frame_id;
-    // output.header.frame_id = "/base_link";
+    // output.header.frame_id = "base_link";
 
     // pub.publish (output);
 // }
