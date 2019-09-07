@@ -147,12 +147,8 @@ source ~/.bashrc
 Automatically setup the XServer with the following command:
 ```shell
 echo "export DISPLAY=:0" >> ~/.bashrc
+echo "export GAZEBO_IP=127.0.0.1" >> ~/.bashrc
 source ~/.bashrc
-```
-
-Extra settings for gazebo:
-```shell
-export GAZEBO_IP=127.0.0.1
 ```
 
 ## Test your installation
