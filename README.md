@@ -130,29 +130,29 @@ Install a XServer such as XMing. This will allow running graphical linux program
 Run the following commands to install ROS
 
 ```shell
-$ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-$ sudo -E apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-$ sudo apt update
-$ sudo apt install -y ros-melodic-desktop-full
-$ sudo rosdep init
-$ rosdep update
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+sudo -E apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+sudo apt update
+sudo apt install -y ros-melodic-desktop-full
+sudo rosdep init
+rosdep update
 ```
 
 Automatiacally source ros files with the following command:
 ```shell
-$ echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-$ source ~/.bashrc
+echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
 ```
 
 Automatically setup the XServer with the following command:
 ```shell
-$ echo "export DISPLAY=:0" >> ~/.bashrc
-$ source ~/.bashrc
+echo "export DISPLAY=:0" >> ~/.bashrc
+source ~/.bashrc
 ```
 
 Extra settings for gazebo:
 ```shell
-$ export GAZEBO_IP=127.0.0.1
+export GAZEBO_IP=127.0.0.1
 ```
 
 ## Test your installation
