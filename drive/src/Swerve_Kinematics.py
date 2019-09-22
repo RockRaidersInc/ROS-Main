@@ -4,7 +4,7 @@
 
 #TODO: Eliminate the wheel that's slipping the most before taking pseudo-inverse
 
-#Last edited by Connor McGowan 9/3/19
+#Last edited by Connor McGowan 9/21/19
 
 from math import pi, sqrt, sin, cos, atan, atan2, fabs
 from numpy import array, zeros, dot, linalg
@@ -28,6 +28,8 @@ front_wheelbase = 2
 rear_wheelbase = 3
 
 #Establish coordinates of the center of each wheel relative to the reference point
+#x is positive toward the front of the robot
+#y is positive toward the robot's left
     #Wheel definitions:
     #0 = Front Left
     #1 = Front Right
@@ -65,20 +67,19 @@ def forward_kinematics(wheel_angles, wheel_speeds):
     #Calculate least squares solution
     robot_velocities=dot(trans_pinv, wheel_velocities)
     
-    v=sqrt(robot_velocities[0][0]**2+robot_velocities[1][0]**2)
-    theta=atan2(robot_velocities[1][0],robot_velocities[0][0])
+    v_x=robot_velocities[0][0]
+    v_y=robot_velocities[1][0]
     omega=robot_velocities[2][0]
-    return v, theta, omega
+    return v_x, v_y, omega
 
-def inverse_kinematics(v, theta, omega):
+def inverse_kinematics(v_x, v_y, omega):
     """
     Obtain wheel directions and speeds from desired velocities
     
     Inputs:
-    v - Linear velocity in m/s
+    v_x - x component of linear velocity
     
-    theta - Direction of linear velocity relative to straight ahead in radians
-        Negative values of v will result in movement in the opposite direction
+    v_y - y component of linear velocity
     
     omega - Angular velocity in rad/s
     """
@@ -90,7 +91,7 @@ def inverse_kinematics(v, theta, omega):
     wheel_speeds = [None]*4
     
     #Compute wheel velocities in vector form
-    velocities = dot(transform,array([[v*cos(theta)],[v*sin(theta)],[omega]]))
+    velocities = dot(transform,array([[v_x],[v_y],[omega]]))
     
     for i in range(4):
         vel_x=velocities[2*i][0]
