@@ -47,7 +47,7 @@ If catkin build succeeded then test the install by running
 ```
 ./src/launchscripts/simulator.sh igvc17
 ```
-The simulator should start. If it crashes press control-c in the terminal and try it again. Gazebo often crashes on startup for unknonw reasons.
+The simulator should start. If it crashes press control-c in the terminal and try it again. Gazebo often crashes on startup for unknown reasons.
 
 
 ##Starting up the actual rover
