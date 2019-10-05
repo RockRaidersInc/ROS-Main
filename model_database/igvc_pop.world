@@ -341,7 +341,7 @@
         <pose frame=''>-14.8865 -15.1605 0 0 -0 0</pose>
     </include>
 
-    <include>
+    <!-- <include>
         <uri>model://construction_barrel_red</uri>
         <name>construction_barrel_red_4</name>
         <pose frame=''>-15.7083 -14.3806 0 0 -0 0</pose>
@@ -462,7 +462,7 @@
         <uri>model://pothole</uri>
         <name>'pothole_3</name>
         <pose frame=''>25.0833 13.6135 0 0 -0 0</pose>
-    </include>
+    </include> -->
 
       <!-- <include>
         <uri>model://pothole</uri>

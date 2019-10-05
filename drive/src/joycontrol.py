@@ -15,6 +15,7 @@ class joycontrol:
     right_x = 0
     right_y = 0
 
+    # definitions of which buttons on the joystick match to which index in the message
     LEFT_STICK_X_INDEX = 0
     LEFT_STICK_Y_INDEX = 1
     LEFT_BUMPER_INDEX = 4
@@ -39,21 +40,10 @@ class joycontrol:
         rospy.Subscriber("joy", Joy, self.callback)
         # self.publish_timer = rospy.Timer(rospy.Duration(0.05), self.publish_stuff)
 
-    def publish_stuff(self, event):
-        twist_msg = Twist()
-        if abs(self.left_y) > self.THRESHOLD or abs(self.left_x) > self.THRESHOLD:
-            if self.button_x:
-                twist_msg.linear.x = self.left_y * self.TURBO_MAX_LINEAR_SPEED
-                twist_msg.angular.z = self.left_x * self.TURBO_MAX_ANGULAR_SPEED
-            else:
-                twist_msg.linear.x = self.left_y * self.MAX_LINEAR_SPEED
-                twist_msg.angular.z = self.left_x * self.MAX_ANGULAR_SPEED
-        else:
-            twist_msg.linear.x = 0.0
-            twist_msg.angular.z = 0.0
-        self.twist_pub.publish(twist_msg)
-
     def callback(self, data):
+        """
+        Record data from the incoming joystick message then call the function to publish a twist message
+        """
         self.left_y = data.axes[self.LEFT_STICK_Y_INDEX]
         self.left_x = data.axes[self.LEFT_STICK_X_INDEX]
         self.right_y = data.axes[self.RIGHT_STICK_Y_INDEX]
@@ -68,7 +58,33 @@ class joycontrol:
 
         self.publish_stuff(None)
 
+    def publish_stuff(self, event):
+        """
+        Take saved joystick positions and publish a twist message. Basically joystick up/down is 
+        directly converted into linear motion and joystick left/right is directly converted to angular motion.
+        """
+        twist_msg = Twist()
+
+        # Joysticks don't always return to exactly zero when let go of. The threshold is here so that if it's really
+        # close to zero then teh software will assume it's supposed to be zero. Otherwise the rover will try to creep
+        # forward really slowly.
+        if abs(self.left_y) > self.THRESHOLD or abs(self.left_x) > self.THRESHOLD:
+
+            # x is the "turbo" button. The rover drives much faster when it's pressed (so that taking it places is faster)
+            if self.button_x:
+                twist_msg.linear.x = self.left_y * self.TURBO_MAX_LINEAR_SPEED
+                twist_msg.angular.z = self.left_x * self.TURBO_MAX_ANGULAR_SPEED
+            else:
+                twist_msg.linear.x = self.left_y * self.MAX_LINEAR_SPEED
+                twist_msg.angular.z = self.left_x * self.MAX_ANGULAR_SPEED
+        else:
+            twist_msg.linear.x = 0.0
+            twist_msg.angular.z = 0.0
+        self.twist_pub.publish(twist_msg)
+
 
 if __name__ == '__main__':
     joy = joycontrol()
+
+    # This function forever. It's needed because otherwise the node wil exit.
     rospy.spin()
