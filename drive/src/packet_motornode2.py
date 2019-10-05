@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+"""
+This is the start of an alternative roboclaw control method. Basically instead of plugging them all into separate
+USB ports they are all connected to a single serial port. They are then differentiated based off of their ID. David
+doesn't know if this was ever tested.
+"""
+
 import rospy
 import roboclaw
 from std_msgs.msg import Int8

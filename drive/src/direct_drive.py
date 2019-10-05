@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 """
-This node converts joystick messages to twist messages
+This node converts joystick messages directly to motor PWM values. This is mostly for debugging drive code.
 """
 
 
 import rospy
-from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy
 from std_msgs.msg import Int8
 
@@ -16,6 +15,7 @@ class direct_drive:
     right_x = 0
     right_y = 0
 
+    # definitions of which buttons on the joystick match to which index in the message
     LEFT_STICK_X_INDEX = 0
     LEFT_STICK_Y_INDEX = 1
     LEFT_BUMPER_INDEX = 4
@@ -32,23 +32,27 @@ class direct_drive:
     TURBO_MAX_LINEAR_SPEED = 1.5
     TURBO_MAX_ANGULAR_SPEED = 1.5
 
-    
+    # constants for how joystick positions get mapped to PWM values
     JOYSTICK_MAX_READING = 0.95  # any values above this wil be mapped to full speed
     JOYSTICK_DEADBAND = 0.1
     DRIVE_MAX_SPEED = 127
     DRIVE_MIN_SPEED = 0
 
 
-
     def __init__(self):
-        rospy.init_node('joy_to_twist')
+        rospy.init_node('joy_to_motor')
         self.left_pub = rospy.Publisher('/motors/left_pwm', Int8, queue_size=1)
         self.right_pub = rospy.Publisher('/motors/right_pwm', Int8, queue_size=1)
         rospy.Subscriber("joy", Joy, self.callback)
+
+        # set the publish_stuff function to run 10 times a second
         self.publish_timer = rospy.Timer(rospy.Duration(0.1), self.publish_stuff)
 
 
     def callback(self, data):
+        """
+        Record what buttons are pressed on the controller and what positions the joysticks are in
+        """
         self.left_y = data.axes[self.LEFT_STICK_Y_INDEX]
         self.left_x = data.axes[self.LEFT_STICK_X_INDEX]
         self.right_y = data.axes[self.RIGHT_STICK_Y_INDEX]
@@ -62,24 +66,28 @@ class direct_drive:
         self.button_y = True if data.buttons[self.Y_BUTTON_INDEX] == 1 else False
 
         
-    def publish_stuff(self, asdf):
-        def map_joystick_to_pwm(joyval):
-            if abs(joyval) > self.JOYSTICK_DEADBAND:
-                if joyval > 0:
-                    pwm = map_to(joyval, self.JOYSTICK_DEADBAND, self.JOYSTICK_MAX_READING, 64, 127)
-                    pwm = max(pwm, 64)
-                    pwm = min(pwm, 127)
-                    return pwm
-                else:
-                    pwm = map_to(joyval, -1 * self.JOYSTICK_DEADBAND, -1 * self.JOYSTICK_MAX_READING, 64, 0)
-                    pwm = max(pwm, 0)
-                    pwm = min(pwm, 64)
-                    return pwm
+    def map_joystick_to_pwm(self, joyval):
+        """
+        Takes a joystick position and turns it into a PWM. There really isn't a lot going on here
+        """
+        if abs(joyval) > self.JOYSTICK_DEADBAND:
+            if joyval > 0:
+                pwm = map_to(joyval, self.JOYSTICK_DEADBAND, self.JOYSTICK_MAX_READING, 64, 127)
+                pwm = max(pwm, 64)
+                pwm = min(pwm, 127)
+                return pwm
             else:
-                return 64
-        
-        left_pwm = map_joystick_to_pwm(self.left_y)
-        right_pwm = map_joystick_to_pwm(self.right_y)
+                pwm = map_to(joyval, -1 * self.JOYSTICK_DEADBAND, -1 * self.JOYSTICK_MAX_READING, 64, 0)
+                pwm = max(pwm, 0)
+                pwm = min(pwm, 64)
+                return pwm
+        else:
+            return 64
+
+    def publish_stuff(self, asdf):
+        # Publish motor commands from the last recieved joystick position
+        left_pwm = self.map_joystick_to_pwm(self.left_y)
+        right_pwm = self.map_joystick_to_pwm(self.right_y)
 
         print("%4i, %4i" % (left_pwm, right_pwm))
 
@@ -89,6 +97,11 @@ class direct_drive:
 
 
 def map_to(x, in_low, in_high, out_low, out_high):
+    """
+    This function was stolen from the arduino standard library. It moves x from the range [in_low, in_high] to [out_low, out_high].
+    For example, map_to(0.25,  0, 1,  10, 20) returns 12.5.
+    https://www.arduino.cc/reference/en/language/functions/math/map/
+    """
     val = (x - in_low) / (in_high - in_low) * (out_high - out_low) + out_low
     return val
 

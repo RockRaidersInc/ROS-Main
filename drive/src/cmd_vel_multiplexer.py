@@ -35,10 +35,14 @@ class CmdVelMultiplexer:
         rospy.Subscriber('~joy', Joy, self.joy_callback)
 
     def autonomy_callback(self, data):
+        # runs when the autonomy system sends a twist message.
         if not self.user_in_controll:
             self.twist_pub.publish(data)
 
     def user_callback(self, data):
+        # runs when a twist message is sent by the user
+        # if the twist is non-zero then take control away from the autonomy system 
+        # (zero twists are sent when the user isn't touching the joystick)
         if abs(data.linear.x) > 0.0001 or abs(data.angular.z) > 0.0001:
             if not self.user_in_controll:
                 rospy.loginfo("controll taken away from autonomy system")
@@ -46,7 +50,9 @@ class CmdVelMultiplexer:
         self.twist_pub.publish(data)
 
     def joy_callback(self, data):
+        # runs when buttons on the joystick are pressed.
         if data.buttons[A_BUTTON_INDEX] == 1:
+            # if the A button was pressed give control back to autonomy
             self.user_in_controll = False
             rospy.loginfo("controll given back to autonomy system")
 

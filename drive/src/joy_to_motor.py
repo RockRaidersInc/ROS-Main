@@ -38,13 +38,11 @@ class joycontrol:
         self.publish_timer = rospy.Timer(rospy.Duration(0.05), self.publish_to_motors)
 
     def publish_to_motors(self, event):
-
         #Publishes motor velocites IN RADIANS PER SECOND
         self.left_pub.publish(int(self.left))
         self.right_pub.publish(int(self.right))
 
     def calc_motor_limits(self):
-
         #Should calculate motor limits based on slope
         self.motor_max = self.motor_max
         self.motor_min = self.motor_min
@@ -58,7 +56,6 @@ class joycontrol:
         self.right = temp_right * self.encoder_ticks_per_rad
 
     def twist_callback(self, data):
-        
         #We can't do zero point turning, so velocity must be nonzero
         if data.linear.x==0 and data.angular.z!=0:
             data.linear.x=0.00001

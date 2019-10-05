@@ -1,3 +1,9 @@
+"""
+This file has functions for sending/reading "all" standard roboclaw commands. IT HAS BUGS, we've run into a few.
+If Roboclaw behavior can't be explained then it actually could be a bug in this file or the roboclaw firmware.
+"""
+
+
 import random
 import serial
 import struct
