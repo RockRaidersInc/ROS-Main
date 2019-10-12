@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """
 This node converts joystick messages directly to motor PWM values. This is mostly for debugging drive code.
+(dirivng the rover in this mode is hard)
 """
 
 
@@ -40,7 +41,7 @@ class direct_drive:
 
 
     def __init__(self):
-        rospy.init_node('joy_to_motor')
+        rospy.init_node('joy_to_motor_direct_drive')
         self.left_pub = rospy.Publisher('/motors/left_pwm', Int8, queue_size=1)
         self.right_pub = rospy.Publisher('/motors/right_pwm', Int8, queue_size=1)
         rospy.Subscriber("joy", Joy, self.callback)

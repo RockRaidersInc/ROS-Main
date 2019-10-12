@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-  <arg name="params" default="sam-m8q" doc="Config file name for GPS"/>
-  <node pkg="ublox_gps" type="ublox_gps" name="ublox_gps">
-    <rosparam command="load" file="$(find sensor_publisher)/config/$(arg params).yaml"/>
-  </node>
-</launch>

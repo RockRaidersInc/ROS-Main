@@ -1,12 +1,30 @@
 <?xml version="1.0"?>
 <launch>
+    <arg name="sim_world_file"/>
+
     <include file="$(find drive)/launch/kinematics.launch"/> 
 
-    <include file="$(find rover_simulated)/launch/hardware_simulated.launch" pass_all_args="true"/> 
     <node name="imu_quaternion_to_rpy" pkg="utils" type="imu_msg_to_xyz_rpy.py">
         <remap from="~imu_msg_in" to="/imu/data"/>
         <remap from="~imu_msg_out" to="/debug/imu_rpy"/>
     </node>
     
     <node name="joy_0" pkg="joy" type="joy_node"/>
+
+    <include file="$(find simulator)/launch/sim_any_map.launch" pass_all_args="true"/> 
+
+    <node name="magnetometer_republisher" pkg="simulator" type="magnetometer_republisher.py">
+        <remap from="~vect3_msg" to="/rover/magnetometer"/>
+        <remap from="~mag_msg" to="/imu/mag"/>
+        <remap from="~imu_msg_in" to="/rover/imu"/>
+        <remap from="~imu_msg_out" to="/imu/data"/>
+    </node>
+
+    <node name="gps_covariance_booster" pkg="sensor_publisher" type="gps_covariance_booster.py" output="screen">
+        <remap from="~gps_msg_in" to="/gps/fix_unadjusted"/>
+        <remap from="~gps_msg_out" to="/gps/fix"/>
+        <rosparam param="gps_scale_factor"> 20 </rosparam>
+    </node>
+
+    <node name="camera_transform_publisher" pkg="tf" type="static_transform_publisher" args="0.2 0 0.894 -1.57 0.0 -2.22 base_link zed_camera_center 10"/>
 </launch>
