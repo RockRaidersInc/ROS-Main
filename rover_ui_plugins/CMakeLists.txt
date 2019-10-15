@@ -5,12 +5,24 @@ project(rover_ui_plugins)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  roslint
   rospy
   rqt_gui
   rqt_gui_py
+  rqt_gui_cpp
+  std_msgs
 )
 
 ## System dependencies are found with CMake's conventions
+
+if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
+  find_package(Qt5Widgets REQUIRED)
+else()
+  find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
+  include(${QT_USE_FILE})
+endif()
+
 # find_package(Boost REQUIRED COMPONENTS system)
 
 
@@ -18,6 +30,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 catkin_python_setup()
+
+roslint_cpp()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -83,8 +97,30 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES rqt_mypkg
 #  CATKIN_DEPENDS rospy rqt_gui_py
+  LIBRARIES ${PROJECT_NAME}
+  CATKIN_DEPENDS roscpp rqt_gui_cpp std_msgs
 #  DEPENDS system_lib
 )
+
+set (rover_ui_plugins_SRCS
+  src/rover_ui_plugins/button_test_cpp/button_test.cpp
+)
+
+set(rover_ui_pluginsHDRS
+  include/rover_ui_plugins/button_test_cpp/button_test.h
+)
+
+set(rover_ui_pluginsUIS
+  src/rover_ui_plugins/button_test_cpp/button_test.ui
+)
+
+if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
+  qt5_wrap_cpp(rover_ui_plugins_MOCS ${rover_ui_plugins_HDRS})
+  qt5_wrap_ui(rover_ui_plugins_UIS_H ${rover_ui_plugins_UIS})
+else()
+  qt4_wrap_cpp(rover_ui_plugins_MOCS ${rover_ui_plugins_HDRS})
+  qt4_wrap_ui(rover_ui_plugins_UIS_H ${rover_ui_plugins_UIS})
+endif()
 
 ###########
 ## Build ##
@@ -94,13 +130,17 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  include
+  ${CMAKE_CURRENT_BINARY_DIR}/..
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
-# add_library(rqt_mypkg
-#   src/${PROJECT_NAME}/rqt_mypkg.cpp
-# )
+add_library(${PROJECT_NAME}
+    ${rover_ui_plugins_SRCS}
+    ${rover_ui_plugins_MOCS}
+    ${rover_ui_plugins_UIS_H}
+    )
 
 ## Declare a cpp executable
 # add_executable(rqt_mypkg_node src/rqt_mypkg_node.cpp)
@@ -110,9 +150,15 @@ include_directories(
 # add_dependencies(rqt_mypkg_node rqt_mypkg_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(rqt_mypkg_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+)
+
+if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
+  target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
+else()
+  target_link_libraries(${PROJECT_NAME} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
+endif()
 
 #############
 ## Install ##

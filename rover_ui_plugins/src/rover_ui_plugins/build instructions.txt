@@ -1,0 +1,3 @@
+cd /mnt/c/Users/Mason/Documents/Rock\ Raiders/
+catkin build
+

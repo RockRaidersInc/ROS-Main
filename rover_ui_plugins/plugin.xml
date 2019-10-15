@@ -1,4 +1,4 @@
-<library path="src">
+<library path="lib/librover_ui_plugins">
   <class name="Video Selection" type="rover_ui_plugins.video_selection.VideoSelectionPlugin" base_class_type="rqt_gui_py::Plugin">
     <description>
         Allows video streams to be chosen.
@@ -50,4 +50,18 @@
       <icon type="theme">system-help</icon>
     </qtgui>
   </class>
+  <class name="rover_ui_plugins/button_test_cpp/ButtonTest" type="button_test_cpp::ButtonTest" base_class_type="rqt_gui_cpp::Plugin">
+    <description>
+      A test C++ plugin, maybe with a button that would be pretty cool
+    </description>
+    <qtgui>
+      <group>
+        <label>Rock Raiders Plugins</label>
+      </group>
+      <label>this is a label.</label>
+      <icon type="theme">system-help</icon>
+      <statustip>https://www.youtube.com/watch?v=dQw4w9WgXcQ</statustip>
+    </qtgui>
+  </class>
 </library>
+
