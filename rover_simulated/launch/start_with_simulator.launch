@@ -9,7 +9,9 @@
         <remap from="~imu_msg_out" to="/debug/imu_rpy"/>
     </node>
     
-    <node name="joy_0" pkg="joy" type="joy_node"/>
+    <node name="joy_0" pkg="joy" type="joy_node">
+        <param name="dev" value="$(optenv JOYSTICK_PATH /dev/input/js0)"/>
+    </node>
 
     <include file="$(find simulator)/launch/sim_any_map.launch" pass_all_args="true"/> 
 
