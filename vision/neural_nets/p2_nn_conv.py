@@ -1,10 +1,17 @@
 from __future__ import print_function
 
 import torch
+from torch import nn
+import torchvision.models
 from matplotlib import pyplot as plt
+import PIL
 
 from nn_utils import *
 from confusion_mat_tools import save_confusion_matrix
+import networks
+
+
+np.set_printoptions(precision=6)
 
 
 # make numpy printing more readable
@@ -14,92 +21,30 @@ np.set_printoptions(precision=5, suppress=True)
 
 
 input_file_list = "image_list.txt"
-shrunk_width = 512
+shrunk_width = 416
 
 
-class SmallerNet(torch.nn.Module):
-    """
-    This network appears to generalize quite well, even when only training with the small igvc_sim_trainset_3 dataset
-    (test error is within 3% of training error). It doesn't work super well though.
-    """
-    def __init__(self):
-        super(SmallerNet, self).__init__()
-        self.conv1 = torch.nn.Conv2d(3, 8, 3, padding=1)
-        self.conv2 = torch.nn.Conv2d(8, 12, 3, padding=1)
-        self.conv3 = torch.nn.Conv2d(12, 16, 3, padding=1)
-        self.conv4 = torch.nn.Conv2d(16, 1, 3, padding=1)
-
-        self.pool = torch.nn.MaxPool2d(2, 2)
-        self.nonlinear = torch.nn.functional.elu
-        self.sigmoid = torch.sigmoid
-        self.tanh = torch.tanh
-        self.dropout = torch.nn.Dropout(0.4)  # drop 50% of the neurons
-    
-    def forward(self, x_raw):
-        x_prepared = x_raw / 128 - 1
-        x1 = self.pool(self.nonlinear(self.conv1(x_prepared)))
-        x2 = self.pool(self.nonlinear(self.conv2(x1)))
-        x3 = self.pool(self.nonlinear(self.conv3(x2)))
-        x4 = self.nonlinear(self.conv4(x3))
-        output = self.tanh(x4)  # using tanh to get a value between -1 and 1
-        return output
-
-
-class LargerNet(torch.nn.Module):
-    def __init__(self):
-        super(LargerNet, self).__init__()
-        self.conv1 = torch.nn.Conv2d(3, 8, 3, padding=1)
-        self.conv2_1 = torch.nn.Conv2d(8, 12, 3, padding=1)
-        self.conv2_2 = torch.nn.Conv2d(12, 12, 1, padding=0)
-        self.conv2_3 = torch.nn.Conv2d(12, 12, 3, padding=1)
-
-        self.conv3_1 = torch.nn.Conv2d(12, 16, 3, padding=1)
-        self.conv3_2 = torch.nn.Conv2d(16, 32, 1, padding=0)
-        self.conv3_3 = torch.nn.Conv2d(32, 16, 3, padding=1)
-
-        self.conv4_1 = torch.nn.Conv2d(16, 36, 3, padding=1)
-        self.conv4_2 = torch.nn.Conv2d(36, 36, 1, padding=0)
-        self.conv4_3 = torch.nn.Conv2d(36, 1, 3, padding=1)
-
-        self.pool = torch.nn.MaxPool2d(2, 2)
-        self.nonlinear = torch.nn.functional.elu
-        self.sigmoid = torch.sigmoid
-        self.tanh = torch.tanh
-        self.dropout = torch.nn.Dropout(0.4)  # drop 50% of the neurons
-    
-    def forward(self, x_raw):
-        x_prepared = x_raw / 128 - 1
-        x1 = self.pool(self.nonlinear(self.conv1(x_prepared)))
-        x2_1 = self.nonlinear(self.conv2_1(x1))
-        x2_2 = self.nonlinear(self.conv2_2(x2_1))
-        x2_3 = self.pool(self.nonlinear(self.conv2_3(x2_2)))
-        x3_1 = self.nonlinear(self.conv3_1(x2_3))
-        x3_2 = self.nonlinear(self.conv3_2(x3_1))
-        x3_3 = self.pool(self.nonlinear(self.conv3_3(x3_2)))
-        x4_1 = self.nonlinear(self.conv4_1(x3_3))
-        x4_2 = self.nonlinear(self.conv4_2(x4_1))
-        x4_3 = self.nonlinear(self.conv4_3(x4_2))
-        output = self.tanh(x4_3)  # using tanh to get a value between -1 and 1
-        return output
 
 
 def main():
-    train_images = data_loader("train", shrunk_width, shrunk_width/8)
-    test_images = data_loader("test", shrunk_width, shrunk_width/8)
+    train_images = data_loader("train", shrunk_width, shrunk_width/2)
+    test_images = data_loader("test", shrunk_width, shrunk_width/2)
 
     # train_images = data_loader("train", shrunk_width, shrunk_width)
     # test_images = data_loader("test", shrunk_width, shrunk_width)
 
     epochs = 1000  # number of times to go through the training set
 
-    N = 2  # batch size
+    N = 1  # batch size
 
-    model = SmallerNet()
+    # model = SmallerNet().to(get_default_torch_device())
     # model = LargerNet()
+    # model = Vgg11TransferNet().to(get_default_torch_device())
+    model = networks.Yolo2Transfer("/home/david/state_dict_test").to(get_default_torch_device())
 
     loss_fn = torch.nn.L1Loss()
 
-    learning_rate = 1e-2
+    learning_rate = 1e-3
     # use the ADAM optimizer because it has fewer parameters to tune than SGD
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -114,15 +59,15 @@ def main():
             next_batch_images_unprocessed = []
             next_batch_labels = []
             for j in range(N):
-                image, label = train_images[(i + j) % len(train_images)]
+                image, label, excluded = train_images[(i + j) % len(train_images)]
                 next_batch_images_unprocessed.append(image)
-                next_batch_labels.append(label)
+                next_batch_labels.append(np.array(label))
 
             # batch = torch.from_numpy(np.stack(next_batch_images)).float()
-            batch = prepare_images_for_nn(next_batch_images_unprocessed)
+            # batch = prepare_images_for_nn(next_batch_images_unprocessed)
             label_images = torch.from_numpy(np.array(next_batch_labels)).float()
 
-            predictions = model(batch)
+            predictions = model(next_batch_images_unprocessed).to("cpu")
 
             lane_bg_scaling_factor = 1 / (np.mean(np.array(next_batch_labels) / 2 + 0.5) + 0.0001) + 0.75
             # print("   ", lane_bg_scaling_factor, (np.array(next_batch_labels) / 2 + 0.5).sum(), np.product(np.array(next_batch_labels).shape))
@@ -145,10 +90,12 @@ def main():
         # print("average epoch training accuracy:", epoch_correct_predictions / len(train_images) / np.product(train_images[0][0].shape))
 
         # now that the network has been trained for one epoch, test it on the testing data
-        evaluate_model(model, train_images, epoch_num, train=True, show_images=True if epoch_num % 30 == 29 else False)
-        evaluate_model(model, test_images, epoch_num, train=False, show_images=True if epoch_num % 30 == 29 else False)
+        evaluate_model(model, train_images, epoch_num, train=True, show_images=True if epoch_num % 15 == 0 else False)
+        evaluate_model(model, test_images, epoch_num, train=False, show_images=True if epoch_num % 15 == 1 else False)
 
         optimizer.zero_grad()  # just to make sure it doesn't learn from the testing data
+
+        torch.save(model.state_dict(), "nn_weights")
 
     # save the final confusion matrix and print out misclassified images
     # save_confusion_and_print_errors(confusion, model, test_images, "convolutional_network")
@@ -157,10 +104,11 @@ def main():
 def evaluate_model(model, image_set, epoch_num, train=False, show_images=False):
     model.eval()  # turn off dropout
     # image_set.clear_augmentation()
-    confusion = np.zeros((2, 2), dtype=np.int32)
+    confusion = np.zeros((2, 2), dtype=np.float64)
+    image_accuracies = []
     for i in range(len(image_set)):
-        image, label = image_set[i]
-        x = prepare_images_for_nn([image])
+        image, label, excluded = image_set[i]
+        x = [image]
 
         prediction_raw = model(x).data.cpu().numpy().astype(np.float32)
         prediction = (prediction_raw > 0).astype(np.int32)
@@ -193,20 +141,14 @@ def evaluate_model(model, image_set, epoch_num, train=False, show_images=False):
     print("row is correct label, column is predicted label")
     for i in range(2):
         print(" " * (11 - len(index_to_label_name[i])) + index_to_label_name[i] + ": ", end="")
-        print(confusion[i])
+        print(confusion[i] / confusion.sum())
 
-    n_correct_predictions = np.sum(confusion * np.eye(2, 2)) / np.product(label.shape)
+    image_accuracies.append(np.sum(confusion * np.eye(2, 2)) / np.sum(confusion))
     if train:
         print("training accuracy:")
     else:
         print("testing accuracy:")
-    print("%3.4f%%" % (n_correct_predictions / len(image_set) * 100,))
-
-
-
-def prepare_images_for_nn(imgs):
-    return torch.from_numpy(np.stack([np.swapaxes(image, 0, 2).swapaxes(1, 2) for image in imgs])).float()
-
+    print("%3.4f%%" % (np.mean(image_accuracies) * 100,))
 
 
 if __name__ == "__main__":

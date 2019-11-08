@@ -5,6 +5,7 @@ import torch
 import os
 import functools
 import collections
+from PIL import Image
 
 from confusion_mat_tools import save_confusion_matrix
 
@@ -24,6 +25,15 @@ index_to_label_name = {0: "other",
 
 def to_indices(arr):
     return np.array(list(map(lambda ar: ar.argmax(), [arr[i] for i in range(arr.shape[0])])))
+
+
+
+def get_default_torch_device():
+    """ Pick GPU if available, otherwise use CPU """
+    if torch.cuda.is_available():
+        return torch.device('cuda:0')
+    else:
+        return torch.device('cpu')
 
 
 # from https://wiki.python.org/moin/PythonDecoratorLibrary#Memoize
@@ -54,6 +64,17 @@ class memoized(object):
         return functools.partial(self.__call__, obj)
 
 
+# from https://codereview.stackexchange.com/questions/153029/recursively-list-files-within-a-directory
+def files_within(directory_path):
+    pass
+    for dirpath, dirnames, filenames in os.walk(directory_path):
+        for file_name in filenames:
+            if file_name.endswith("jpg") or file_name.endswith("png"):
+                relative_path = os.path.join(dirpath[len(directory_path): ], file_name)
+                yield relative_path if relative_path[0] != "/" else relative_path[1:]
+
+
+
 class data_loader:
     """
     This class lazily loads training datasets (it makes debugging a lot faster if you
@@ -64,9 +85,10 @@ class data_loader:
         self.labels = {}
         self.shrunk_width = image_size
         self.label_shrunk_width = label_size
-        self.input_folder = input_folder
+        self.input_folder = os.path.join("../combined_dataset", input_folder)
 
-        self.input_image_names = list(map(lambda x: x.strip(), os.listdir(self.input_folder + "/images")))
+        self.input_image_names = list(files_within(os.path.join(self.input_folder, "images")))
+
         random.shuffle(self.input_image_names)
         self.clear_augmentation()
 
@@ -80,6 +102,7 @@ class data_loader:
 
         self.images = {}
         self.labels = {}
+        self.excluded = {}
     
     def update_data_augmentation(self):
         self.top_left_corner = np.random.randint(0, self.shrunk_width // 4, [2])
@@ -90,6 +113,7 @@ class data_loader:
 
         self.images = {}
         self.labels = {}
+        self.excluded = {}
 
     def _augment_image(self, img, change_colors=False):
         """
@@ -128,14 +152,27 @@ class data_loader:
         if i not in self.images.keys():
             unaugmented = self._read_img_from_disk(self.input_folder + "/images/" + self.input_image_names[i], cv2.IMREAD_COLOR)
             augmented = self._augment_image(unaugmented, change_colors=True)
-            self.images[i] = cv2.resize(augmented, (self.shrunk_width, self.shrunk_width))[:, :, ::-1]
+            self.images[i] = unaugmented
             
-            label = self._read_img_from_disk(self.input_folder + "/gt/" + self.input_image_names[i], cv2.IMREAD_GRAYSCALE)
-            intermediate = self._augment_image(label)
-            label_resized = cv2.resize(intermediate, (self.label_shrunk_width, self.label_shrunk_width), interpolation=cv2.INTER_AREA).astype(np.float32)[:, :]
-            self.labels[i] = (label_resized != 0).astype(np.float32) * 2 - 1
-        
-        return (self.images[i], self.labels[i])
+            raw_label = self._read_img_from_disk(self.input_folder + "/gt/" + self.input_image_names[i], cv2.IMREAD_COLOR)
+            label = self._augment_image(raw_label)
+
+            excluded = ((label != 0) * (label != 255)).astype(np.uint8)[:, :, 0]
+            excluded_resized = cv2.resize(excluded, (self.label_shrunk_width, self.label_shrunk_width), interpolation=cv2.INTER_AREA != 0).astype(np.float32)[:, :]
+            self.excluded[i] = excluded_resized
+            
+            intermediate = (label == 255)[:, :, 0].astype(np.uint8)
+            label_opened = cv2.morphologyEx((intermediate != 0).astype(np.uint8), cv2.MORPH_CLOSE, np.ones((5, 5)))
+            label_resized = cv2.resize(label_opened, (self.label_shrunk_width, self.label_shrunk_width), interpolation=cv2.INTER_AREA != 0).astype(np.float32)[:, :]
+            self.labels[i] = (label_resized).astype(np.float32) * 2 - 1
+            # ratio = self.shrunk_width / self.label_shrunk_width
+            # label_resized_final = np.zeros((self.label_shrunk_width, self.label_shrunk_width), dtype=np.float32)
+            # for ii in range(self.label_shrunk_width):
+            #     for jj in range(self.label_shrunk_width):
+            #         label_resized_final[ii, jj] = np.max(label_resized[ii * ratio : (ii+1) * ratio, jj * ratio : (jj+1) * ratio])
+            # self.labels[i] = label_resized
+
+        return (self.images[i], self.labels[i], self.excluded[i])
 
     def get_path(self, index):
         return self.input_folder + "/images/" + self.input_image_names[index]
@@ -151,7 +188,19 @@ class data_loader:
         inputs a second timethen the outputs are looked up from the previous run and returned (instead of running 
         the function again).
         """
-        return cv2.imread(path, mode)
+        if mode == cv2.IMREAD_COLOR:
+            return np.array(Image.open(path).convert('RGB'))
+        else:
+            return cv2.imread(path, mode)
+
+
+def prepare_images_for_nn(imgs):
+    """
+    Turn an array of images into a tensor and move it to the GPU if the GPU is being used.
+    imgs is a list of 3d arrays (width x height x 3)
+    """
+    raise Exception("deprecated")
+    return torch.from_numpy(np.stack([image for image in imgs])).transpose(1,2).transpose(1,3).float().div(255.0).to(get_default_torch_device())
 
 
 def save_confusion_and_print_errors(confusion, model, test_images, network_name):
