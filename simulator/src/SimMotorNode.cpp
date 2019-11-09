@@ -215,9 +215,9 @@ namespace gazebo {
     void MotorNodePlugin::OnUpdate() {
         u_int joint_axis = 0;
 
-        this->model->GetJoint("left_back_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(leftMotorVel));
+        //this->model->GetJoint("left_back_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(leftMotorVel));
         this->model->GetJoint("left_front_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(leftMotorVel));
-        this->model->GetJoint("right_back_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(rightMotorVel));
+        //this->model->GetJoint("right_back_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(rightMotorVel));
         this->model->GetJoint("right_front_wheel_hinge")->SetVelocity(joint_axis, mapMotorVel(rightMotorVel));
 
         ros::Time current_time = ros::Time::now();
