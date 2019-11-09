@@ -13,13 +13,13 @@
     -->
 
     <physics type="ode">
-      <max_step_size>0.002</max_step_size>
+      <max_step_size>0.0001</max_step_size>
       <!-- <real_time_factor>0.1</real_time_factor> -->
-      <real_time_update_rate>500</real_time_update_rate>
+      <real_time_update_rate>10000</real_time_update_rate>
       <ode>
         <solver>
-          <type>quick</type>
-          <iters>50</iters>
+          <type>world</type>
+          <iters>100</iters>
           <precon_iters>0</precon_iters>
           <sor>1.300000</sor>
         </solver>
