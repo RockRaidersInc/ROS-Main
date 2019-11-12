@@ -218,7 +218,7 @@ class Yolo2Transfer(torch.nn.Module):
 
         self.classify_module = model = nn.Sequential()
         self.classify_module.add_module('classifier_conv1', nn.Conv2d(64 + 16, 16, 1, 1, 0, bias=False))
-        self.condense_1.add_module('classifier_leaky1', nn.LeakyReLU(0.1, inplace=False))
+        self.classify_module.add_module('classifier_leaky1', nn.LeakyReLU(0.1, inplace=False))
         self.classify_module.add_module('classifier_conv2', nn.Conv2d(16, 1, 1, 1, 0, bias=False))
         self.classify_module.add_module('classifier_leaky2', nn.Hardtanh())
         self.classify_module.requires_grad = True
@@ -242,6 +242,8 @@ class Yolo2Transfer(torch.nn.Module):
             if i == 2:
                 downsampled_4x = x
         
+        # x is the output from the pretrained network at this point
+
         condensed = self.condense_1(x)
         upsampled = nn.functional.interpolate(condensed, size=(condensed.data.shape[2] * 4, condensed.data.shape[3] * 4))
         skip_link_concatenated = torch.cat((downsampled_4x, upsampled), dim=1)  # stack along the pixel value dimension
