@@ -2,7 +2,6 @@ from __future__ import print_function
 
 import torch
 from torch import nn
-import torchvision.models
 from matplotlib import pyplot as plt
 import PIL
 
@@ -148,7 +147,7 @@ def evaluate_model(model, image_set, epoch_num, train=False, show_images=False):
             label[0, 1] = -1
             ax[2].imshow(label, cmap='jet', alpha=1)
         plt.suptitle("worst results from testing, balanced accuracies are: " + ", ".join(map(lambda x: str(x[0]), all_accuracies_images[:4])))
-        plt.show()
+        plt.savefig("output_epoch_" + str(epoch_num) + ".png")
         plt.close(f)
 
 

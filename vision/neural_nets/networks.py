@@ -2,7 +2,6 @@ from __future__ import print_function
 
 import torch
 from torch import nn
-import torchvision.models
 import PIL
 
 from nn_utils import *
@@ -235,7 +234,7 @@ class Yolo2Transfer(torch.nn.Module):
             img = img.view(3, 416, 416)
             xs.append(img.float().div(255.0))
 
-        x = torch.stack(xs)
+        x = torch.stack(xs).to(get_default_torch_device())
 
         for i, model in enumerate(self.models):
             x = model(x)
