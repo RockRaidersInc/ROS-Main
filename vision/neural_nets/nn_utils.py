@@ -104,6 +104,9 @@ class data_loader:
         self.labels = {}
         self.excluded = {}
     
+    def shuffle(self):
+        random.shuffle(self.input_image_names)
+    
     def update_data_augmentation(self):
         self.top_left_corner = np.random.randint(0, self.shrunk_width // 4, [2])
         self.bottom_right_corner = np.random.randint(1, self.shrunk_width // 4, [2])
@@ -152,7 +155,8 @@ class data_loader:
         if i not in self.images.keys():
             unaugmented = self._read_img_from_disk(self.input_folder + "/images/" + self.input_image_names[i], cv2.IMREAD_COLOR)
             augmented = self._augment_image(unaugmented, change_colors=True)
-            self.images[i] = unaugmented
+            image_resized = cv2.resize(augmented, (self.shrunk_width, self.shrunk_width), interpolation=cv2.INTER_AREA != 0).astype(np.uint8)
+            self.images[i] = image_resized
             
             raw_label = self._read_img_from_disk(self.input_folder + "/gt/" + self.input_image_names[i], cv2.IMREAD_COLOR)
             label = self._augment_image(raw_label)

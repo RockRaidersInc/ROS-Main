@@ -76,6 +76,10 @@ class LargerNet(torch.nn.Module):
 class Yolo2Transfer(torch.nn.Module):
     def __init__(self, pretrained_weights):
         super(Yolo2Transfer, self).__init__()
+        
+        self.width = 416
+        self.height = 416
+        
         self.models = torch.nn.ModuleList()
 
         # [convolutional]
@@ -211,42 +215,71 @@ class Yolo2Transfer(torch.nn.Module):
         self.load_state_dict(torch.load("yolo2_partial_weights"))
 
         self.condense_1 = nn.Sequential()
-        self.condense_1.add_module('condense_conv1', nn.Conv2d(256, 16, 3, 1, 1, bias=False))
-        self.condense_1.add_module('condense_leaky1', nn.LeakyReLU(0.1, inplace=False))
+        self.condense_1.add_module('condense_1_conv1', nn.Conv2d(256, 16, 1, 1, 0, bias=False))
+        self.condense_1.add_module('condense_1_leaky1', nn.LeakyReLU(0.1, inplace=False))
         self.condense_1.requires_grad = True
 
+        self.condense_2 = nn.Sequential()
+        self.condense_2.add_module('condense_2_conv1', nn.Conv2d(64, 16, 1, 1, 0, bias=False))
+        self.condense_2.add_module('condense_2_leaky1', nn.LeakyReLU(0.1, inplace=False))
+        self.condense_2.requires_grad = True
+
+        self.condense_3 = nn.Sequential()
+        self.condense_3.add_module('condense_3_conv1', nn.Conv2d(64, 8, 1, 1, 0, bias=False))
+        self.condense_3.add_module('condense_3_leaky1', nn.LeakyReLU(0.1, inplace=False))
+        self.condense_3.requires_grad = True
+
         self.classify_module = model = nn.Sequential()
-        self.classify_module.add_module('classifier_conv1', nn.Conv2d(64 + 16, 16, 1, 1, 0, bias=False))
+        self.classify_module.add_module('classifier_conv1', nn.Conv2d(8 + 16 + 16, 8, 1, 1, 0, bias=False))
         self.classify_module.add_module('classifier_leaky1', nn.LeakyReLU(0.1, inplace=False))
-        self.classify_module.add_module('classifier_conv2', nn.Conv2d(16, 1, 1, 1, 0, bias=False))
-        self.classify_module.add_module('classifier_leaky2', nn.Hardtanh())
+        self.classify_module.add_module('classifier_conv2', nn.Conv2d(8, 1, 1, 1, 0, bias=False))
         self.classify_module.requires_grad = True
     
-    def forward(self, imgs):
+
+    def prep_images(self, imgs):
+        """
+        Rescale, re-order axes, and move images to GPU (if used) to prepare input images for the neural network
+        """
         width = 416
         height = 416
         xs = []
         for img in imgs:
-            img = PIL.Image.fromarray(np.array(img))
-            sized = img.resize((width, width))
+            if (self.width, self.height) != img.size:
+                img = PIL.Image.fromarray(np.array(img))
+                sized = img.resize((width, width))
+            else:
+                sized = img
             img = torch.ByteTensor(torch.ByteStorage.from_buffer(sized.tobytes()))
             img = img.view(height, width, 3).transpose(0,1).transpose(0,2).contiguous()
             img = img.view(3, 416, 416)
             xs.append(img.float().div(255.0))
 
         x = torch.stack(xs).to(get_default_torch_device())
+        return x
+
+    def forward(self, imgs):
+        """
+        Run the neural network. imgs should be a list of PIL images, all with the same height/width
+        """
+        x = self.prep_images(imgs)
 
         for i, model in enumerate(self.models):
             x = model(x)
             if i == 2:
                 downsampled_4x = x
+            if i == 5:
+                downsampled_8x = x
         
         # x is the output from the pretrained network at this point
 
-        condensed = self.condense_1(x)
-        upsampled = nn.functional.interpolate(condensed, size=(condensed.data.shape[2] * 4, condensed.data.shape[3] * 4))
-        skip_link_concatenated = torch.cat((downsampled_4x, upsampled), dim=1)  # stack along the pixel value dimension
+        condensed_higher = self.condense_1(x)
+        upsampled_higher = nn.functional.interpolate(condensed_higher, size=(condensed_higher.data.shape[2] * 4, condensed_higher.data.shape[3] * 4))
+        condensed_lower = self.condense_2(downsampled_8x)
+        upsampled_lower = nn.functional.interpolate(condensed_lower, size=(condensed_lower.data.shape[2] * 2, condensed_lower.data.shape[3] * 2))
+        condensed_4x = self.condense_3(downsampled_4x)
+        skip_link_concatenated = torch.cat((condensed_4x, upsampled_lower, upsampled_higher), dim=1)  # stack along the pixel value dimension
 
         classified = self.classify_module(skip_link_concatenated)
-
-        return classified
+        
+        original_size = nn.functional.interpolate(classified, size=np.array(imgs[0]).shape[:2])  # resize the output back to the input's origional size
+        return original_size

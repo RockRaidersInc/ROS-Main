@@ -24,8 +24,8 @@ shrunk_width = 416
 
 
 def main():
-    train_images = data_loader("train", shrunk_width, shrunk_width/2)
-    test_images = data_loader("test", shrunk_width, shrunk_width/2)
+    train_images = data_loader("train", shrunk_width, shrunk_width)
+    test_images = data_loader("test", shrunk_width, shrunk_width)
 
     epochs = 1000  # number of times to go through the training set
     N = 1  # batch size
@@ -33,14 +33,16 @@ def main():
 
     loss_fn = torch.nn.L1Loss()
 
-    learning_rate = 1e-2
+    learning_rate = 1e-3
     # use the ADAM optimizer because it has fewer parameters to tune than SGD
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.001)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
     for epoch_num in range(epochs):
         model.train()  # turn on dropout
         epoch_correct_predictions = 0
         print()
+        loss_list = []
         for i in range(0, len(train_images), N):
             print("\ron image " + str(i), end='')
 
@@ -71,26 +73,29 @@ def main():
             loss = torch.mean((lane_pixel_loss + other_pixel_loss) * (1 - exclusion_images))
 
             # Compute and print loss.
-            # lane_pixel_loss = (label_images + 1) / 2 * lane_bg_scaling_factor  # image with 0 where there is no lane, higher where there is lane
-            # pixelwise_squared_diff = torch.pow((predictions - label_images) * (1 + lane_pixel_loss), 2)
+            # lane_pixel_loss = np.abs((label_images + 1) / 2 * lane_bg_scaling_factor - 1)  # image with 0 where there is no lane, higher where there is lane
+            # pixelwise_squared_diff = torch.pow((predictions - label_images) * lane_pixel_loss, 2)
             # loss = torch.mean(pixelwise_squared_diff)
 
             # loss = torch.mean(torch.pow(predictions - label_images, 2))
-            print(" \t loss: ", loss.data.cpu().numpy())
-
+            # print(" \t loss: ", loss.data.cpu().numpy())
+            loss_list.append(loss.data.cpu().numpy())
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
         train_images.update_data_augmentation()
+        train_images.shuffle()
 
         print("\r", end="")
+        print("loss from epoch " + str(epoch_num) + ": " + str(np.mean(loss_list)))
         # print("average epoch training accuracy:", epoch_correct_predictions / len(train_images) / np.product(train_images[0][0].shape))
 
         # now that the network has been trained for one epoch, test it on the testing data
-        # evaluate_model(model, train_images, epoch_num, train=True, show_images=True if epoch_num % 15 == 0 else False)
-        evaluate_model(model, test_images, epoch_num, train=False, show_images=True if epoch_num % 10 == 0 else False)
+        if epoch_num % 4 == 0:
+            evaluate_model(model, train_images, epoch_num, train=True, show_images=False)
+            evaluate_model(model, test_images, epoch_num, train=False, show_images=True if epoch_num % 12 == 0 else False)
 
         optimizer.zero_grad()  # just to make sure it doesn't learn from the testing data
 
@@ -109,8 +114,8 @@ def evaluate_model(model, image_set, epoch_num, train=False, show_images=False):
     for i in range(len(image_set)):
         image, label, excluded = image_set[i]
         new_confusion = get_confusion_mat_single_image(model, image, label)
-        balanced_accuracy = ((new_confusion[0, 0] / (new_confusion[0, 0] + new_confusion[0, 1])) + 
-                            (new_confusion[1, 1] / (new_confusion[1, 0] + new_confusion[1, 1]))) / 2
+        balanced_accuracy = ((new_confusion[0, 0] / (new_confusion[0, 0] + new_confusion[0, 1] + 0.00001)) + 
+                            (new_confusion[1, 1] / (new_confusion[1, 0] + new_confusion[1, 1] + 0.00001))) / 2
         all_accuracies_images.append((balanced_accuracy, i))
         confusion += new_confusion
 
@@ -122,21 +127,24 @@ def evaluate_model(model, image_set, epoch_num, train=False, show_images=False):
 
     image_accuracies.append(np.sum(confusion * np.eye(2, 2)) / np.sum(confusion))
     if train:
-        print("training accuracy:")
+        print("training balanced accuracy:")
     else:
-        print("testing accuracy:")
-    print("%3.4f%%" % (np.mean(image_accuracies) * 100,))
+        print("testing balanced accuracy:")
+    print("%3.4f%%" % (np.mean(list(map(lambda x: x[0], all_accuracies_images))) * 100,))
 
     all_accuracies_images.sort(key=lambda x: x[0])
 
     if show_images:
-        f, ax_list = plt.subplots(4, 3)
+        f, ax_list = plt.subplots(6, 3)
+        f.set_size_inches(10,10)
+        displayed_accuracies = []
         for i, ax in enumerate(ax_list):
-            image, label, _ = image_set[all_accuracies_images[i][1]]
+            image, label, _ = image_set[all_accuracies_images[(i - 2) % len(all_accuracies_images)][1]]
+            displayed_accuracies.append(all_accuracies_images[(i - 2) % len(all_accuracies_images)][0])
             ax[0].imshow(image.squeeze().astype(np.uint8))
 
             x = [image]
-            prediction_raw = model(x).data.cpu().numpy().astype(np.float32)
+            prediction_raw = np.tanh(model(x).data.cpu().numpy().astype(np.float32))
             resized = cv2.resize((np.dstack([prediction_raw.squeeze(), prediction_raw.squeeze(), prediction_raw.squeeze()]) * 127 + 127).astype(np.uint8), 
                                                         dsize=(shrunk_width, shrunk_width), interpolation=cv2.INTER_CUBIC)
             resized[0, 0, 0] = 127
@@ -146,8 +154,8 @@ def evaluate_model(model, image_set, epoch_num, train=False, show_images=False):
             label[0, 0] = 1
             label[0, 1] = -1
             ax[2].imshow(label, cmap='jet', alpha=1)
-        plt.suptitle("worst results from testing, balanced accuracies are: " + ", ".join(map(lambda x: str(x[0]), all_accuracies_images[:4])))
-        plt.savefig("output_epoch_" + str(epoch_num) + ".png")
+        plt.suptitle("worst results from testing, balanced accuracies are: \n" + ", ".join(map(lambda x: str(x)[:5], displayed_accuracies)))
+        plt.savefig("output_epoch_" + str(epoch_num) + ".png", dpi=100)
         plt.close(f)
 
 
