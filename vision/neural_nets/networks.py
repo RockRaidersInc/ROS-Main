@@ -74,7 +74,7 @@ class LargerNet(torch.nn.Module):
 
 
 class Yolo2Transfer(torch.nn.Module):
-    def __init__(self, pretrained_weights):
+    def __init__(self, pretrained_weights=None):
         super(Yolo2Transfer, self).__init__()
         
         self.width = 416
@@ -212,7 +212,8 @@ class Yolo2Transfer(torch.nn.Module):
         model.requires_grad = False
         self.models.append(model)
 
-        self.load_state_dict(torch.load("yolo2_partial_weights"))
+        if pretrained_weights is None:
+            self.load_state_dict(torch.load("yolo2_partial_weights"))
 
         self.condense_1 = nn.Sequential()
         self.condense_1.add_module('condense_1_conv1', nn.Conv2d(256, 16, 1, 1, 0, bias=False))
@@ -234,6 +235,9 @@ class Yolo2Transfer(torch.nn.Module):
         self.classify_module.add_module('classifier_leaky1', nn.LeakyReLU(0.1, inplace=False))
         self.classify_module.add_module('classifier_conv2', nn.Conv2d(8, 1, 1, 1, 0, bias=False))
         self.classify_module.requires_grad = True
+
+        if pretrained_weights is not None:
+            self.load_state_dict(torch.load(pretrained_weights))
     
 
     def prep_images(self, imgs):
@@ -244,11 +248,8 @@ class Yolo2Transfer(torch.nn.Module):
         height = 416
         xs = []
         for img in imgs:
-            if (self.width, self.height) != img.size:
-                img = PIL.Image.fromarray(np.array(img))
-                sized = img.resize((width, width))
-            else:
-                sized = img
+            img = PIL.Image.fromarray(np.array(img))
+            sized = img.resize((width, width))
             img = torch.ByteTensor(torch.ByteStorage.from_buffer(sized.tobytes()))
             img = img.view(height, width, 3).transpose(0,1).transpose(0,2).contiguous()
             img = img.view(3, 416, 416)

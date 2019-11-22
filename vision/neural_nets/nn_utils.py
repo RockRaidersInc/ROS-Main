@@ -165,7 +165,7 @@ class data_loader:
             excluded_resized = cv2.resize(excluded, (self.label_shrunk_width, self.label_shrunk_width), interpolation=cv2.INTER_AREA != 0).astype(np.float32)[:, :]
             self.excluded[i] = excluded_resized
             
-            intermediate = (label[:, :, 1] == 255).astype(np.uint8)
+            intermediate = (label[:, :, 1] > 70).astype(np.uint8)
             label_opened = cv2.morphologyEx((intermediate != 0).astype(np.uint8), cv2.MORPH_CLOSE, np.ones((5, 5)))
             label_resized = cv2.resize(label_opened, (self.label_shrunk_width, self.label_shrunk_width), interpolation=cv2.INTER_AREA != 0).astype(np.float32)[:, :]
             self.labels[i] = (label_resized).astype(np.float32) * 2 - 1
@@ -184,7 +184,6 @@ class data_loader:
     def __len__(self):
         return len(self.input_image_names)
 
-    @memoized
     def _read_img_from_disk(self, path, mode):
         """
         Saves a little time by not reading the same image from disk twice. The @memoized annotation means that if
