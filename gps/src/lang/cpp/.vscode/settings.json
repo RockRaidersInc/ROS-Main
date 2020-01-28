@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "iosfwd": "cpp",
+        "__functional_03": "cpp",
+        "functional": "cpp"
+    }
+}
