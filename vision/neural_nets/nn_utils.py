@@ -69,7 +69,7 @@ def files_within(directory_path):
     pass
     for dirpath, dirnames, filenames in os.walk(directory_path):
         for file_name in filenames:
-            if file_name.endswith("jpg") or file_name.endswith("png"):
+            if file_name.lower().endswith("jpg") or file_name.lower().endswith("png"):
                 relative_path = os.path.join(dirpath[len(directory_path): ], file_name)
                 yield relative_path if relative_path[0] != "/" else relative_path[1:]
 
@@ -112,6 +112,7 @@ class data_loader:
         self.bottom_right_corner = np.random.randint(1, self.shrunk_width // 4, [2])
         self.reflect_1, self.reflect_2 = np.random.randint(0, 1, [2]) * 2 - 1
         self.color_scaling = np.random.random([3]) * (1.2 - 0.8) + 0.8  # this produces random floats on the range [0.8, 1.2]
+        self.color_scaling *= np.random.random([1]) * 0.5 + 0.5  # simulate low lighting where all colors are equally effected
         self.color_offset = np.random.randint(-20, 20, [3])
 
         self.images = {}

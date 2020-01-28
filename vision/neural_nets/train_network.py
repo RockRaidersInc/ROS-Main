@@ -1,4 +1,8 @@
 from __future__ import print_function
+import math
+import time
+
+import cProfile
 
 import torch
 from torch import nn
@@ -7,24 +11,14 @@ matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import PIL
 
-import math
-
 from nn_utils import *
 from confusion_mat_tools import save_confusion_matrix
 import networks
 
 
-np.set_printoptions(precision=6)
-
-def whopskip():
-    print("\r\n plopper" * 100)
-
-
 # make numpy printing more readable
-int_formatter = lambda x: "%3if" % x
-np.set_printoptions(formatter={'int_kind':int_formatter})
+np.set_printoptions(formatter={'int_kind':lambda x: "%3if" % x})
 np.set_printoptions(precision=5, suppress=True)
-
 
 input_file_list = "image_list.txt"
 shrunk_width = 416
@@ -34,12 +28,11 @@ def main():
     train_images = data_loader("train", shrunk_width, shrunk_width)
     test_images = data_loader("test", shrunk_width, shrunk_width)
 
-    epochs = 1000  # number of times to go through the training set
+    epochs = 100  # number of times to go through the training set
     N = 1  # batch size
-    # model = networks.Yolo2Transfer(pretrained_weights="nn_weights").to(get_default_torch_device())
+    
     model = networks.Yolo2Transfer().to(get_default_torch_device())
-
-    loss_fn = torch.nn.L1Loss()
+    # model = networks.Yolo2Transfer_smaller().to(get_default_torch_device())
 
     learning_rate = 1e-4
     # use the ADAM optimizer because it has fewer parameters to tune than SGD
@@ -54,11 +47,17 @@ def main():
         print()
         loss_list = []
 
+        data_loading_time = 0
+        inference_time = 0
+        backprop_update_time = 0
+
         print("starting epoch " + str(epoch_num))
         for i in range(0, len(train_images), N):
             print("\ron image " + str(i) + "/" + str(len(train_images)), end='')
 
             optimizer.zero_grad()  # just to make sure the network doesn't learn from any previous testing or training data
+
+            last_time = time.time()
 
             # Forward pass: compute predicted y by passing x to the model.
             next_batch_images_unprocessed = []
@@ -72,24 +71,15 @@ def main():
 
             label_images = torch.from_numpy(np.array(next_batch_labels)).float()
 
-            if label_images.max() == -1:
-                # there are no lane points in this batch
-                continue
-
             exclusion_images = torch.from_numpy(np.array(next_batch_exclusion_mask)).float()
+
+            data_loading_time += time.time() - last_time
+            last_time = time.time()
+
             predictions = model(next_batch_images_unprocessed).to("cpu")
-            # lane_bg_scaling_factor = 1 / (np.mean(np.array(next_batch_labels) / 2 + 0.5) + 0.0001) + 0.75
 
-            # Compute and print loss.
-            # pixelwise_squared_diff = torch.pow(predictions - label_images, 2)
-            # lane_pixel_loss = (label_images + 1) / 2 * pixelwise_squared_diff * lane_bg_scaling_factor    # component of loss from pixels on a lane
-            # other_pixel_loss = (label_images - 1) / -2 * pixelwise_squared_diff        # component of loss from pixels in the background
-            # loss = torch.mean((lane_pixel_loss + other_pixel_loss) * (1 - exclusion_images))
-
-            # Compute and print loss.
-            # lane_pixel_loss = np.abs((label_images + 1) / 2 * lane_bg_scaling_factor - 1)  # image with 0 where there is no lane, higher where there is lane
-            # pixelwise_squared_diff = torch.pow((predictions - label_images) * lane_pixel_loss, 2)
-            # loss = torch.mean(pixelwise_squared_diff)
+            inference_time += time.time() - last_time
+            last_time = time.time()
 
             positive_points = (label_images * (1 - exclusion_images) + 1) / 2  # one where there is a lane, 0 otherwise
             negative_points = (label_images * (1 - exclusion_images) - 1) / -2  # one where there is a lane, 0 otherwise
@@ -97,8 +87,8 @@ def main():
             squared_loss = torch.pow(predictions - label_images, 2)
             true_positives = torch.sum(positive_points * squared_loss)
             true_negatives = torch.sum(negative_points * squared_loss)
-            loss = (true_positives / (true_positives + torch.sum(positive_points) + 0.00001) + 
-                    (true_negatives / (true_negatives + torch.sum(negative_points) + 0.00001))) / 2  # 0.00001 added to avoid division by 0
+            loss = (true_positives / (true_positives + torch.sum(positive_points) + 0.001) + 
+                    (true_negatives / (true_negatives + torch.sum(negative_points) + 0.001))) / 2  # 0.001 added to avoid division by 0
 
             # loss = torch.mean(torch.pow(predictions - label_images, 2))
             # print(" \t loss: ", loss.data.cpu().numpy())
@@ -107,17 +97,23 @@ def main():
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+            backprop_update_time += time.time() - last_time
+            last_time = time.time()
+
             train_images.update_data_augmentation()
             
         train_images.shuffle()
         print()
         print("loss from epoch " + str(epoch_num) + ": " + str(np.mean(loss_list)))
-        # print("average epoch training accuracy:", epoch_correct_predictions / len(train_images) / np.product(train_images[0][0].shape))
+        print("average time spent loading image: %2.3f, running model: %2.3f, backprop and weight updates: %2.3f" % 
+                (data_loading_time / len(train_images), inference_time / len(train_images), backprop_update_time / len(train_images)))
+
 
         # now that the network has been trained for one epoch, test it on the testing data
-        if epoch_num % 4 == 3:
+        if epoch_num % 5 == 0:
             evaluate_model(model, train_images, epoch_num, train=True, show_images=False, sample=0.2)
-            epoch_test_accuracy = evaluate_model(model, test_images, epoch_num, train=False, show_images=True if epoch_num % 4 == 3 else False)
+            epoch_test_accuracy = evaluate_model(model, test_images, epoch_num, train=False, show_images=True if epoch_num % 5 == 0 else False)
             
             if best_test_accuracy < epoch_test_accuracy:
                 best_test_accuracy = epoch_test_accuracy
@@ -201,13 +197,24 @@ def get_confusion_mat_single_image(model, image, label):
     x = [image]
 
     prediction_raw = model(x).data.cpu().numpy().astype(np.float32)
-    prediction = (prediction_raw > 0).astype(np.int32)
-    label_thresholded = (label > 0).astype(np.int32)
+    prediction = (prediction_raw > 0)
+    label_thresholded = (label > 0)
 
-    for x in range(prediction.shape[2]):
-        for y in range(prediction.shape[3]):
-            confusion[label_thresholded[x, y], prediction[0, 0, x, y]] += 1
+    # for x in range(prediction.shape[2]):
+    #     for y in range(prediction.shape[3]):
+    #         confusion[label_thresholded[x, y], prediction[0, 0, x, y]] += 1
+
+    true_positives = np.count_nonzero(label_thresholded * prediction)
+    true_negatives = np.count_nonzero(~label_thresholded * ~prediction)
+    false_positives = np.count_nonzero(~label_thresholded * prediction)
+    false_negatives = np.count_nonzero(label_thresholded * ~prediction)
+
+    confusion[0, 0] = true_negatives
+    confusion[1, 0] = false_negatives
+    confusion[0, 1] = false_positives
+    confusion[1, 1] = true_positives
+
     return confusion
 
 if __name__ == "__main__":
-    main()
+    cProfile.run('main()', 'profile_results')
