@@ -1,3 +1,4 @@
+import pdb
 import random
 import numpy as np
 import cv2
@@ -9,9 +10,7 @@ from PIL import Image
 
 from confusion_mat_tools import save_confusion_matrix
 
-
 np.random.seed(0)
-
 
 label_name_to_onehot = {"other" :     np.array([1, 0]),
                         "lane":      np.array([0, 1])}
@@ -25,7 +24,6 @@ index_to_label_name = {0: "other",
 
 def to_indices(arr):
     return np.array(list(map(lambda ar: ar.argmax(), [arr[i] for i in range(arr.shape[0])])))
-
 
 
 def get_default_torch_device():
@@ -69,7 +67,7 @@ def files_within(directory_path):
     pass
     for dirpath, dirnames, filenames in os.walk(directory_path):
         for file_name in filenames:
-            if file_name.endswith("jpg") or file_name.endswith("png"):
+            if file_name.lower().endswith("jpg") or file_name.lower().endswith("png"):
                 relative_path = os.path.join(dirpath[len(directory_path): ], file_name)
                 yield relative_path if relative_path[0] != "/" else relative_path[1:]
 
@@ -80,43 +78,67 @@ class data_loader:
     This class lazily loads training datasets (it makes debugging a lot faster if you
     don't have to wait for the entire dataset to load first).
     """
-    def __init__(self, input_folder, image_size, label_size):
-        self.images = {}
-        self.labels = {}
+    def __init__(self, input_folder, image_size, label_size, num_augmentation_sets=10):
+        self.unaugmented_images = {}
+        self.unaugmented_labels = {}
+        self.unaugmented_excluded = {}
+        self.augmented_image_sets = [{} for i in range(num_augmentation_sets)]
+        self.augmented_label_sets = [{} for i in range(num_augmentation_sets)]
+        self.augmented_excluded_sets = [{} for i in range(num_augmentation_sets)]
         self.shrunk_width = image_size
         self.label_shrunk_width = label_size
         self.input_folder = os.path.join("../combined_dataset", input_folder)
 
-        self.input_image_names = list(files_within(os.path.join(self.input_folder, "images")))
+        self.input_image_names = list([x for x in files_within(os.path.join(self.input_folder, "images")) if "no" not in x])
+        self.image_ordering = list(range(len(self.input_image_names)))
 
-        random.shuffle(self.input_image_names)
+        self.augmentation_specs = [{"top_left_corner": np.random.randint(0, self.shrunk_width // 4, [2]),
+                                   "bottom_right_corner": np.random.randint(1, self.shrunk_width // 4, [2]),
+                                   "reflect_1": 1,  # don't actually fip long vertical axis, that wouldn't ever represent real world data
+                                   "reflect_2": np.random.randint(0, 2, [1])[0] * 2 - 1,
+                                   "color_scaling": (np.random.random([3]) * (1.1 - 0.9) + 0.9),
+                                   "color_offset": np.random.randint(-10, 10, [3])} for i in range(num_augmentation_sets)]
+
         self.clear_augmentation()
 
     def clear_augmentation(self):
+        
         self.top_left_corner = [0, 0]
         self.bottom_right_corner = [1, 1]
         self.reflect_1 = 1
         self.reflect_2 = 1
         self.color_scaling = np.array([1, 1, 1])
         self.color_offset = np.array([0, 0, 0])
+        
+        self.images = self.unaugmented_images
+        self.labels = self.unaugmented_labels
+        self.excluded = self.unaugmented_excluded
 
-        self.images = {}
-        self.labels = {}
-        self.excluded = {}
-    
     def shuffle(self):
-        random.shuffle(self.input_image_names)
-    
+        random.shuffle(self.image_ordering)
+
     def update_data_augmentation(self):
+        """
         self.top_left_corner = np.random.randint(0, self.shrunk_width // 4, [2])
         self.bottom_right_corner = np.random.randint(1, self.shrunk_width // 4, [2])
         self.reflect_1, self.reflect_2 = np.random.randint(0, 1, [2]) * 2 - 1
         self.color_scaling = np.random.random([3]) * (1.2 - 0.8) + 0.8  # this produces random floats on the range [0.8, 1.2]
+        self.color_scaling *= np.random.random([1]) * 0.5 + 0.5  # simulate low lighting where all colors are equally effected
         self.color_offset = np.random.randint(-20, 20, [3])
+        """
 
-        self.images = {}
-        self.labels = {}
-        self.excluded = {}
+        image_set_num = np.random.randint(len(self.augmentation_specs))
+
+        self.top_left_corner = self.augmentation_specs[image_set_num]["top_left_corner"]
+        self.bottom_right_corner = self.augmentation_specs[image_set_num]["bottom_right_corner"]
+        self.reflect_1 = self.augmentation_specs[image_set_num]["reflect_1"]
+        self.reflect_2 = self.augmentation_specs[image_set_num]["reflect_2"]
+        self.color_scaling = self.augmentation_specs[image_set_num]["color_scaling"]
+        self.color_offset = self.augmentation_specs[image_set_num]["color_offset"]
+
+        self.images = self.augmented_image_sets[image_set_num]
+        self.labels = self.augmented_label_sets[image_set_num]
+        self.excluded = self.augmented_excluded_sets[image_set_num]
 
     def _augment_image(self, img, change_colors=False):
         """
@@ -125,7 +147,6 @@ class data_loader:
         them they are a little different (and effectively somewhat new training data). This isn't as good as
         having a larger training dataset, but it helps. This function "augments" training images.
         """
-        
         # for input images
         if len(img.shape) == 3:
             # crop the image a bit
@@ -151,7 +172,8 @@ class data_loader:
             raise Exception()
         
 
-    def __getitem__(self, i):
+    def __getitem__(self, i_raw):
+        i = self.image_ordering[i_raw]
         if i not in self.images.keys():
             unaugmented = self._read_img_from_disk(self.input_folder + "/images/" + self.input_image_names[i], cv2.IMREAD_COLOR)
             augmented = self._augment_image(unaugmented, change_colors=True)
@@ -184,6 +206,7 @@ class data_loader:
     def __len__(self):
         return len(self.input_image_names)
 
+    @memoized
     def _read_img_from_disk(self, path, mode):
         """
         Saves a little time by not reading the same image from disk twice. The @memoized annotation means that if
