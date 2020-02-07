@@ -22,7 +22,7 @@ import networks
 np.set_printoptions(formatter={'int_kind':lambda x: "%3if" % x})
 np.set_printoptions(precision=5, suppress=True)
 
-hard_negative_mining = True
+hard_negative_mining = False
 
 input_file_list = "image_list.txt"
 shrunk_width = int(416*1.5)
@@ -40,8 +40,8 @@ def main():
 
     learning_rate = 1e-4
     # use the ADAM optimizer because it has fewer parameters to tune than SGD
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.0001)
-    # optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.0000)  # weight decay was 0.0001
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
     best_test_accuracy = 0
 
@@ -188,7 +188,7 @@ def evaluate_model(model, image_set, epoch_num, train=False, show_images=False, 
             label[0, 0] = 1
             label[0, 1] = -1
             ax_list[2][i].imshow(label, cmap='jet', alpha=1)
-        plt.suptitle("worst results from testing, balanced accuracies are: \n" + ", ".join(map(lambda x: str(x)[:5], displayed_accuracies)))
+        plt.suptitle("best and worst results from testing, balanced accuracies are: \n" + ", ".join(map(lambda x: str(x)[:5], displayed_accuracies)))
         plt.savefig("output_epoch_" + str(epoch_num) + ("_train" if train else "_test") + ".png", dpi=100)
         plt.close(f)
 
