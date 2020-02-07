@@ -63,6 +63,8 @@ def main():
             optimizer.zero_grad()  # just to make sure the network doesn't learn from any previous testing or training data
             last_time = time.time()
 
+            last_time = time.time()
+
             # Forward pass: compute predicted y by passing x to the model.
             next_batch_images_unprocessed = []
             next_batch_labels = []
@@ -91,6 +93,7 @@ def main():
             squared_loss = torch.pow(predictions - label_images, 2)
             true_positives = torch.sum(positive_points * squared_loss)
             true_negatives = torch.sum(negative_points * squared_loss)
+
             loss = (true_positives / (torch.sum(positive_points) + 0.001) +
                     (true_negatives / (torch.sum(negative_points) + 0.001))) / 2  # 0.001 added to avoid division by 0
 
@@ -113,7 +116,6 @@ def main():
         # how much of a speedup do we get from not updating the augmentation?
         if epoch_num % 1 == 0:
             train_images.shuffle()
-            train_images.update_data_augmentation()
 
         print()
         print("loss from epoch " + str(epoch_num) + ": " + str(np.mean(loss_list)))

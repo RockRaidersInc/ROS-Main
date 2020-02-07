@@ -256,7 +256,6 @@ class Yolo2Base(torch.nn.Module):
 
         if pretrained_weights is None:
             self.load_state_dict(torch.load("yolo2_partial_weights"))
-    
 
     def prep_images(self, imgs):
         """
@@ -276,7 +275,6 @@ class Yolo2Base(torch.nn.Module):
 
         x = torch.stack(xs).to(get_default_torch_device())
         return x
-
 
 
 class Yolo2Transfer(Yolo2Base):
@@ -422,4 +420,3 @@ class Yolo2Transfer_smaller(Yolo2Base):
         
         original_size = nn.functional.interpolate(classified, size=np.array(imgs[0]).shape[:2])  # resize the output back to the input's origional size
         return original_size
-
