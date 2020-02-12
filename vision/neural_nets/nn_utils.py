@@ -98,6 +98,7 @@ class data_loader:
                                    "reflect_2": np.random.randint(0, 2, [1])[0] * 2 - 1,
                                    "color_scaling": (np.random.random([3]) * (1.1 - 0.9) + 0.9),
                                    "color_offset": np.random.randint(-10, 10, [3])} for i in range(num_augmentation_sets)]
+        self.augmentation_current_index = 0
 
         self.clear_augmentation()
 
@@ -127,7 +128,8 @@ class data_loader:
         self.color_offset = np.random.randint(-20, 20, [3])
         """
 
-        image_set_num = np.random.randint(len(self.augmentation_specs))
+        image_set_num = self.augmentation_current_index
+        self.augmentation_current_index = (self.augmentation_current_index + 1) % len(self.augmentation_specs)
 
         self.top_left_corner = self.augmentation_specs[image_set_num]["top_left_corner"]
         self.bottom_right_corner = self.augmentation_specs[image_set_num]["bottom_right_corner"]
