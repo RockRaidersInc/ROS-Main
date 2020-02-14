@@ -113,6 +113,9 @@ class Yolo2Base(torch.nn.Module):
         
         self.models = torch.nn.ModuleList()
 
+        track_running_stats = True
+        bn_momentum = 1
+
         # [convolutional]
         # batch_normalize=1
         # filters=32
@@ -122,7 +125,7 @@ class Yolo2Base(torch.nn.Module):
         # activation=leaky
         model = nn.Sequential()
         model.add_module('conv1', nn.Conv2d(3, 32, 3, 1, 1, bias=False))
-        model.add_module('bn1', nn.BatchNorm2d(32))
+        model.add_module('bn1', nn.BatchNorm2d(32, momentum=bn_momentum))
         model.add_module('leaky1', nn.LeakyReLU(0.1, inplace=True))
         model.requires_grad = False
         self.models.append(model)
@@ -144,7 +147,7 @@ class Yolo2Base(torch.nn.Module):
         # activation=leaky
         model = nn.Sequential()
         model.add_module('conv2', nn.Conv2d(32, 64, 3, 1, 1, bias=False))
-        model.add_module('bn2', nn.BatchNorm2d(64))
+        model.add_module('bn2', nn.BatchNorm2d(64, momentum=bn_momentum))
         model.add_module('leaky2', nn.LeakyReLU(0.1, inplace=True))
         model.requires_grad = False
         self.models.append(model)
@@ -166,7 +169,7 @@ class Yolo2Base(torch.nn.Module):
         # activation=leaky
         model = nn.Sequential()
         model.add_module('conv3', nn.Conv2d(64, 128, 3, 1, 1, bias=False))
-        model.add_module('bn3', nn.BatchNorm2d(128))
+        model.add_module('bn3', nn.BatchNorm2d(128, momentum=bn_momentum))
         model.add_module('leaky3', nn.LeakyReLU(0.1, inplace=True))
         model.requires_grad = False
         self.models.append(model)
@@ -181,7 +184,7 @@ class Yolo2Base(torch.nn.Module):
         # activation=leaky
         model = nn.Sequential()
         model.add_module('conv4', nn.Conv2d(128, 64, 1, 1, 0, bias=False))
-        model.add_module('bn4', nn.BatchNorm2d(64))
+        model.add_module('bn4', nn.BatchNorm2d(64, momentum=bn_momentum))
         model.add_module('leaky4', nn.LeakyReLU(0.1, inplace=True))
         model.requires_grad = False
         self.models.append(model)
@@ -196,7 +199,7 @@ class Yolo2Base(torch.nn.Module):
         # activation=leaky
         model = nn.Sequential()
         model.add_module('conv5', nn.Conv2d(64, 128, 3, 1, 1, bias=False))
-        model.add_module('bn5', nn.BatchNorm2d(128))
+        model.add_module('bn5', nn.BatchNorm2d(128, momentum=bn_momentum))
         model.add_module('leaky5', nn.LeakyReLU(0.1, inplace=True))
         model.requires_grad = False
         self.models.append(model)
@@ -218,7 +221,7 @@ class Yolo2Base(torch.nn.Module):
         # activation=leaky
         model = nn.Sequential()
         model.add_module('conv6', nn.Conv2d(128, 256, 3, 1, 1, bias=False))
-        model.add_module('bn6', nn.BatchNorm2d(256))
+        model.add_module('bn6', nn.BatchNorm2d(256, momentum=bn_momentum))
         model.add_module('leaky6', nn.LeakyReLU(0.1, inplace=True))
         model.requires_grad = False
         self.models.append(model)
@@ -233,7 +236,7 @@ class Yolo2Base(torch.nn.Module):
         # activation=leaky
         model = nn.Sequential()
         model.add_module('conv7', nn.Conv2d(256, 128, 1, 1, 0, bias=False))
-        model.add_module('bn7', nn.BatchNorm2d(128))
+        model.add_module('bn7', nn.BatchNorm2d(128, momentum=bn_momentum))
         model.add_module('leaky7', nn.LeakyReLU(0.1, inplace=True))
         model.requires_grad = False
         self.models.append(model)
@@ -248,13 +251,15 @@ class Yolo2Base(torch.nn.Module):
         # activation=leaky
         model = nn.Sequential()
         model.add_module('conv8', nn.Conv2d(128, 256, 3, 1, 1, bias=False))
-        model.add_module('bn8', nn.BatchNorm2d(256))
+        model.add_module('bn8', nn.BatchNorm2d(256, momentum=bn_momentum))
         model.add_module('leaky8', nn.LeakyReLU(0.1, inplace=True))
         model.requires_grad = False
         self.models.append(model)
         self.model_name_index[len(self.model_name_index)] = "conv8"
 
         if pretrained_weights is None:
+            # state_dict = torch.load("yolo2_partial_weights")
+            # print(state_dict["models.0.bn1.running_mean"])  #, "models.0.bn1.running_var", "models.0.bn1.num_batches_tracked"
             self.load_state_dict(torch.load("yolo2_partial_weights"))
 
     def prep_images(self, imgs):

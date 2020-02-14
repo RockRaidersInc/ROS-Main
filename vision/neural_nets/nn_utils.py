@@ -78,7 +78,7 @@ class data_loader:
     This class lazily loads training datasets (it makes debugging a lot faster if you
     don't have to wait for the entire dataset to load first).
     """
-    def __init__(self, input_folder, image_size, label_size, num_augmentation_sets=10):
+    def __init__(self, input_folder, image_size, label_size, num_augmentation_sets=5):
         self.unaugmented_images = {}
         self.unaugmented_labels = {}
         self.unaugmented_excluded = {}
@@ -117,6 +117,9 @@ class data_loader:
 
     def shuffle(self):
         random.shuffle(self.image_ordering)
+
+    def unshuffle(self):
+        sorted(self.image_ordering)
 
     def update_data_augmentation(self):
         """
@@ -208,7 +211,6 @@ class data_loader:
     def __len__(self):
         return len(self.input_image_names)
 
-    @memoized
     def _read_img_from_disk(self, path, mode):
         """
         Saves a little time by not reading the same image from disk twice. The @memoized annotation means that if

@@ -38,7 +38,7 @@ def cyclical_lr(stepsize, min_lr=3e-4, max_lr=3e-3, training_log={}):
     def lr_lambda(it):
         # next_lr = min_lr + (max_lr - min_lr) * relative(it, stepsize)
         epoch = training_log["current_epoch"]
-        next_lr = max_lr * 10 ** (-math.floor(epoch/400.))
+        next_lr = max_lr * 10 ** (-math.floor(epoch/100.))
         # training_log["lr_iter"].append(epoch)
         # training_log["lr_val"].append(next_lr)
         return next_lr
@@ -53,8 +53,8 @@ def cyclical_lr(stepsize, min_lr=3e-4, max_lr=3e-3, training_log={}):
 
 
 def main():
-    train_images = data_loader("train", shrunk_width, shrunk_width)
-    test_images = data_loader("test", shrunk_width, shrunk_width)
+    train_images = data_loader("train", shrunk_width, shrunk_width, num_augmentation_sets=10)
+    test_images = data_loader("test", shrunk_width, shrunk_width, num_augmentation_sets=0)
 
     epochs = 5000  # number of times to go through the training set
     batch_size = 4  # batch size
@@ -62,7 +62,7 @@ def main():
     model = networks.Yolo2Transfer().to(get_default_torch_device())
     # model = networks.Yolo2Transfer_smaller().to(get_default_torch_device())
 
-    initial_learning_rate = 1e-3
+    initial_learning_rate = 1e-2
     momentum = 0.9
     weight_decay = 0.000
     optimizer_name = "SGD"
@@ -96,7 +96,10 @@ def main():
 
     for epoch_num in range(epochs):
         training_log["current_epoch"] = epoch_num
-        model.train()  # turn on dropout
+
+        # model.train()  # turn on dropout and batch norm
+        model.eval()
+
         epoch_correct_predictions = 0
         print()
         loss_list = []
@@ -106,8 +109,23 @@ def main():
         backprop_update_time = 0
 
         print("starting epoch " + str(epoch_num))
+
+        if epoch_num >= 10:
+            if epoch_num > 10:
+                new_state_dict = model.state_dict()
+                for key in new_state_dict.keys():
+                    try:
+                        if prev_state_dict[key] != new_state_dict[key]:
+                            print("state dict changed for key " + key)
+                    except RuntimeError as e:
+                        if torch.max(prev_state_dict[key] - new_state_dict[key]) > 0.00000001:
+                            print("state dict changed for key " + key)
+            prev_state_dict = model.state_dict()
+
         # pdb.set_trace()
         for i in range(0, len(train_images), batch_size):
+            if epoch_num >= 10:
+                continue
             print("\ron image " + str(i) + "/" + str(len(train_images)), end='')
 
             optimizer.zero_grad()  # just to make sure the network doesn't learn from any previous testing or training data
@@ -135,19 +153,24 @@ def main():
             data_loading_time += time.time() - last_time
             last_time = time.time()
 
+            # predict the training images
             predictions = model(next_batch_images_unprocessed).to("cpu")
-
-            predictions = torch.nn.Tanh()(predictions * 1.1)
-
             inference_time += time.time() - last_time
             last_time = time.time()
 
+            # calculate the training loss
+            #TODO: explain what this loss function does
+            pixelwise_error_unthresholded = torch.abs(predictions - label_images) - 0.5
+            pixelwise_loss = torch.max(pixelwise_error_unthresholded, 0.001 * pixelwise_error_unthresholded)
+
+            # +1 where the gt image is lane and not excluded, 0 everywhere else
             positive_points = (label_images ==  1) * (exclusion_images == 0).type(torch.float32)
+            # +1 where the gt image is not lane and not excluded, 0 everywhere else
             negative_points = (label_images == -1) * (exclusion_images == 0).type(torch.float32)
 
-            squared_loss = torch.pow(predictions - label_images, 2)
-            true_positives = torch.sum(positive_points * squared_loss)
-            true_negatives = torch.sum(negative_points * squared_loss)
+            # pixelwise_loss = torch.pow(predictions - label_images, 2)
+            true_positives = torch.sum(positive_points * pixelwise_loss)
+            true_negatives = torch.sum(negative_points * pixelwise_loss)
 
             loss = (true_positives / (torch.sum(positive_points) + 0.001) +
                     (true_negatives / (torch.sum(negative_points) + 0.001))) / 2  # 0.001 added to avoid division by 0
@@ -192,6 +215,9 @@ def main():
         # now that the network has been trained for one epoch, test it on the testing data
         if epoch_num == 5 or epoch_num % 10 == 0:
             epoch_train_accuracy = evaluate_model(model, train_images, epoch_num, train=True, show_images=True)
+            if epoch_num >= 10:
+                epoch_train_accuracy = evaluate_model(model, train_images, epoch_num, train=True, show_images=True)
+                epoch_train_accuracy = evaluate_model(model, train_images, epoch_num, train=True, show_images=True)
             epoch_test_accuracy = evaluate_model(model, test_images, epoch_num, train=False, show_images=True)
             # epoch_test_accuracy = evaluate_model(model, train_images, epoch_num, train=True, show_images=True if epoch_num % 5 == 0 else False)
 
@@ -252,16 +278,16 @@ def save_graphs(training_log):
     plt.close(f)
 
 
-
 def evaluate_model(model, image_set, epoch_num, train=False, show_images=False, sample=1):
-    model.eval()  # turn off dropout (if the network uses dropout)
+    model.eval()  # turn off dropout and batch norm (if the network uses dropout)
     image_set.clear_augmentation()
-    # image_set.shuffle()
+    image_set.unshuffle()
     confusion = np.zeros((2, 2), dtype=np.float64)
-    image_accuracies = []
     all_accuracies_images = []
 
-    for i in range(int(math.floor(len(image_set) * sample))):
+    #image_set = data_loader("train" if train else "test", shrunk_width, shrunk_width, num_augmentation_sets=0)
+
+    for i in range(len(image_set)):
         image, label, excluded = image_set[i]
         new_confusion = get_confusion_mat_single_image(model, image, label)
         balanced_accuracy = get_balanced_accuracy(new_confusion)
@@ -274,7 +300,6 @@ def evaluate_model(model, image_set, epoch_num, train=False, show_images=False, 
         print(" " * (11 - len(index_to_label_name[i])) + index_to_label_name[i] + ": ", end="")
         print(confusion[i] / confusion.sum())
 
-    image_accuracies.append(np.sum(confusion * np.eye(2, 2)) / np.sum(confusion))
     if train:
         print("training balanced accuracy: ", end="")
     else:
@@ -300,7 +325,6 @@ def evaluate_model(model, image_set, epoch_num, train=False, show_images=False, 
             prediction_raw = np.tanh(model(x).data.cpu().numpy().astype(np.float32))
             im_obj = ax_list[1][i].imshow(prediction_raw.squeeze(), cmap='jet', alpha=1, norm=colorbar_norm)
             f.colorbar(im_obj, ax=ax_list[1][i])
-            print(model(x).data.cpu().numpy().max(), model(x).data.cpu().numpy().min(), model(x).data.cpu().numpy().mean())
 
             label[0, 0] = 1
             label[0, 1] = -1
