@@ -19,9 +19,12 @@ from nn_utils import *
 from confusion_mat_tools import save_confusion_matrix
 import networks
 
+import unittest
+
 
 # make numpy printing more readable
 np.set_printoptions(formatter={'int_kind':lambda x: "%3if" % x})
+np.set_printoptions(formatter={'float_kind':lambda x: "%3.7f" % x})
 np.set_printoptions(precision=5, suppress=True)
 
 hard_negative_mining = False
@@ -38,7 +41,7 @@ def cyclical_lr(stepsize, min_lr=3e-4, max_lr=3e-3, training_log={}):
     def lr_lambda(it):
         # next_lr = min_lr + (max_lr - min_lr) * relative(it, stepsize)
         epoch = training_log["current_epoch"]
-        next_lr = max_lr * 10 ** (-math.floor(epoch/100.))
+        next_lr = max_lr * 10 ** (-math.floor(epoch/60.))
         # training_log["lr_iter"].append(epoch)
         # training_log["lr_val"].append(next_lr)
         return next_lr
@@ -65,7 +68,7 @@ def main():
     initial_learning_rate = 1e-2
     momentum = 0.9
     weight_decay = 0.000
-    optimizer_name = "SGD"
+    optimizer_name = "ADAM"
 
     training_log = {"training_loss_iter": [],
                     "training_loss_val": [],
@@ -94,11 +97,11 @@ def main():
 
     best_test_accuracy = 0
 
-    for epoch_num in range(epochs):
+    for epoch_num in range(0, epochs):
         training_log["current_epoch"] = epoch_num
 
-        # model.train()  # turn on dropout and batch norm
-        model.eval()
+        model.train()  # turn on dropout and batch norm
+        # model.eval()
 
         epoch_correct_predictions = 0
         print()
@@ -110,6 +113,7 @@ def main():
 
         print("starting epoch " + str(epoch_num))
 
+        """
         if epoch_num >= 10:
             if epoch_num > 10:
                 new_state_dict = model.state_dict()
@@ -121,11 +125,12 @@ def main():
                         if torch.max(prev_state_dict[key] - new_state_dict[key]) > 0.00000001:
                             print("state dict changed for key " + key)
             prev_state_dict = model.state_dict()
+        """
 
         # pdb.set_trace()
+        # model.load_state_dict(torch.load("save_nn_weights_epoch_0"))
+
         for i in range(0, len(train_images), batch_size):
-            if epoch_num >= 10:
-                continue
             print("\ron image " + str(i) + "/" + str(len(train_images)), end='')
 
             optimizer.zero_grad()  # just to make sure the network doesn't learn from any previous testing or training data
@@ -158,22 +163,26 @@ def main():
             inference_time += time.time() - last_time
             last_time = time.time()
 
-            # calculate the training loss
-            #TODO: explain what this loss function does
-            pixelwise_error_unthresholded = torch.abs(predictions - label_images) - 0.5
-            pixelwise_loss = torch.max(pixelwise_error_unthresholded, 0.001 * pixelwise_error_unthresholded)
+            if False:
+                # calculate the training loss
+                #TODO: explain what this loss function does
+                pixelwise_error_unthresholded = torch.abs(predictions - label_images) - 0.5
+                pixelwise_loss = torch.max(pixelwise_error_unthresholded, 0.001 * pixelwise_error_unthresholded)
 
-            # +1 where the gt image is lane and not excluded, 0 everywhere else
-            positive_points = (label_images ==  1) * (exclusion_images == 0).type(torch.float32)
-            # +1 where the gt image is not lane and not excluded, 0 everywhere else
-            negative_points = (label_images == -1) * (exclusion_images == 0).type(torch.float32)
+                # +1 where the gt image is lane and not excluded, 0 everywhere else
+                positive_points = (label_images ==  1) * (exclusion_images == 0).type(torch.float32)
+                # +1 where the gt image is not lane and not excluded, 0 everywhere else
+                negative_points = (label_images == -1) * (exclusion_images == 0).type(torch.float32)
 
-            # pixelwise_loss = torch.pow(predictions - label_images, 2)
-            true_positives = torch.sum(positive_points * pixelwise_loss)
-            true_negatives = torch.sum(negative_points * pixelwise_loss)
+                # pixelwise_loss = torch.pow(predictions - label_images, 2)
+                true_positives = torch.sum(positive_points * pixelwise_loss)
+                true_negatives = torch.sum(negative_points * pixelwise_loss)
 
-            loss = (true_positives / (torch.sum(positive_points) + 0.001) +
-                    (true_negatives / (torch.sum(negative_points) + 0.001))) / 2  # 0.001 added to avoid division by 0
+                loss = (true_positives / (torch.sum(positive_points) + 0.001) +
+                        (true_negatives / (torch.sum(negative_points) + 0.001))) / 2  # 0.001 added to avoid division by 0
+
+            else:
+                loss = 1 - approx_balanced_accuracy(predictions, label_images, exclusion_images)
 
             # loss = torch.mean(torch.pow(predictions - label_images, 2))
             # print(" \t loss: ", loss.data.cpu().numpy())
@@ -186,7 +195,8 @@ def main():
             if not hard_negative_mining or (len(loss_list) < 13 or sorted(loss_list)[int(len(loss_list) // 2)] <= loss_cpu):
                 loss.backward()
                 optimizer.step()
-                scheduler.step()  # this updates the learning rate
+                if optimizer_name == "SGD":
+                    scheduler.step()  # this updates the learning rate
 
             backprop_update_time += time.time() - last_time
             last_time = time.time()
@@ -206,7 +216,10 @@ def main():
         training_log["training_loss_iter"].append(epoch_num)
         training_log["training_loss_val"].append(np.mean(loss_list))
         training_log["lr_iter"].append(epoch_num)
-        training_log["lr_val"].append(scheduler.get_lr()[0])
+        if optimizer_name == "SGD":
+            training_log["lr_val"].append(scheduler.get_lr()[0])
+        else:
+            training_log["lr_val"].append(0)
 
 
         # re-randomize the order training images are viewed in
@@ -285,8 +298,6 @@ def evaluate_model(model, image_set, epoch_num, train=False, show_images=False, 
     confusion = np.zeros((2, 2), dtype=np.float64)
     all_accuracies_images = []
 
-    #image_set = data_loader("train" if train else "test", shrunk_width, shrunk_width, num_augmentation_sets=0)
-
     for i in range(len(image_set)):
         image, label, excluded = image_set[i]
         new_confusion = get_confusion_mat_single_image(model, image, label)
@@ -301,10 +312,9 @@ def evaluate_model(model, image_set, epoch_num, train=False, show_images=False, 
         print(confusion[i] / confusion.sum())
 
     if train:
-        print("training balanced accuracy: ", end="")
+        print("training average balanced accuracy: ", end="")
     else:
-        print("testing balanced accuracy: ", end="")
-    print("%3.4f%%" % (get_balanced_accuracy(confusion) * 100))
+        print("testing average balanced accuracy: ", end="")
     average_accuracy = float(np.mean(list(map(lambda x: float(x[0]), all_accuracies_images))) * 100)
     print("average balanced accuracy from all images: %3.4f%%" % average_accuracy)
 
@@ -323,13 +333,13 @@ def evaluate_model(model, image_set, epoch_num, train=False, show_images=False, 
 
             x = [image]
             prediction_raw = np.tanh(model(x).data.cpu().numpy().astype(np.float32))
-            im_obj = ax_list[1][i].imshow(prediction_raw.squeeze(), cmap='jet', alpha=1, norm=colorbar_norm)
-            f.colorbar(im_obj, ax=ax_list[1][i])
+            im_obj = ax_list[1][i].imshow(prediction_raw.squeeze(), cmap='jet', norm=colorbar_norm)
+            # f.colorbar(im_obj, ax=ax_list[1][i])
 
             label[0, 0] = 1
             label[0, 1] = -1
-            gt_im_obj = ax_list[2][i].imshow(label, cmap='jet', alpha=1, norm=colorbar_norm)
-            f.colorbar(gt_im_obj, ax=ax_list[2][i])
+            gt_im_obj = ax_list[2][i].imshow(label, cmap='jet', norm=colorbar_norm)
+            # f.colorbar(gt_im_obj, ax=ax_list[2][i])
 
         plt.suptitle("best and worst results from " + ("training" if train else "testing") + ", balanced accuracies are: \n" + ", ".join(map(lambda x: str(x)[:5], displayed_accuracies)))
         f.tight_layout()
@@ -347,6 +357,146 @@ def get_balanced_accuracy(confusion):
     """
     return float(((confusion[0, 0] / (confusion[0, 0] + confusion[0, 1] + 0.0000001)) +
                 (confusion[1, 1] / (confusion[1, 0] + confusion[1, 1] + 0.0000001))) / 2)
+
+
+def deadzone_loss(pred, label, exclusion):
+    """
+    
+    """
+    assert(len(pred.size()) == 4)
+    assert(pred.size()[1] == 1)
+    assert(len(label.size()) == 3)
+    assert(len(exclusion.size()) == 3)
+    assert(exclusion.size() == label.size())
+    assert(pred.size()[:1] + pred.size()[2:] == label.size())
+
+    pred = pred.squeeze()
+
+    # calculate the training loss
+    #TODO: explain what this loss function does
+    pixelwise_error_unthresholded = torch.abs(pred - label) - 0.5
+    pixelwise_loss = torch.max(pixelwise_error_unthresholded, 0.001 * pixelwise_error_unthresholded)
+
+    # +1 where the gt image is lane and not excluded, 0 everywhere else
+    positive_points = (label ==  1) * (exclusion == 0).type(torch.float32)
+    # +1 where the gt image is not lane and not excluded, 0 everywhere else
+    negative_points = (label == -1) * (exclusion == 0).type(torch.float32)
+
+    # pixelwise_loss = torch.pow(predictions - label_images, 2)
+    true_positives = torch.sum(positive_points * pixelwise_loss, axis=(1, 2))
+    true_negatives = torch.sum(negative_points * pixelwise_loss, axis=(1, 2))
+
+    loss_per_image = (true_positives / (torch.sum(positive_points, axis=(1, 2)) + 0.001) +
+            (true_negatives / (torch.sum(negative_points, axis=(1, 2)) + 0.001))) / 2  # 0.001 added to avoid division by 0
+
+    loss = torch.mean(loss_per_image)
+    return loss
+
+
+def f(x):
+    linearity_factor = 0.02
+    return (1 - 2 * linearity_factor) * torch.sigmoid(5 * x) + linearity_factor * (x + 1)
+    # return torch.sigmoid(10 * x)
+
+
+def approx_balanced_accuracy(pred, label, exclusion, over_1_penalty=2):
+    """
+    Calculates an approximate but differentiable balanced accuracy (this makes it useable as a neural network loss).
+
+    However, any individual predicted pixels outside [-1,1] will be penalized by the over_1_penalty term (so this
+    function no longer approximates balanced accuracy in this case)
+
+    Note: a quirk of balanced accuracy is that if all data is from one class then the maximum accuracy is 50%, not 100%
+    (even if all data is correctly predicted)
+
+    pred should have shape [n, 1, x, y]
+    lable and exclusion should have shape [n, x, y]
+    """
+
+    assert(len(pred.size()) == 4)
+    assert(pred.size()[1] == 1)
+    assert(len(label.size()) == 3)
+    assert(len(exclusion.size()) == 3)
+    assert(exclusion.size() == label.size())
+    assert(pred.size()[:1] + pred.size()[2:] == label.size())
+
+    pred = pred.squeeze()
+
+    # +1 where the gt image is lane and not excluded, 0 everywhere else
+    gt_plus = (label ==  1) * (exclusion == 0).type(torch.float32)
+    # +1 where the gt image is not lane and not excluded, 0 everywhere else
+    gt_neg = (label == -1) * (exclusion == 0).type(torch.float32)
+
+    true_pos = torch.min(gt_plus * f(pred * gt_plus), torch.ones(gt_plus.size(), dtype=torch.float))
+    false_neg = gt_plus * (gt_plus - f(pred * gt_plus))
+    true_neg = torch.min(gt_neg * f(-1 * pred * gt_neg), torch.ones(gt_neg.size(), dtype=torch.float))
+    false_pos = gt_neg * (gt_neg - f(-1 * pred * gt_neg))
+
+    balanced_accuracy_each_image = (torch.sum(true_pos, axis=(1, 2)) / (torch.sum(gt_plus, axis=(1, 2)) + 0.00001) +
+            (torch.sum(true_neg, axis=(1, 2)) / (torch.sum(gt_neg, axis=(1, 2)) + 0.00001))) / 2  # 0.00001 added to avoid division by 0
+
+    balanced_accuracy = torch.mean(balanced_accuracy_each_image)
+
+    zeros_like = torch.zeros(pred.size(), dtype=torch.float)
+    overages = torch.abs(pred) - 1.0
+    overage_penalty = torch.sum(torch.max(zeros_like, overages)) * (over_1_penalty / np.product(pred.size()))
+
+    augmented_accuracy = balanced_accuracy + overage_penalty
+    # augmented_accuracy = balanced_accuracy
+
+    """
+    if balanced_accuracy > 1:
+        pdb.set_trace()
+
+    if true_pos.max() > 1:
+        pdb.set_trace()
+    """
+
+    return augmented_accuracy
+
+
+class TestApproxBalancedAccuracy(unittest.TestCase):
+    def test_true_pos(self):
+        self.assertAlmostEqual(approx_balanced_accuracy(torch.ones([1, 1, 1, 1]), torch.ones([1, 1, 1]), torch.zeros([1, 1, 1])).item(), 0.5, places=2)
+
+    def test_true_neg(self):
+        self.assertAlmostEqual(approx_balanced_accuracy(-1 * torch.ones([1, 1, 1, 1]), -1 * torch.ones([1, 1, 1]), torch.zeros([1, 1, 1])).item(), 0.5, places=2)
+
+    def test_false_pos(self):
+        self.assertAlmostEqual(approx_balanced_accuracy(torch.ones([1, 1, 1, 1]), -1 * torch.ones([1, 1, 1]), torch.zeros([1, 1, 1])).item(), 0, places=2)
+
+    def test_false_neg(self):
+        self.assertAlmostEqual(approx_balanced_accuracy(-1 * torch.ones([1, 1, 1, 1]), torch.ones([1, 1, 1]), torch.zeros([1, 1, 1])).item(), 0, places=2)
+
+    def test_3x3(self):
+        pred = torch.tensor([[[[1, 1, 0.5], [0.00000001, -0.5, -1], [-1, -0.999, -1]]]])
+        gt = torch.tensor([[[1, -1, 1], [1, -1, 1], [-1, -1, 0]]])
+        exclusion = torch.tensor([[[0, 0, 0], [0, 0, 0], [0, 0, 1]]])
+        self.assertAlmostEqual(approx_balanced_accuracy(pred, gt, exclusion).item(), ((2.5/4) + (3./4)) / 2, places=2)
+
+    def test_2x1x2x2(self):
+        pred = torch.tensor([[[[1, 1], [1, 1]]], [[[-1, -1], [-1, -1]]]])
+        gt = torch.tensor([[[1, 1], [1, 1]], [[-1, -1], [-1, -1]]])
+        exclusion = torch.tensor([[[0, 0], [0, 0]], [[0, 0], [0, 0]]])
+        self.assertAlmostEqual(approx_balanced_accuracy(pred, gt, exclusion).item(), 0.5, places=2)
+
+        pred = torch.tensor([[[[1, 1], [-1, -1]]], [[[-1, -1], [-1, -1]]]])
+        gt = torch.tensor([[[1, 1], [-1, -1]], [[1, 1], [-1, -1]]])
+        exclusion = torch.tensor([[[0, 0], [0, 0]], [[0, 0], [0, 0]]])
+        self.assertAlmostEqual(approx_balanced_accuracy(pred, gt, exclusion).item(), (4./4 + 2./4)/2, places=2)
+
+        pred = torch.tensor([[[[1, 1], [-1, -1]]], [[[1, 1], [-1, -1]]]])
+        gt = torch.tensor([[[1, 1], [-1, -1]], [[-1, -1], [-1, -1]]])
+        exclusion = torch.tensor([[[0, 0], [0, 0]], [[0, 0], [0, 0]]])
+        self.assertAlmostEqual(approx_balanced_accuracy(pred, gt, exclusion).item(), (4./4 + 1./4)/2, places=2)
+
+
+    def test_large_inputs(self):
+        self.assertAlmostEqual(approx_balanced_accuracy(5 * torch.ones([1, 1, 1, 1]), torch.ones([1, 1, 1]), torch.zeros([1, 1, 1]), over_1_penalty=0).item(), 0.5, places=2)
+        self.assertAlmostEqual(approx_balanced_accuracy(5 * torch.ones([1, 1, 1, 1]), torch.ones([1, 1, 1]), torch.zeros([1, 1, 1]), over_1_penalty=1).item(), 4.5, places=2)
+        self.assertAlmostEqual(approx_balanced_accuracy(-5 * torch.ones([1, 1, 1, 1]), -1 * torch.ones([1, 1, 1]), torch.zeros([1, 1, 1]), over_1_penalty=0).item(), 0.5, places=2)
+        self.assertAlmostEqual(approx_balanced_accuracy(-5 * torch.ones([1, 1, 1, 1]), -1 * torch.ones([1, 1, 1]), torch.zeros([1, 1, 1]), over_1_penalty=2).item(), 8.5, places=2)
+
 
 
 def get_confusion_mat_single_image(model, image, label):
@@ -368,6 +518,7 @@ def get_confusion_mat_single_image(model, image, label):
     confusion[1, 1] = true_positives
 
     return confusion
+
 
 if __name__ == "__main__":
     main()

@@ -119,7 +119,7 @@ class data_loader:
         random.shuffle(self.image_ordering)
 
     def unshuffle(self):
-        sorted(self.image_ordering)
+        self.image_ordering.sort()
 
     def update_data_augmentation(self):
         """
@@ -196,12 +196,6 @@ class data_loader:
             label_opened = cv2.morphologyEx((intermediate != 0).astype(np.uint8), cv2.MORPH_CLOSE, np.ones((5, 5)))
             label_resized = cv2.resize(label_opened, (self.label_shrunk_width, self.label_shrunk_width), interpolation=cv2.INTER_AREA != 0).astype(np.float32)[:, :]
             self.labels[i] = (label_resized).astype(np.float32) * 2 - 1
-            # ratio = self.shrunk_width / self.label_shrunk_width
-            # label_resized_final = np.zeros((self.label_shrunk_width, self.label_shrunk_width), dtype=np.float32)
-            # for ii in range(self.label_shrunk_width):
-            #     for jj in range(self.label_shrunk_width):
-            #         label_resized_final[ii, jj] = np.max(label_resized[ii * ratio : (ii+1) * ratio, jj * ratio : (jj+1) * ratio])
-            # self.labels[i] = label_resized
 
         return (self.images[i], self.labels[i], self.excluded[i])
 
