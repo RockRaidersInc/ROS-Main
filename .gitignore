@@ -10,3 +10,4 @@ simulator_plugins/devel*
 
 *frames.pdf
 *frames.gv
+vision/neural_nets/training_outputs_*

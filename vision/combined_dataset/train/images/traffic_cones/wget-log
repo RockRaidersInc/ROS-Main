@@ -1,0 +1,11 @@
+--2020-02-11 17:37:43--  https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.veritas-consulting.co.uk%2Fwp-content%2Fuploads%2F2017%2F06%2FConstruction-machinery.jpg
+Resolving external-content.duckduckgo.com (external-content.duckduckgo.com)... 23.21.193.199
+Connecting to external-content.duckduckgo.com (external-content.duckduckgo.com)|23.21.193.199|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [image/jpeg]
+Saving to: ‘index.html?u=https:%2F%2Fwww.veritas-consulting.co.uk%2Fwp-content%2Fuploads%2F2017%2F06%2FConstruction-machinery.jpg’
+
+                          index.html?u=https:%2F%2F     [<=>                                                                                                              ]       0  --.-KB/s               index.html?u=https:%2F%2Fwww.veritas-consulting.co.     [ <=>                                                                                                             ] 804.95K  --.-KB/s    in 0.09s   
+
+2020-02-11 17:37:43 (8.74 MB/s) - ‘index.html?u=https:%2F%2Fwww.veritas-consulting.co.uk%2Fwp-content%2Fuploads%2F2017%2F06%2FConstruction-machinery.jpg’ saved [824267]
+

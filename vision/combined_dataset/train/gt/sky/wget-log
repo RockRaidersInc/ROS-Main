@@ -1,0 +1,11 @@
+--2020-02-27 15:42:57--  https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fbestsellingcarsblog.com%2Fwp-content%2Fuploads%2F2014%2F11%2FArizona-sky.jpg
+Resolving external-content.duckduckgo.com (external-content.duckduckgo.com)... 50.16.241.130
+Connecting to external-content.duckduckgo.com (external-content.duckduckgo.com)|50.16.241.130|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [image/jpeg]
+Saving to: ‘index.html?u=http:%2F%2Fbestsellingcarsblog.com%2Fwp-content%2Fuploads%2F2014%2F11%2FArizona-sky.jpg’
+
+                          index.html?u=http:%2F%2Fb     [<=>                                                                                                              ]       0  --.-KB/s               index.html?u=http:%2F%2Fbestsellingcarsblog.com%2Fw     [ <=>                                                                                                             ] 326.76K  --.-KB/s    in 0.04s   
+
+2020-02-27 15:42:58 (7.18 MB/s) - ‘index.html?u=http:%2F%2Fbestsellingcarsblog.com%2Fwp-content%2Fuploads%2F2014%2F11%2FArizona-sky.jpg’ saved [334603]
+
