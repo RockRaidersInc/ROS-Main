@@ -122,6 +122,11 @@ class motornode:
             self.connected = self.connect()
             if self.connected:
                 rospy.loginfo('%s has connected (' + str((self.name, os.getpid())) + ')', self.address)
+                rospy.logerr('m1 current limit' + str(roboclaw.ReadM1MaxCurrent(self.address)))
+                rospy.logerr('m2 current limit' + str(roboclaw.ReadM2MaxCurrent(self.address)))
+                roboclaw.SetM1MaxCurrent(self.address, 60*100)
+                roboclaw.SetM2MaxCurrent(self.address, 60*100)
+                #print("connected")
                 break
             rospy.sleep(1.0)
 
