@@ -14,6 +14,7 @@ import UBXMessage
 import rospy
 from sensor_msgs.msg import NavSatFix, Imu
 from geometry_msgs.msg import Quaternion, Vector3
+from nav_msgs.msg import Odometry
 
 from ubx_utils import write_config_value, get_unique_id, get_ublox_usb_ports, read_ubx_message, cfg_valset_msg, reset_receivers, read_config_value
 
@@ -135,7 +136,7 @@ class gps_receiver:
     def setup_ROS(self):
         rospy.init_node("GPS_driver")
         self.position_publisher = rospy.Publisher("~position", NavSatFix, queue_size=2)
-        self.heading_publisher = rospy.Publisher("~heading", Imu, queue_size=2)
+        self.heading_publisher = rospy.Publisher("~heading", Odometry, queue_size=2)
 
         # rospy.get_param('param_name')
 
@@ -292,6 +293,7 @@ class gps_receiver:
                                   ("\t\theight: %3.1f meters  +- %3.2f m\n" % (height, vertical_acc * 10 ** (-3))))
 
                 msg = NavSatFix()
+                msg.header.frame_id = "base_link"  # TODO: make a frame for the GPS
                 msg.status.status = 0
                 msg.status.service = 15  # defines which GNSs systems are used (eg GPS, GLONAS, GALILEO, ect)
                 msg.latitude = latitude
@@ -326,17 +328,22 @@ class gps_receiver:
                     output_buffer += "\treported baseline too large, not publishing data\n"
 
                 if valid_flag and baseline_good:
-                    headding_msg = Imu()
-                    headding_msg.orientation = Quaternion(0, 0, sin(angle/180*pi/2), cos(angle/180*pi/2))  # x, y, z, w
-                    headding_msg.orientation_covariance = (angle_accuracy/180*pi, ) + (1, ) * 8
+                    heading_msg = Odometry()
+                    heading_msg.header.stamp = rospy.Time.now()
+                    heading_msg.header.frame_id = "map"
+                    heading_msg.child_frame_id = "base_link"
+                    # -angle because the gps uses a north-east-down frame but ROS uses a east-north-up frame
+                    heading_msg.pose.pose.orientation = Quaternion(0, 0, sin(-angle/180*pi/2), cos(-angle/180*pi/2))  # x, y, z, w
+                    heading_msg.pose.covariance = [0, ] * 36
+                    heading_msg.pose.covariance[35] = angle_accuracy/180*pi
 
-                    headding_msg.angular_velocity = Vector3(0, 0, 0)
-                    headding_msg.angular_velocity_covariance = (-1, ) * 9  # vector of length 9 filled with -1
+                    heading_msg.pose.pose.position = Vector3(0, 0, 0)
 
-                    headding_msg.linear_acceleration = Vector3(0, 0, 0)
-                    headding_msg.linear_acceleration_covariance = (-1,) * 9
+                    heading_msg.twist.twist.linear = Vector3(0, 0, 0)
+                    heading_msg.twist.twist.angular = Vector3(0, 0, 0)
+                    heading_msg.twist.covariance = (0, ) * 36  # vector of length 9 filled with -1
 
-                    self.heading_publisher.publish(headding_msg)
+                    self.heading_publisher.publish(heading_msg)
 
             else:
                 # print("\tNo RELPOSNED message received, no relative position information available")
