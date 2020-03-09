@@ -22,6 +22,7 @@ sudo apt install -y cmake python-catkin-pkg python-empy python-nose libgtest-dev
 Some installs to make python3 nodes work:
 ```
 pip3 install rospkg
+pip install timeout_decorator
 ```
 
 Next install Gazebo. Use this command:
