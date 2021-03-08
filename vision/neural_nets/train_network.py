@@ -1,4 +1,4 @@
-from __future__ import print_function;
+from __future__ import print_function
 import math
 import time
 import random
@@ -8,17 +8,32 @@ import pdb
 
 import cProfile
 
+global use_matplotlib
+use_matplotlib = True
+
 import torch
 from torch import nn
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
-from matplotlib import colors, cm
+
+if use_matplotlib:
+    import matplotlib
+    matplotlib.use('Agg')
+    from matplotlib import pyplot as plt
+    from matplotlib import colors, cm
 import PIL
 
+try:
+    from apex.parallel import DistributedDataParallel as DDP
+    from apex.fp16_utils import *
+    from apex import amp, optimizers
+    from apex.multi_tensor_apply import multi_tensor_applier
+    from torch2trt import TRTModule
+    from torch2trt import torch2trt
+except ImportError:
+    raise ImportError("Please install apex or torch2trt")
+
 from nn_utils import *
-from confusion_mat_tools import save_confusion_matrix
 import networks
+import networks2
 
 import unittest
 
@@ -46,7 +61,7 @@ def cyclical_lr(stepsize, min_lr=3e-4, max_lr=3e-3, training_log={}):
         # next_lr = min_lr + (max_lr - min_lr) * relative(it, stepsize)
         # epoch = training_log["current_epoch"]
         # next_lr = max_lr * 10 ** (-math.floor(epoch/240.))
-        next_lr = max_lr * 10 ** (-math.floor(it / (75 * 1000.)))
+        next_lr = max_lr * 10 ** (-math.floor(it / (10 * 1000.)))
         return next_lr
 
     # Additional function to see where on the cycle we are
@@ -63,18 +78,20 @@ def main():
     test_images = data_loader("test", image_width_input, image_width_output, num_augmentation_sets=0)
 
     epochs = 700  # number of times to go through the training set
-    batch_size = 1  # batch size
+    batch_size = 16  # batch size
 
     # model = networks.Yolo2Transfer().to(get_default_torch_device())
     # model = networks.Yolo2TransferSmaller().to(get_default_torch_device())
     # model = networks.Yolo2TransferDilated().to(get_default_torch_device())
     # model = networks.Yolo2TransferUndilated().to(get_default_torch_device())
     # model = networks.Yolo2TransferPixelnet().to(get_default_torch_device())
-    model = networks.Yolo2TransferPixelnetMoreYolo().to(get_default_torch_device())
+    # model = networks.Yolo2TransferPixelnetMoreYolo(init_yolo_weights=False).to(get_default_torch_device())
+    # model = networks.PixelnetNoYolo(init_yolo_weights=False).to(get_default_torch_device())
+    model = networks2.PixelMobileNet().to(get_default_torch_device())
 
-    initial_learning_rate = 1e-3
+    initial_learning_rate = 1e-1
     momentum = 0.9
-    weight_decay = 0.001
+    weight_decay = 0.0001
     optimizer_name = "SGD"
     hard_negative_mining = True
     epoch_size = 1000
@@ -131,6 +148,11 @@ def main():
                                                         hard_negative_revisit_period if hard_negative_mining else 1,
                                                         min_iters_between_sightings=200)
 
+    # model, optimizer = amp.initialize(model, optimizer,
+    #                                   opt_level="O0",
+    #                                   keep_batchnorm_fp32=True
+    #                                   )
+
     best_test_accuracy = 0
 
     for epoch_num in range(0, epochs):
@@ -151,7 +173,7 @@ def main():
         # model.load_state_dict(torch.load("save_nn_weights_epoch_0"))
 
         for i in range(0, epoch_size, batch_size):
-            print("\ron image " + str(i) + "/" + str(epoch_size), end='')
+            print("\ron image {:-4}/{:}".format(i, epoch_size), end='')
 
             optimizer.zero_grad()  # just to make sure the network doesn't learn from any previous testing or training data
             last_time = time.time()
@@ -170,16 +192,14 @@ def main():
                 next_batch_labels.append(np.array(label))
                 next_batch_exclusion_mask.append(np.array(excluded))
 
-            label_images = torch.from_numpy(np.array(next_batch_labels)).float()
-
-            exclusion_images = torch.from_numpy(np.array(next_batch_exclusion_mask)).float()
+            label_images = torch.from_numpy(np.array(next_batch_labels)).float().to(get_default_torch_device())
+            exclusion_images = torch.from_numpy(np.array(next_batch_exclusion_mask)).float().to(get_default_torch_device())
 
             data_loading_time += time.time() - last_time
             last_time = time.time()
 
             # predict the training images
-            predictions = model(next_batch_images_unprocessed).to("cpu")
-            # predictions = model(next_batch_images_unprocessed)
+            predictions = model.do_images(next_batch_images_unprocessed)
             inference_time += time.time() - last_time
             last_time = time.time()
 
@@ -191,11 +211,14 @@ def main():
             loss_list.append(loss_cpu)
             print(", ", loss_cpu, end='')
 
-            loss_by_image_cpu = loss.data.cpu().numpy().reshape([-1])
+            loss_by_image_cpu = loss_by_image.data.cpu().numpy().reshape([-1])
             for j in range(len(batch_image_indexes)):
                 negative_mining_manager.update_loss(epoch_num * epoch_size + i + j, batch_image_indexes[j], loss_by_image_cpu[j])
 
             loss.backward()
+            # with amp.scale_loss(loss, optimizer) as scaled_loss:
+            #     scaled_loss.backward()
+
             optimizer.step()
             if optimizer_name == "SGD":
                 scheduler.step()  # this updates the learning rate
@@ -215,7 +238,7 @@ def main():
         training_log["training_loss_val"].append(negative_mining_manager.average_loss())
         training_log["lr_iter"].append(epoch_num)
         if optimizer_name == "SGD":
-            training_log["lr_val"].append(scheduler.get_lr()[0])
+            training_log["lr_val"].append(scheduler.get_last_lr()[0])
         else:
             training_log["lr_val"].append(0)
 
@@ -227,8 +250,17 @@ def main():
 
         # now that the network has been trained for one epoch, test it on the testing data
         if epoch_num % 4 == 0:
-            epoch_train_accuracy = evaluate_model(model, train_images, epoch_num, train=True, show_images=True, training_log=training_log, sample=0.2)
-            epoch_test_accuracy = evaluate_model(model, test_images, epoch_num, train=False, show_images=True, training_log=training_log)
+            # print("no TRT")
+            # epoch_train_accuracy = evaluate_model(model, train_images, epoch_num, train=True, show_images=True, training_log=training_log, sample=0.2, useTRT=False)
+            # print("basic TRT")
+            # epoch_train_accuracy = evaluate_model(model, train_images, epoch_num, train=True, show_images=True, training_log=training_log, sample=0.2)
+            print("fp16")
+            epoch_train_accuracy = evaluate_model(model, train_images, epoch_num, train=True, show_images=True,
+                                                  training_log=training_log, sample=0.2, fp16=True)
+            # print("int8")
+            # epoch_train_accuracy = evaluate_model(model, train_images, epoch_num, train=True, show_images=True,
+            #                                       training_log=training_log, sample=0.2, int8=True)
+            epoch_test_accuracy = evaluate_model(model, test_images, epoch_num, train=False, show_images=True, training_log=training_log, useTRT=True)
             # epoch_test_accuracy = evaluate_model(model, train_images, epoch_num, train=True, show_images=True if epoch_num % 5 == 0 else False)
 
             # if this was the best iteration so far then save the weights
@@ -251,6 +283,9 @@ def save_graphs(training_log):
     """
     include_lr = training_log["optimizer"] == "SGD"
 
+    if not use_matplotlib:
+        return
+
     f = plt.figure()
     ax1 = f.add_subplot(111)
     f.set_size_inches(15,10)
@@ -258,7 +293,7 @@ def save_graphs(training_log):
     if include_lr: lr_ax = ax1.twinx()
 
     ax1.set_xlabel("Epoch")
-    ax1.set_ylabel("Balanced Accuracy (out of 100%)")
+    ax1.set_ylabel("IoU (out of 100%)")
     ax1.set_ylim([0, 100])
     ax1.yaxis.set_ticks([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
     ax2.set_ylabel("Training Loss")
@@ -293,23 +328,63 @@ def save_graphs(training_log):
     plt.close(f)
 
 
-def evaluate_model(model, image_set, epoch_num, train=False, show_images=False, sample=1, training_log=None):
+def evaluate_model(model, image_set, epoch_num, train=False, show_images=False, sample=0.3, training_log=None, useTRT=True, fp16=False, int8=False):
     model.eval()  # turn off dropout and batch norm (if the network uses dropout)
     # image_set.clear_augmentation()
     image_set.unshuffle()
     confusion = np.zeros((2, 2), dtype=np.float64)
     all_accuracies_images = []
 
-    # for i in range(0, len(image_set)):
-    start_time = time.time()
-    for i in (int(i) for i in np.linspace(0, len(image_set) - 1, len(image_set) * sample)):
-        image, label, excluded = image_set[i]
-        new_confusion = get_confusion_mat_single_image(model, image, label)
-        balanced_accuracy = get_balanced_accuracy(new_confusion)
-        IoU = get_IoU_single_image(model, image, label)
-        all_accuracies_images.append((IoU, i))
-        confusion += new_confusion
-    print("average model inference and accuracy calculation time: %3.1f ms" % ((time.time() - start_time) * 1000 / (len(image_set) * sample)))
+    if useTRT:
+        input = model.prep_images([image_set[0][0]])
+        model_trt = torch2trt(model, [input], fp16_mode=fp16, int8_mode=int8)
+        # no_trt_out = model(input)
+        # trt_out = model_trt(input)
+        # print("max deviation between trt and non_trt models: " + str(torch.max(torch.abs(trt_out - no_trt_out))))
+
+        inputs = []
+        outputs = []
+        for i in (int(i) for i in np.linspace(0, len(image_set) - 1, int(len(image_set) * sample))):
+            image, label, excluded = image_set[i]
+            x = model.prep_images([image])
+            inputs.append((i, x, label, excluded))
+
+        start_time = time.time()
+        for i, x, label, excluded in inputs:
+            prediction_raw = model_trt(x).data.cpu().numpy().astype(np.float32)
+            outputs.append((i, prediction_raw, label, excluded))
+        print("average model inference and accuracy calculation time: %3.1f ms" % (
+        (time.time() - start_time) * 1000 / (len(image_set) * sample)))
+
+        for i, prediction_raw, label, excluded in outputs:
+            new_confusion = get_confusion_mat_single_image(prediction_raw, label)
+            balanced_accuracy = get_balanced_accuracy(new_confusion)
+            IoU = get_IoU_single_image(prediction_raw, label)
+            all_accuracies_images.append((IoU, i))
+            confusion += new_confusion
+
+    else:
+        inputs = []
+        outputs = []
+        for i in (int(i) for i in np.linspace(0, len(image_set) - 1, int(len(image_set) * sample))):
+            image, label, excluded = image_set[i]
+            x = model.prep_images([image])
+            inputs.append((i, x, label, excluded))
+
+        start_time = time.time()
+        for i, x, label, excluded in inputs:
+            prediction_raw = model(x).data.cpu().numpy().astype(np.float32)
+            outputs.append((i, prediction_raw, label, excluded))
+        print("average model inference and accuracy calculation time: %3.1f ms" % (
+        (time.time() - start_time) * 1000 / (len(image_set) * sample)))
+
+        for i, prediction_raw, label, excluded in outputs:
+            new_confusion = get_confusion_mat_single_image(prediction_raw, label)
+            balanced_accuracy = get_balanced_accuracy(new_confusion)
+            IoU = get_IoU_single_image(prediction_raw, label)
+            all_accuracies_images.append((IoU, i))
+            confusion += new_confusion
+        model_trt = None
 
 
     print("confusion matrix after epoch", epoch_num)
@@ -319,44 +394,45 @@ def evaluate_model(model, image_set, epoch_num, train=False, show_images=False, 
         print(confusion[i] / confusion.sum())
 
     if train:
-        print("training average balanced accuracy: ", end="")
+        print("training average IoU: ", end="")
     else:
-        print("testing average balanced accuracy: ", end="")
+        print("testing average IoU: ", end="")
     average_accuracy = float(np.mean(list(map(lambda x: float(x[0]), all_accuracies_images))) * 100)
     print("average balanced accuracy from all images: %3.4f%%" % average_accuracy)
 
     all_accuracies_images.sort(key=lambda x: x[0])
 
-    colorbar_norm = colors.Normalize(vmin=-1, vmax=1, clip=True)
-
     if show_images:
         n_shown_images = 6
         shown_image_indexes = [int(i) for i in np.linspace(0, len(all_accuracies_images) - 1, n_shown_images)][::-1]
 
-        f, ax_list = plt.subplots(3, n_shown_images)
-        f.set_size_inches(15,10)
-        displayed_accuracies = []
-        for i in range(len(ax_list[0])):
-            image, label, _ = image_set[all_accuracies_images[shown_image_indexes[i]][1]]
-            displayed_accuracies.append(all_accuracies_images[shown_image_indexes[i]][0])
-            ax_list[0][i].imshow(image.squeeze().astype(np.uint8))
+        if use_matplotlib:
+            colorbar_norm = colors.Normalize(vmin=-1, vmax=1, clip=True)
 
-            x = [image]
-            prediction_raw = np.tanh(model(x).data.cpu().numpy().astype(np.float32))
-            im_obj = ax_list[1][i].imshow(prediction_raw.squeeze(), cmap='jet')  #, norm=colorbar_norm)
-            # uncomment this line to add a color scale to the predicted plots
-            # f.colorbar(im_obj, ax=ax_list[1][i])
+            f, ax_list = plt.subplots(3, n_shown_images)
+            f.set_size_inches(15,10)
+            displayed_accuracies = []
+            for i in range(len(ax_list[0])):
+                image, label, _ = image_set[all_accuracies_images[shown_image_indexes[i]][1]]
+                displayed_accuracies.append(all_accuracies_images[shown_image_indexes[i]][0])
+                ax_list[0][i].imshow(image.squeeze().astype(np.uint8))
 
-            label[0, 0] = 1
-            label[0, 1] = -1
-            gt_im_obj = ax_list[2][i].imshow(label, cmap='jet', norm=colorbar_norm)
-            # uncomment this line to add a colro scale to the ground truth (gt) plots
-            # f.colorbar(gt_im_obj, ax=ax_list[2][i])
+                x = model.prep_images([image])
+                prediction_raw = np.tanh((model(x) if model_trt is None else model_trt(x)).data.cpu().numpy().astype(np.float32))
+                im_obj = ax_list[1][i].imshow(prediction_raw.squeeze(), cmap='jet')  #, norm=colorbar_norm)
+                # uncomment this line to add a color scale to the predicted plots
+                # f.colorbar(im_obj, ax=ax_list[1][i])
 
-        plt.suptitle("Best and Worst Results from " + ("Training" if train else "Testing") + ", Balanced Accuracies Are: \n" + ", ".join(map(lambda x: str(x)[:5], displayed_accuracies)))
-        f.tight_layout()
-        plt.savefig(training_log["output_dir"] + "output_epoch_" + str(epoch_num) + ("_train" if train else "_test") + ".png", dpi=100)
-        plt.close(f)
+                label[0, 0] = 1
+                label[0, 1] = -1
+                gt_im_obj = ax_list[2][i].imshow(label, cmap='jet', norm=colorbar_norm)
+                # uncomment this line to add a colro scale to the ground truth (gt) plots
+                # f.colorbar(gt_im_obj, ax=ax_list[2][i])
+
+            plt.suptitle("Best and Worst Results from " + ("Training" if train else "Testing") + ", IoU Accuracies Are: \n" + ", ".join(map(lambda x: str(x)[:5], displayed_accuracies)))
+            f.tight_layout()
+            plt.savefig(training_log["output_dir"] + "output_epoch_" + str(epoch_num) + ("_train" if train else "_test") + ".png", dpi=100)
+            plt.close(f)
 
     return average_accuracy
 
@@ -420,19 +496,35 @@ def deadzone_loss(pred, label, exclusion):
     return loss
 
 
-def f(x):
+def leaky_sigmoid(x):
     linearity_factor = balanced_loss_linearity_factor
-    return (1 - 2 * linearity_factor) * torch.sigmoid(balanced_loss_horizontal_scale * x) + linearity_factor * (x + 1)
+    return (1 - 2 * linearity_factor) * torch.sigmoid((balanced_loss_horizontal_scale * x).type(torch.float32)) + linearity_factor * (x + 1)
     # return torch.sigmoid(10 * x)
 
 
+@memoized
+def memoized_zeros(size, dtype):
+    """
+    This is actually pretty dangerous because the returned object is mutable. This is an optimization so that the IoU
+    loss function doesn't have to create a new array of all zeros every iteration (I haven't tested how much time it
+    actually saves yet)
+    """
+    return torch.zeros(size, dtype=dtype).to(get_default_torch_device())
 
-def IoU(pred, label, exclusion, over_1_penalty=0):
+
+@memoized
+def memoized_ones(size, dtype):
+    return torch.ones(size, dtype=dtype).to(get_default_torch_device())
+
+
+def IoU(pred, label, exclusion, over_1_penalty=0, buffer_pixels=2):
     """
     Intersecion over Union
 
     pred should have shape [n, 1, x, y]
     lable and exclusion should have shape [n, x, y]
+
+    buffer_pixels creates a margin between gt + and - pixels where no loss function is applied
     """
 
     try:
@@ -446,6 +538,9 @@ def IoU(pred, label, exclusion, over_1_penalty=0):
         pdb.set_trace()
 
     orig_shape = pred.size()
+
+    n = orig_shape[0]
+
     # pred = pred.squeeze()
     if len(pred.size()) == 3:
         pass
@@ -460,8 +555,27 @@ def IoU(pred, label, exclusion, over_1_penalty=0):
     # +1 where the gt image is not lane and not excluded, 0 everywhere else
     gt_neg = ((label == -1) * (exclusion == 0)).type(torch.float32)
 
-    ones = torch.ones(gt_neg.size(), dtype=torch.float)
-    zeros = torch.zeros(gt_neg.size(), dtype=torch.float)
+    ones = memoized_ones(gt_neg.size(), torch.float)
+    zeros = memoized_zeros(gt_neg.size(), torch.float)
+
+
+    def elementwise_min(t1, t2):
+        combined = torch.cat((t1.unsqueeze(2), t2.unsqueeze(2)), dim=2)
+        return torch.min(combined, dim=2)[0].squeeze(2)
+
+
+    # do the dilation
+    conv = gt_plus.clone().detach()
+    conv = conv.reshape((conv.shape[0], 1, conv.shape[1], conv.shape[2]))
+    for i in range(buffer_pixels):
+        conv = torch.nn.functional.conv2d(conv, torch.as_tensor(np.ones((1, 1, 3, 3))).type(torch.float32).to(get_default_torch_device()), stride=1, padding=1)
+        conv = elementwise_min(conv, ones.reshape(conv.shape))
+
+    extra_exclusion_map = 1 - (conv.reshape(gt_plus.shape) - gt_plus)  # 0 in the excluded border pixels, 1 everywhere else
+
+    gt_plus *= extra_exclusion_map
+    gt_neg *= extra_exclusion_map
+
 
     # true_pos = torch.min(gt_plus * f(pred * gt_plus), ones)
     # false_neg = torch.min(gt_plus * (gt_plus - f(pred * gt_plus)), ones)
@@ -472,69 +586,21 @@ def IoU(pred, label, exclusion, over_1_penalty=0):
     # negative_sum = torch.sum(gt_neg, axis=(1, 2))
 
     eps = 0.00001
-    image_losses = torch.zeros([pred.size()[0]], dtype=torch.float32)
+    image_losses = torch.zeros([pred.size()[0]], dtype=torch.float32).to(get_default_torch_device())
     for i in range(pred.size()[0]):
         if torch.sum(gt_plus) != 0:
             # intersection = torch.min(f(pred[i]), gt_plus[i])
             # union = torch.max(f(pred[i]), gt_plus[i])
-            intersection = torch.sigmoid(pred[i]) * gt_plus[i]
-            union = torch.sigmoid(pred[i]) + gt_plus[i] - intersection
+            intersection = torch.sigmoid(pred[i].type(torch.float32)) * gt_plus[i]
+            union = torch.sigmoid(pred[i].type(torch.float32)) + gt_plus[i] - intersection
             image_losses[i] = torch.sum(torch.min(intersection, ones)) / torch.sum(torch.max(union, zeros))
         else:
-            image_losses[i] = 1 + 0.1 * (100 / (torch.sum(torch.sigmoid(pred[i]), axis=(0, 1)) + 100) - 1)
+            image_losses[i] = 1 + 0.1 * (100 / (torch.sum(torch.sigmoid(pred[i].type(torch.float32)), axis=(0, 1)) + 100) - 1)
 
     # image_losses -= torch.sum(torch.abs(pred - label)) * 10
     return image_losses
 
 
-class TestIoULossFunc(unittest.TestCase):
-
-    def test_true_pos(self):
-        global balanced_loss_horizontal_scale
-        balanced_loss_horizontal_scale = 50
-        self.assertAlmostEqual(IoU(torch.ones([1, 1, 1, 1], dtype=torch.float32), torch.ones([1, 1, 1], dtype=torch.float32), torch.zeros([1, 1, 1])).item(), 1.0, places=2)
-
-    def test_true_neg(self):
-        global balanced_loss_horizontal_scale
-        balanced_loss_horizontal_scale = 50
-        self.assertAlmostEqual(IoU(-1 * torch.ones([1, 1, 1, 1], dtype=torch.float32), -1 * torch.ones([1, 1, 1]), torch.zeros([1, 1, 1])).item(), 1.0, places=2)
-
-    def test_false_pos(self):
-        global balanced_loss_horizontal_scale
-        balanced_loss_horizontal_scale = 50
-        self.assertAlmostEqual(IoU(torch.ones([1, 1, 1, 1], dtype=torch.float32), -1 * torch.ones([1, 1, 1]), torch.zeros([1, 1, 1])).item(), 0.0, places=2)
-
-    def test_false_neg(self):
-        global balanced_loss_horizontal_scale
-        balanced_loss_horizontal_scale = 50
-        self.assertAlmostEqual(IoU(-1 * torch.ones([1, 1, 1, 1], dtype=torch.float32), torch.ones([1, 1, 1]), torch.zeros([1, 1, 1])).item(), 0.0, places=2)
-
-    def test_3x3(self):
-        global balanced_loss_horizontal_scale
-        balanced_loss_horizontal_scale = 50
-        pred = torch.tensor([[[[1, 1, 1], [1, 1, 1], [-1, -1, -1]]]], dtype=torch.float32)
-        gt = torch.tensor([[[1, 1, 1], [-1, -1, -1], [1, 1, 1]]])
-        exclusion = torch.tensor([[[0, 0, 0], [0, 0, 0], [0, 0, 0]]])
-        self.assertAlmostEqual(IoU(pred, gt, exclusion).item(), 1./3, places=2)
-
-    def test_relative(self):
-        global balanced_loss_horizontal_scale
-        balanced_loss_horizontal_scale = 50
-        exclusion = torch.tensor([[[0, 0], [0, 0]]])
-        a = IoU(torch.tensor([[[[1, 1], [-1, -1]]]], dtype=torch.float32), torch.tensor([[[1, 1], [-1, -1]]]), exclusion).item()
-        b = IoU(torch.tensor([[[[0, 1], [-1, -1]]]], dtype=torch.float32), torch.tensor([[[1, 1], [-1, -1]]]), exclusion).item()
-        bb = IoU(torch.tensor([[[[1, 0], [-1, -1]]]], dtype=torch.float32), torch.tensor([[[1, 1], [-1, -1]]]), exclusion).item()
-        c = IoU(torch.tensor([[[[1, 1], [0, 0]]]], dtype=torch.float32), torch.tensor([[[1, 1], [-1, -1]]]), exclusion).item()
-        d = IoU(torch.tensor([[[[-1, 1], [0, 1]]]], dtype=torch.float32), torch.tensor([[[1, 1], [-1, -1]]]), exclusion).item()
-        e = IoU(torch.tensor([[[[-1, -1], [1, 1]]]], dtype=torch.float32), torch.tensor([[[1, 1], [-1, -1]]]), exclusion).item()
-
-        self.assertAlmostEqual(a, 1.0, places=2)
-        self.assertTrue(a > b)
-        self.assertAlmostEqual(b, bb, places=6)
-        self.assertTrue(b > c)
-        self.assertTrue(c > d)
-        self.assertTrue(d > e)
-        self.assertAlmostEqual(e, 0.0, places=2)
 
 
 def approx_balanced_accuracy(pred, label, exclusion, over_1_penalty=0):
@@ -566,14 +632,14 @@ def approx_balanced_accuracy(pred, label, exclusion, over_1_penalty=0):
         pred = torch.unsqueeze(pred, 0)
 
     # +1 where the gt image is lane and not excluded, 0 everywhere else
-    gt_plus = (label ==  1) * (exclusion == 0).type(torch.float32)
+    gt_plus = (label == 1) * (exclusion == 0).type(torch.float32)
     # +1 where the gt image is not lane and not excluded, 0 everywhere else
     gt_neg = (label == -1) * (exclusion == 0).type(torch.float32)
 
-    true_pos = torch.min(gt_plus * f(pred * gt_plus), torch.ones(gt_plus.size(), dtype=torch.float))
-    false_neg = gt_plus * (gt_plus - f(pred * gt_plus))
-    true_neg = torch.min(gt_neg * f(-1 * pred * gt_neg), torch.ones(gt_neg.size(), dtype=torch.float))
-    false_pos = gt_neg * (gt_neg - f(-1 * pred * gt_neg))
+    true_pos = torch.min(gt_plus * leaky_sigmoid(pred * gt_plus), torch.ones(gt_plus.size(), dtype=torch.float))
+    false_neg = gt_plus * (gt_plus - leaky_sigmoid(pred * gt_plus))
+    true_neg = torch.min(gt_neg * leaky_sigmoid(-1 * pred * gt_neg), torch.ones(gt_neg.size(), dtype=torch.float))
+    false_pos = gt_neg * (gt_neg - leaky_sigmoid(-1 * pred * gt_neg))
 
     positive_sum = torch.sum(gt_plus, axis=(1, 2))
     negative_sum = torch.sum(gt_neg, axis=(1, 2))
@@ -585,7 +651,7 @@ def approx_balanced_accuracy(pred, label, exclusion, over_1_penalty=0):
 
     # balanced_accuracy = torch.mean(balanced_accuracy_each_image)
 
-    zeros_like = torch.zeros(pred.size(), dtype=torch.float)
+    zeros_like = torch.zeros(pred.size(), dtype=torch.float).to(get_default_torch_device())
     overages = torch.abs(pred) - 1.0
     overage_penalty = torch.sum(torch.max(zeros_like, overages), axis=(1, 2)) * (over_1_penalty / np.product(pred.size()))
 
@@ -594,57 +660,9 @@ def approx_balanced_accuracy(pred, label, exclusion, over_1_penalty=0):
     return augmented_accuracy
 
 
-"""
-class TestApproxBalancedAccuracy(unittest.TestCase):
-    def test_true_pos(self):
-        self.assertAlmostEqual(approx_balanced_accuracy(torch.ones([1, 1, 1, 1]), torch.ones([1, 1, 1]), torch.zeros([1, 1, 1])).item(), 0.5, places=2)
-
-    def test_true_neg(self):
-        self.assertAlmostEqual(approx_balanced_accuracy(-1 * torch.ones([1, 1, 1, 1]), -1 * torch.ones([1, 1, 1]), torch.zeros([1, 1, 1])).item(), 0.5, places=2)
-
-    def test_false_pos(self):
-        self.assertAlmostEqual(approx_balanced_accuracy(torch.ones([1, 1, 1, 1]), -1 * torch.ones([1, 1, 1]), torch.zeros([1, 1, 1])).item(), 0, places=2)
-
-    def test_false_neg(self):
-        self.assertAlmostEqual(approx_balanced_accuracy(-1 * torch.ones([1, 1, 1, 1]), torch.ones([1, 1, 1]), torch.zeros([1, 1, 1])).item(), 0, places=2)
-
-    def test_3x3(self):
-        pred = torch.tensor([[[[1, 1, 0.5], [0.00000001, -0.5, -1], [-1, -0.999, -1]]]])
-        gt = torch.tensor([[[1, -1, 1], [1, -1, 1], [-1, -1, 0]]])
-        exclusion = torch.tensor([[[0, 0, 0], [0, 0, 0], [0, 0, 1]]])
-        self.assertAlmostEqual(approx_balanced_accuracy(pred, gt, exclusion).item(), ((2.5/4) + (3./4)) / 2, places=2)
-
-    def test_2x1x2x2(self):
-        pred = torch.tensor([[[[1, 1], [1, 1]]], [[[-1, -1], [-1, -1]]]])
-        gt = torch.tensor([[[1, 1], [1, 1]], [[-1, -1], [-1, -1]]])
-        exclusion = torch.tensor([[[0, 0], [0, 0]], [[0, 0], [0, 0]]])
-        self.assertAlmostEqual(torch.mean(approx_balanced_accuracy(pred, gt, exclusion)).item(), 0.5, places=2)
-
-        pred = torch.tensor([[[[1, 1], [-1, -1]]], [[[-1, -1], [-1, -1]]]])
-        gt = torch.tensor([[[1, 1], [-1, -1]], [[1, 1], [-1, -1]]])
-        exclusion = torch.tensor([[[0, 0], [0, 0]], [[0, 0], [0, 0]]])
-        self.assertAlmostEqual(torch.mean(approx_balanced_accuracy(pred, gt, exclusion)).item(), (4./4 + 2./4)/2, places=2)
-
-        pred = torch.tensor([[[[1, 1], [-1, -1]]], [[[1, 1], [-1, -1]]]])
-        gt = torch.tensor([[[1, 1], [-1, -1]], [[-1, -1], [-1, -1]]])
-        exclusion = torch.tensor([[[0, 0], [0, 0]], [[0, 0], [0, 0]]])
-        self.assertAlmostEqual(torch.mean(approx_balanced_accuracy(pred, gt, exclusion)).item(), (4./4 + 1./4)/2, places=2)
-
-
-    def test_large_inputs(self):
-        self.assertAlmostEqual(approx_balanced_accuracy(5 * torch.ones([1, 1, 1, 1]), torch.ones([1, 1, 1]), torch.zeros([1, 1, 1]), over_1_penalty=0).item(), 0.5, places=2)
-        self.assertAlmostEqual(approx_balanced_accuracy(5 * torch.ones([1, 1, 1, 1]), torch.ones([1, 1, 1]), torch.zeros([1, 1, 1]), over_1_penalty=1).item(), 4.5, places=2)
-        self.assertAlmostEqual(approx_balanced_accuracy(-5 * torch.ones([1, 1, 1, 1]), -1 * torch.ones([1, 1, 1]), torch.zeros([1, 1, 1]), over_1_penalty=0).item(), 0.5, places=2)
-        self.assertAlmostEqual(approx_balanced_accuracy(-5 * torch.ones([1, 1, 1, 1]), -1 * torch.ones([1, 1, 1]), torch.zeros([1, 1, 1]), over_1_penalty=2).item(), 8.5, places=2)
-"""
-
-
-
-def get_confusion_mat_single_image(model, image, label):
+def get_confusion_mat_single_image(prediction_raw, label):
     confusion = np.zeros((2, 2), dtype=np.float64)
-    x = [image]
 
-    prediction_raw = model(x).data.cpu().numpy().astype(np.float32)
     prediction = (prediction_raw > 0)
     label_thresholded = (label > 0)
 
@@ -661,10 +679,8 @@ def get_confusion_mat_single_image(model, image, label):
     return confusion
 
 
-def get_IoU_single_image(model, image, label):
-    x = [image]
+def get_IoU_single_image(prediction_raw, label):
 
-    prediction_raw = model(x).data.cpu().numpy().astype(np.float32)
     prediction = (prediction_raw > 0)
     label_thresholded = (label > 0)
 

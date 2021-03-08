@@ -103,7 +103,7 @@ class LargerNet(torch.nn.Module):
 
 
 class Yolo2Base(torch.nn.Module):
-    def __init__(self, pretrained_weights=None):
+    def __init__(self, pretrained_weights=None, init_weights=True):
         super(Yolo2Base, self).__init__()
 
         self.model_name_index = {}
@@ -257,7 +257,7 @@ class Yolo2Base(torch.nn.Module):
         self.models.append(model)
         self.model_name_index[len(self.model_name_index)] = "conv8"
 
-        if pretrained_weights is None:
+        if pretrained_weights is None and init_weights:
             # state_dict = torch.load("yolo2_partial_weights")
             # print(state_dict["models.0.bn1.running_mean"])  #, "models.0.bn1.running_var", "models.0.bn1.num_batches_tracked"
             self.load_state_dict(torch.load("yolo2_partial_weights"))
@@ -498,7 +498,7 @@ class Yolo2TransferDilated(Yolo2Base):
         self.stage_1_2x.add_module('condense_4x_leaky2', nn.LeakyReLU(0.1, inplace=False))
         self.stage_1_2x.requires_grad = True
 
-	self.stage_1_combine = nn.Sequential()
+        self.stage_1_combine = nn.Sequential()
         self.stage_1_combine.add_module('stage_1_combine_conv2', nn.Conv2d(128 * 2, 128, 1, stride=1, padding=0, bias=True))
         self.stage_1_combine.add_module('stage_1_combine_leaky2', nn.LeakyReLU(0.1, inplace=False))
         self.stage_1_combine.requires_grad = True
@@ -521,7 +521,7 @@ class Yolo2TransferDilated(Yolo2Base):
         self.stage_2_2x.add_module('condense_4x_leaky11', nn.LeakyReLU(0.1, inplace=False))
         self.stage_2_2x.requires_grad = True
 
-	self.stage_2_combine = nn.Sequential()
+        self.stage_2_combine = nn.Sequential()
         self.stage_2_combine.add_module('stage_2_combine_conv2', nn.Conv2d(64 * 2, 128, 1, stride=1, padding=0, bias=True))
         self.stage_2_combine.add_module('stage_2_combine_leaky2', nn.LeakyReLU(0.1, inplace=False))
         self.stage_2_combine.requires_grad = True
@@ -542,7 +542,7 @@ class Yolo2TransferDilated(Yolo2Base):
         self.stage_3_2x.add_module('condense_4x_leaky13', nn.LeakyReLU(0.1, inplace=False))
         self.stage_3_2x.requires_grad = True
 
-	self.stage_3_combine = nn.Sequential()
+        self.stage_3_combine = nn.Sequential()
         self.stage_3_combine.add_module('stage_3_combine_conv2', nn.Conv2d(64 * 2, 64, 1, stride=1, padding=0, bias=True))
         self.stage_3_combine.add_module('stage_3_combine_leaky2', nn.LeakyReLU(0.1, inplace=False))
         self.stage_3_combine.requires_grad = True
@@ -638,7 +638,7 @@ class Yolo2TransferUndilated(Yolo2Base):
         self.stage_1_2x.requires_grad = True
         """
 
-	self.stage_1_combine = nn.Sequential()
+        self.stage_1_combine = nn.Sequential()
         self.stage_1_combine.add_module('stage_1_combine_conv2', nn.Conv2d(128 * 1, 128, 1, stride=1, padding=0, bias=True))
         self.stage_1_combine.add_module('stage_1_combine_leaky2', nn.LeakyReLU(0.1, inplace=False))
         self.stage_1_combine.requires_grad = True
@@ -663,7 +663,7 @@ class Yolo2TransferUndilated(Yolo2Base):
         self.stage_2_2x.requires_grad = True
         """
 
-	self.stage_2_combine = nn.Sequential()
+        self.stage_2_combine = nn.Sequential()
         self.stage_2_combine.add_module('stage_2_combine_conv2', nn.Conv2d(64 * 1, 128, 1, stride=1, padding=0, bias=True))
         self.stage_2_combine.add_module('stage_2_combine_leaky2', nn.LeakyReLU(0.1, inplace=False))
         self.stage_2_combine.requires_grad = True
@@ -686,7 +686,7 @@ class Yolo2TransferUndilated(Yolo2Base):
         self.stage_3_2x.requires_grad = True
         """
 
-	self.stage_3_combine = nn.Sequential()
+        self.stage_3_combine = nn.Sequential()
         self.stage_3_combine.add_module('stage_3_combine_conv2', nn.Conv2d(64 * 1, 64, 1, stride=1, padding=0, bias=True))
         self.stage_3_combine.add_module('stage_3_combine_leaky2', nn.LeakyReLU(0.1, inplace=False))
         self.stage_3_combine.requires_grad = True
@@ -854,8 +854,8 @@ class Yolo2TransferPixelnetMoreYolo(Yolo2Base):
     """
     The goal of this network is to be smaller, using fewer layers than the normal yolo2 transfer network
     """
-    def __init__(self, pretrained_weights=None):
-        super(Yolo2TransferPixelnetMoreYolo, self).__init__(pretrained_weights=pretrained_weights)
+    def __init__(self, pretrained_weights=None, init_yolo_weights=True):
+        super(Yolo2TransferPixelnetMoreYolo, self).__init__(pretrained_weights=pretrained_weights, init_weights=init_yolo_weights)
 
         def gen_nin_module(name, in_num, mid_num, out_num, dilation=1):
             module = nn.Sequential()
@@ -914,7 +914,6 @@ class Yolo2TransferPixelnetMoreYolo(Yolo2Base):
         self.classifier.add_module('classifier_pixelwise_conv2', nn.Conv2d(64, 1, 1, stride=1, padding=0, bias=True))
         self.classifier.requires_grad = True
 
-
         if pretrained_weights is not None:
             self.load_state_dict(torch.load(pretrained_weights))
 
@@ -959,10 +958,486 @@ class Yolo2TransferPixelnetMoreYolo(Yolo2Base):
         resized_3 = nn.functional.interpolate(output_3, size=classification_size, mode='bilinear', align_corners=False)
         resized_4 = nn.functional.interpolate(output_4, size=classification_size, mode='bilinear', align_corners=False)
 
-        skip_link_concatenated = torch.cat((self.compress_4x(resized_yolo_4x), 
-                                            self.compress_8x(resized_yolo_8x), 
+        skip_link_concatenated = torch.cat((self.compress_4x(resized_yolo_4x),
+                                            self.compress_8x(resized_yolo_8x),
                                             self.compress_1(resized_1),
                                             self.compress_2(resized_2),
+                                            self.compress_3(resized_3),
+                                            resized_4), dim=1)  # stack along the pixel value dimension
+
+        classified = self.classifier(skip_link_concatenated)
+
+        # output_size = nn.functional.interpolate(classified, size=output_size)  # resize the output back to the input's origional size
+        output_size = classified
+        return output_size
+
+
+
+class PixelnetNoYolo(Yolo2Base):
+    """
+    The goal of this network is to be smaller, using fewer layers than the normal yolo2 transfer network
+    """
+    def __init__(self, pretrained_weights=None, init_yolo_weights=True):
+        # super(PixelnetNoYolo, self).__init__()
+        super(PixelnetNoYolo, self).__init__(pretrained_weights=pretrained_weights, init_weights=init_yolo_weights)
+
+        def gen_nin_module(name, in_num, mid_num, out_num, dilation=1):
+            module = nn.Sequential()
+            # padding=dilation because convolutions with dilation 1 require padding of 1 pixel,
+            # convolutions with dilation 2 require padding of 2 pixels, ect (specifically since the convolution is 3x3)
+            module.add_module(name + '_conv1', nn.Conv2d(in_num, mid_num, 3, stride=1, padding=dilation, dilation=dilation, bias=True))
+            module.add_module(name + '_leaky1', nn.LeakyReLU(0.1, inplace=False))
+            module.add_module(name + '_conv2', nn.Conv2d(mid_num, out_num, 1, stride=1, padding=0, bias=True))
+            module.add_module(name + '_leaky2', nn.LeakyReLU(0.1, inplace=False))
+            module.requires_grad = True
+            module.in_feature_len = in_num
+            module.out_len = out_num
+            return module
+
+        def gen_linear_compress_module(name, in_module, out_num):
+            try:
+                in_len = in_module.out_len
+            except:
+                in_len = in_module
+            module = nn.Sequential()
+            module.add_module('compress_' + name + '_conv1', nn.Conv2d(in_len, out_num, 1, stride=1, padding=0, bias=True))
+            module.requires_grad = True
+            module.in_feature_len = in_len
+            module.out_len = out_num
+            return module
+
+        # input is from maxpool_4 which outputs 64 features
+        self.compress_4x = gen_linear_compress_module("yolo_4x", 64, 16)
+        self.compress_8x = gen_linear_compress_module("yolo_8x", 128, 16)
+
+        self.models = torch.nn.ModuleList()
+        self.model_name_index = {}
+
+        # [convolutional]
+        # batch_normalize=1
+        # filters=32
+        # size=3
+        # stride=1
+        # pad=1
+        # activation=leaky
+        model = nn.Sequential()
+        model.add_module('conv1', nn.Conv2d(3, 32, 3, 1, 1, bias=False))
+        model.add_module('bn1', nn.BatchNorm2d(32))
+        model.add_module('leaky1', nn.LeakyReLU(0.1, inplace=True))
+        model.requires_grad = False
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "conv1"
+
+        # [maxpool]
+        # size=2
+        # stride=2
+        model = nn.MaxPool2d(2, 2)
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "max_pool_1"
+
+        # [convolutional]
+        # batch_normalize=1
+        # filters=64
+        # size=3
+        # stride=1
+        # pad=1
+        # activation=leaky
+        model = nn.Sequential()
+        model.add_module('conv2', nn.Conv2d(32, 64, 3, 1, 1, bias=False))
+        model.add_module('bn2', nn.BatchNorm2d(64))
+        model.add_module('leaky2', nn.LeakyReLU(0.1, inplace=True))
+        model.requires_grad = False
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "conv2"
+
+        # [maxpool]
+        # size=2
+        # stride=2
+        model = nn.MaxPool2d(2, 2)
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "max_pool_2"
+
+        # [convolutional]
+        # batch_normalize=1
+        # filters=128
+        # size=3
+        # stride=1
+        # pad=1
+        # activation=leaky
+        model = nn.Sequential()
+        model.add_module('conv3', nn.Conv2d(64, 128, 3, 1, 1, bias=False))
+        model.add_module('bn3', nn.BatchNorm2d(128))
+        model.add_module('leaky3', nn.LeakyReLU(0.1, inplace=True))
+        model.requires_grad = False
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "conv3"
+
+        # [convolutional]
+        # batch_normalize=1
+        # filters=64
+        # size=1
+        # stride=1
+        # pad=1
+        # activation=leaky
+        model = nn.Sequential()
+        model.add_module('conv4', nn.Conv2d(128, 64, 1, 1, 0, bias=False))
+        model.add_module('bn4', nn.BatchNorm2d(64))
+        model.add_module('leaky4', nn.LeakyReLU(0.1, inplace=True))
+        model.requires_grad = False
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "conv4"
+
+        # [convolutional]
+        # batch_normalize=1
+        # filters=128
+        # size=3
+        # stride=1
+        # pad=1
+        # activation=leaky
+        model = nn.Sequential()
+        model.add_module('conv5', nn.Conv2d(64, 128, 3, 1, 1, bias=False))
+        model.add_module('bn5', nn.BatchNorm2d(128))
+        model.add_module('leaky5', nn.LeakyReLU(0.1, inplace=True))
+        model.requires_grad = False
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "conv5"
+
+        # [maxpool]
+        # size=2
+        # stride=2
+        model = nn.MaxPool2d(2, 2)
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "max_pool_3"
+
+        self.module_1 = gen_nin_module("one", 128, 196, 96)
+        self.module_1.add_module('maxpool_4x_1', nn.MaxPool2d(2, 2))
+        self.compress_1 = gen_linear_compress_module("one", self.module_1, 16)
+
+        self.module_2 = gen_nin_module("two", 96, 128, 96)
+        self.module_2.add_module('maxpool_4x_1', nn.MaxPool2d(2, 2))
+        self.compress_2 = gen_linear_compress_module("two", self.module_2, 16)
+
+        self.module_3 = gen_nin_module("three", 96, 196, 128)
+        self.module_3.add_module('maxpool_4x_1', nn.MaxPool2d(2, 2))
+        self.compress_3 = gen_linear_compress_module("three", self.module_3, 16)
+
+        self.module_4 = gen_nin_module("four", 128, 196, 32)
+
+
+        self.classifier = nn.Sequential()
+        self.classifier.add_module('classifier_pixelwise_conv1', nn.Conv2d(self.compress_4x.out_len +
+                                                                       self.compress_8x.out_len +
+                                                                       self.compress_1.out_len +
+                                                                       self.compress_2.out_len +
+                                                                       self.compress_3.out_len +
+                                                                       self.module_4.out_len,
+                                                                       64, 1, stride=1, padding=0, bias=True))
+        self.classifier.add_module('classifier_pixelwise_leaky1', nn.LeakyReLU(0.1, inplace=False))
+        self.classifier.add_module('classifier_pixelwise_conv2', nn.Conv2d(64, 1, 1, stride=1, padding=0, bias=True))
+        self.classifier.requires_grad = True
+
+        if pretrained_weights is not None:
+            self.load_state_dict(torch.load(pretrained_weights))
+
+    def do_images(self, imgs):
+        """
+        Run the neural network. imgs should be a list of PIL images, all with the same height/width
+        """
+        x = self.prep_images(imgs)
+        return self.forward(x)
+
+    def forward(self, x):
+        # x = x.type(torch.cuda.HalfTensor)
+        output_size = (x.data.shape[2] / 4, x.data.shape[3] / 4)
+
+        for i, layer in enumerate(self.models):
+            x = layer(x)
+            if self.model_name_index[i] == "max_pool_2":
+                downsampled_4x = x
+            if self.model_name_index[i] == "max_pool_3":
+                downsampled_8x = x
+                break
+
+        output_1 = self.module_1(downsampled_8x)
+        output_2 = self.module_2(output_1)
+        output_3 = self.module_3(output_2)
+        output_4 = self.module_4(output_3)
+        # output_5 = self.module_5(output_4)
+
+        if False:
+            print()
+            print("downsampled_4x:", downsampled_4x.size())
+            print("output_1:", output_1.size())
+            print("output_2:", output_2.size())
+            print("output_3:", output_3.size())
+            print("output_4:", output_4.size())
+            print("output_size:", output_size)
+            print()
+
+        classification_size = downsampled_4x.data.shape[2:4]
+
+        # resized_yolo_out = nn.functional.interpolate(downsampled_4x, size=classification_size)
+        resized_yolo_4x = downsampled_4x
+        resized_yolo_8x = nn.functional.interpolate(downsampled_8x, size=classification_size, mode='bilinear', align_corners=False)
+        resized_1 = nn.functional.interpolate(output_1, size=classification_size, mode='bilinear', align_corners=False)
+        resized_2 = nn.functional.interpolate(output_2, size=classification_size, mode='bilinear', align_corners=False)
+        resized_3 = nn.functional.interpolate(output_3, size=classification_size, mode='bilinear', align_corners=False)
+        resized_4 = nn.functional.interpolate(output_4, size=classification_size, mode='bilinear', align_corners=False)
+
+        skip_link_concatenated = torch.cat((self.compress_4x(resized_yolo_4x),
+                                            self.compress_8x(resized_yolo_8x),
+                                            self.compress_1(resized_1),
+                                            self.compress_2(resized_2),
+                                            self.compress_3(resized_3),
+                                            resized_4), dim=1)  # stack along the pixel value dimension
+
+        classified = self.classifier(skip_link_concatenated)
+
+        # output_size = nn.functional.interpolate(classified, size=output_size)  # resize the output back to the input's origional size
+        output_size = classified
+        return output_size
+
+
+
+
+
+
+class PixelnetNoYoloBottleneck(torch.nn.Module):
+    """
+
+    The goal of this network is to be smaller, using fewer layers than the normal yolo2 transfer network
+    """
+    def __init__(self):
+        super(PixelnetNoYoloBottleneck, self).__init__()
+
+        def gen_nin_module(name, in_num, mid_num, out_num, dilation=1):
+            module = nn.Sequential()
+            # padding=dilation because convolutions with dilation 1 require padding of 1 pixel,
+            # convolutions with dilation 2 require padding of 2 pixels, ect (specifically since the convolution is 3x3)
+            module.add_module(name + '_conv1', nn.Conv2d(in_num, mid_num, 3, stride=1, padding=dilation, dilation=dilation, bias=True))
+            module.add_module(name + '_leaky1', nn.LeakyReLU(0.1, inplace=False))
+            module.add_module(name + '_conv2', nn.Conv2d(mid_num, out_num, 1, stride=1, padding=0, bias=True))
+            module.add_module(name + '_leaky2', nn.LeakyReLU(0.1, inplace=False))
+            module.requires_grad = True
+            module.in_feature_len = in_num
+            module.out_len = out_num
+            return module
+
+        def gen_linear_compress_module(name, in_module, out_num):
+            try:
+                in_len = in_module.out_len
+            except:
+                in_len = in_module
+            module = nn.Sequential()
+            module.add_module('compress_' + name + '_conv1', nn.Conv2d(in_len, out_num, 1, stride=1, padding=0, bias=True))
+            module.requires_grad = True
+            module.in_feature_len = in_len
+            module.out_len = out_num
+            return module
+
+        def bottleneck_block(x, expand=64, squeeze=16):
+            module = nn.Sequential()
+
+            # m = Conv2D(expand, (1,1))(x)
+            module.add_module('bottleneck_' + name + '_conv1', nn.Conv2d(in_len, expand, 1, stride=1, padding=0, bias=True))
+            # m = BatchNormalization()(m)
+            module.add_module('bottleneck_' + name + '_batchnorm1', nn.BatchNorm2d(expand))
+            # m = Activation('relu6')(m)
+            module.add_module('bottleneck_' + name + '_batchnorm1', nn.relu6())
+            # m = DepthwiseConv2D((3,3))(m)
+            m = BatchNormalization()(m)
+            m = Activation('relu6')(m)
+            m = Conv2D(squeeze, (1,1))(m)
+            m = BatchNormalization()(m)
+            m = Add()([m, x])
+
+            module.requires_grad = True
+            return 
+
+        # input is from maxpool_4 which outputs 64 features
+        self.compress_4x = gen_linear_compress_module("yolo_4x", 64, 16)
+        self.compress_8x = gen_linear_compress_module("yolo_8x", 128, 16)
+
+        self.models = torch.nn.ModuleList()
+        self.model_name_index = {}
+
+        # [convolutional]
+        # batch_normalize=1
+        # filters=32
+        # size=3
+        # stride=1
+        # pad=1
+        # activation=leaky
+        model = nn.Sequential()
+        model.add_module('conv1', nn.Conv2d(3, 32, 3, 1, 1, bias=False))
+        model.add_module('bn1', nn.BatchNorm2d(32))
+        model.add_module('leaky1', nn.LeakyReLU(0.1, inplace=True))
+        model.requires_grad = False
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "conv1"
+
+        # [maxpool]
+        # size=2
+        # stride=2
+        model = nn.MaxPool2d(2, 2)
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "max_pool_1"
+
+        # [convolutional]
+        # batch_normalize=1
+        # filters=64
+        # size=3
+        # stride=1
+        # pad=1
+        # activation=leaky
+        model = nn.Sequential()
+        model.add_module('conv2', nn.Conv2d(32, 64, 3, 1, 1, bias=False))
+        model.add_module('bn2', nn.BatchNorm2d(64))
+        model.add_module('leaky2', nn.LeakyReLU(0.1, inplace=True))
+        model.requires_grad = False
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "conv2"
+
+        # [maxpool]
+        # size=2
+        # stride=2
+        model = nn.MaxPool2d(2, 2)
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "max_pool_2"
+
+        # [convolutional]
+        # batch_normalize=1
+        # filters=128
+        # size=3
+        # stride=1
+        # pad=1
+        # activation=leaky
+        model = nn.Sequential()
+        model.add_module('conv3', nn.Conv2d(64, 128, 3, 1, 1, bias=False))
+        model.add_module('bn3', nn.BatchNorm2d(128))
+        model.add_module('leaky3', nn.LeakyReLU(0.1, inplace=True))
+        model.requires_grad = False
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "conv3"
+
+        # [convolutional]
+        # batch_normalize=1
+        # filters=64
+        # size=1
+        # stride=1
+        # pad=1
+        # activation=leaky
+        model = nn.Sequential()
+        model.add_module('conv4', nn.Conv2d(128, 64, 1, 1, 0, bias=False))
+        model.add_module('bn4', nn.BatchNorm2d(64))
+        model.add_module('leaky4', nn.LeakyReLU(0.1, inplace=True))
+        model.requires_grad = False
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "conv4"
+
+        # [convolutional]
+        # batch_normalize=1
+        # filters=128
+        # size=3
+        # stride=1
+        # pad=1
+        # activation=leaky
+        model = nn.Sequential()
+        model.add_module('conv5', nn.Conv2d(64, 128, 3, 1, 1, bias=False))
+        model.add_module('bn5', nn.BatchNorm2d(128))
+        model.add_module('leaky5', nn.LeakyReLU(0.1, inplace=True))
+        model.requires_grad = False
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "conv5"
+
+        # [maxpool]
+        # size=2
+        # stride=2
+        model = nn.MaxPool2d(2, 2)
+        self.models.append(model)
+        self.model_name_index[len(self.model_name_index)] = "max_pool_3"
+
+        self.module_1 = gen_nin_module("one", 128, 196, 96)
+        self.module_1.add_module('maxpool_4x_1', nn.MaxPool2d(2, 2))
+        self.compress_1 = gen_linear_compress_module("one", self.module_1, 16)
+
+        self.module_2 = gen_nin_module("two", 96, 128, 96)
+        self.module_2.add_module('maxpool_4x_1', nn.MaxPool2d(2, 2))
+        self.compress_2 = gen_linear_compress_module("two", self.module_2, 16)
+
+        self.module_3 = gen_nin_module("three", 96, 196, 128)
+        self.module_3.add_module('maxpool_4x_1', nn.MaxPool2d(2, 2))
+        self.compress_3 = gen_linear_compress_module("three", self.module_3, 16)
+
+        self.module_4 = gen_nin_module("four", 128, 196, 32)
+
+
+        self.classifier = nn.Sequential()
+        self.classifier.add_module('classifier_pixelwise_conv1', nn.Conv2d(self.compress_4x.out_len +
+                                                                       self.compress_8x.out_len +
+                                                                       self.compress_1.out_len +
+                                                                       self.compress_2.out_len +
+                                                                       self.compress_3.out_len +
+                                                                       self.module_4.out_len,
+                                                                       64, 1, stride=1, padding=0, bias=True))
+        self.classifier.add_module('classifier_pixelwise_leaky1', nn.LeakyReLU(0.1, inplace=False))
+        self.classifier.add_module('classifier_pixelwise_conv2', nn.Conv2d(64, 1, 1, stride=1, padding=0, bias=True))
+        self.classifier.requires_grad = True
+
+        if pretrained_weights is not None:
+            self.load_state_dict(torch.load(pretrained_weights))
+
+    def do_images(self, imgs):
+        """
+        Run the neural network. imgs should be a list of PIL images, all with the same height/width
+        """
+        x = self.prep_images(imgs)
+
+        return self.forward(x)
+
+    def forward(self, x):
+        # x = x.type(torch.cuda.HalfTensor)
+        output_size = (x.data.shape[2] / 4, x.data.shape[3] / 4)
+
+        for i, layer in enumerate(self.models):
+            x = layer(x)
+            if self.model_name_index[i] == "max_pool_2":
+                downsampled_4x = x
+            if self.model_name_index[i] == "max_pool_3":
+                downsampled_8x = x
+                break
+
+        output_1 = self.module_1(downsampled_8x)
+        output_2 = self.module_2(output_1)
+        output_3 = self.module_3(output_2)
+        output_4 = self.module_4(output_3)
+        # output_5 = self.module_5(output_4)
+
+        if False:
+            print()
+            print("downsampled_4x:", downsampled_4x.size())
+            print("output_1:", output_1.size())
+            print("output_2:", output_2.size())
+            print("output_3:", output_3.size())
+            print("output_4:", output_4.size())
+            print("output_size:", output_size)
+            print()
+
+        classification_size = downsampled_4x.data.shape[2:4]
+
+        # resized_yolo_out = nn.functional.interpolate(downsampled_4x, size=classification_size)
+        resized_yolo_4x = downsampled_4x
+        resized_yolo_8x = nn.functional.interpolate(downsampled_8x, size=classification_size, mode='bilinear', align_corners=False)
+        resized_1 = nn.functional.interpolate(output_1, size=classification_size, mode='bilinear', align_corners=False)
+        resized_2 = nn.functional.interpolate(output_2, size=classification_size, mode='bilinear', align_corners=False)
+        resized_3 = nn.functional.interpolate(output_3, size=classification_size, mode='bilinear', align_corners=False)
+        resized_4 = nn.functional.interpolate(output_4, size=classification_size, mode='bilinear', align_corners=False)
+
+        skip_link_concatenated = torch.cat((self.compress_4x(resized_yolo_4x),
+                                            self.compress_8x(resized_yolo_8x),
+                                            self.compress_1(resized_1),
+                                            self.compress_2(resized_2),
+
                                             self.compress_3(resized_3),
                                             resized_4), dim=1)  # stack along the pixel value dimension
 

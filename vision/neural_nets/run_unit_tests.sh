@@ -1,5 +1,5 @@
 echo train_Network tests:
-python -m unittest -v train_network
+python -m unittest -v train_network_tests
 
 echo
 echo
