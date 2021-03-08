@@ -14,4 +14,4 @@ local_costmap:
     - {name: anti_reverse_layer, type: "anti_reverse_layer::AntiReverseLayer"}
     - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
     # - {name: obstacle_layer,  type: "costmap_2d::VoxelLayer"}
-    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+    # - {name: inflation_layer, type: "costmap_2d::InflationLayer"}

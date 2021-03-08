@@ -19,6 +19,11 @@ Install some tools:
 sudo apt install -y cmake python-catkin-pkg python-empy python-nose libgtest-dev python-catkin-tools ros-melodic-desktop ros-melodic-joy ros-melodic-geographic-msgs ros-melodic-tf2-geometry-msgs ros-melodic-move-base ros-melodic-map-server ros-melodic-global-planner ros-melodic-pcl-ros ros-melodic-usb-cam ros-pcl-msgs ros-melodic-key-teleop ros-melodic-joy  ros-melodic-geographic-msgs gpsd ros-melodic-gpsd-client ros-melodic-nmea-navsat-driver ros-melodic-gps-common ros-melodic-swri-transform-util ros-melodic-robot-localization ros-melodic-teb-local-planner
 ```
 
+Some installs to make python3 nodes work:
+```
+pip3 install rospkg
+```
+
 Next install Gazebo. Use this command:
 ```
 sudo apt install -y ros-melodic-gazebo-ros libignition-math2-dev ros-melodic-gazebo-ros-pkgs ros-melodic-gazebo-ros-control

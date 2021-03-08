@@ -11,6 +11,19 @@ source /home/rock/URC/devel/setup.bash
 # export ROS_MASTER_URI=http://rock-desktop.local:11311/
 
 
+sudo modprobe pcspkr
+beep -f 1000 -r 2 -l 250
+
+roslaunch rover start_joystick.launch
+exit 0
+
+
+
+# this code makes sure that the USB stop button is plugged in before starting the drive code
+# it was originally used as a saftey measure because the rover used to have a bad habbit of
+# driving away on its own.
+# We never figured out why, but it hasn't happened for quite a while now and I want the extra USB port
+
 echo "hi"
 
 if [[ $(usb-devices | grep 'S:  Product=Gamepad F310') = 'S:  Product=Gamepad F310' ]];
@@ -25,10 +38,6 @@ else
 		exit 0
 	fi
 fi
-
-# roslaunch base_station base_station.launch &
-
-# sleep 3
 
 sudo modprobe pcspkr
 beep -f 1000 -r 2 -l 250

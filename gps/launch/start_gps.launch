@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+
+    <node name="gps_node" pkg="gps" type="start_receiver.py" output="screen">
+        <remap from="~position" to="/gps/fix" />
+        <remap from="~heading" to="/odometry/heading"/>
+    </node>
+
+</launch>              
